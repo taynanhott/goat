@@ -455,17 +455,17 @@ gl.attachShader(program,shader(gl.FRAGMENT_SHADER,`
     vec3 trophy=vec3(1.,.63,.20);
     vec3 material=vC;
     vec3 skin=mix(vec3(.69,.41,.27),uSkin,uCustom);
-    vec3 shorts=mix(vec3(.13,.126,.18),mix(black,uSecondary,.29),uTeam);
-    if(region>2.7&&region<3.3&&(uCustom>.5||uTeam>.5)){
+    vec3 shorts=mix(mix(vec3(.13,.126,.18),mix(black,uSecondary,.29),uTeam),black,uKeeper);
+    if(region>2.7&&region<3.3&&(uCustom>.5||uTeam>.5||uKeeper>.5)){
       float cuffLevel=uLook.z>1.5?58.:uLook.z>.5?19.:44.;
       float sock=1.-smoothstep(cuffLevel-.5,cuffLevel+.5,y);
       float stripe=1.-smoothstep(.38,.9,abs(y-cuffLevel+2.));
-      vec3 sockColor=mix(bone,uPrimary,uTeam);
-      material=mix(skin,mix(sockColor,mix(black,uSecondary,uTeam),stripe)*(0.92+.08*cos(x*4.3+z*2.3)),sock);
+      vec3 sockColor=mix(mix(bone,uPrimary,uTeam),mix(vec3(.85,.11,.48),uPrimary,uTeam),uKeeper);
+      material=mix(skin,mix(sockColor,mix(black,mix(uSecondary,black,uKeeper),uTeam),stripe)*(0.92+.08*cos(x*4.3+z*2.3)),sock);
       float hem=mix(76.,61.,uKitFit.x);
       float fabric=smoothstep(hem,hem+.7,y);
       float stripeShorts=smoothstep(10.1,11.8,abs(x))*(1.-smoothstep(13.,14.,abs(x)));
-      vec3 legShorts=mix(shorts,uPrimary,stripeShorts*.72*uTeam);
+      vec3 legShorts=mix(shorts,uPrimary,stripeShorts*.72*uTeam*(1.-uKeeper));
       material=mix(material,mix(legShorts,black,(1.-smoothstep(.4,1.2,y-hem))*.55),fabric);
     }
     if(region>3.7&&region<4.3&&uCustom>.5){
@@ -487,16 +487,16 @@ gl.attachShader(program,shader(gl.FRAGMENT_SHADER,`
       if(uLook.y<1.5)material=mix(skin,material,.62);
     }
     if(region>5.7&&region<6.3)material=mix(vC,skin,uCustom*.92);
-    if(region>6.7&&region<7.3&&uTeam>.5){
+    if(region>6.7&&region<7.3&&(uTeam>.5||uKeeper>.5)){
       float strip=smoothstep(10.1,11.8,abs(x))*(1.-smoothstep(13.,14.,abs(x)));
-      material=mix(shorts,uPrimary,strip*.72);
+      material=mix(shorts,uPrimary,strip*.72*(1.-uKeeper));
     }
     if(shirt+sleeve>.5){
       float left=1.-smoothstep(-1.2,1.2,x-.32*(y-125.)+z*.32);
       float seam=1.-smoothstep(.28,1.10,abs(x-.32*(y-125.)+z*.32));
       vec3 field=mix(bone,ember,left);
       float keeperStripe=smoothstep(-.8,.45,cos(x*.24-y*.36+z*.06));
-      vec3 keep=mix(teal,vec3(.076,.35,.43),keeperStripe*.48);
+      vec3 keep=mix(vec3(.85,.11,.48),vec3(.60,.07,.34),keeperStripe*.42);
       vec3 jersey=mix(field,keep,uKeeper);
       float kitMark=0.;
       if(uKitPattern>.5&&uKitPattern<1.5)kitMark=step(.5,fract((x+2.8)/11.2));
@@ -508,7 +508,7 @@ gl.attachShader(program,shader(gl.FRAGMENT_SHADER,`
       vec3 teamJersey=mix(uPrimary,uSecondary,kitMark);
       float thirdStripe=kitMark*step(.76,fract((uKitPattern<1.5?x:y)/11.2));
       teamJersey=mix(teamJersey,uTertiary,thirdStripe*uHasTertiary);
-      jersey=mix(jersey,mix(teamJersey,mix(uPrimary,uSecondary,keeperStripe*.45),uKeeper),uTeam);
+      jersey=mix(jersey,mix(teamJersey,mix(uPrimary,uPrimary*.74,keeperStripe*.38),uKeeper),uTeam);
       jersey=mix(jersey,black,seam*(1.-uKeeper*.72)*.78*(1.-uTeam));
       float collar=(1.-smoothstep(.34,1.2,abs(y-149.7+front*4.-abs(x)*.18)))*(1.-smoothstep(7.8,11.,abs(x)));
       float hem=1.-smoothstep(.26,.98,abs(y-102.2));
@@ -546,7 +546,7 @@ gl.attachShader(program,shader(gl.FRAGMENT_SHADER,`
         float side=abs(x),shortSleeve=1.-smoothstep(33.2,34.2,side);
         float fullSleeve=max(uKeeper,uKitFit.y);
         float cuff=1.-smoothstep(.42,1.07,abs(side-mix(32.4,66.4,fullSleeve)));
-        vec3 longSleeve=mix(mix(keep,teal,smoothstep(34.,48.,side)),mix(uPrimary,uSecondary,smoothstep(34.,59.,side)),uTeam);
+        vec3 longSleeve=mix(mix(keep,vec3(.72,.09,.40),smoothstep(34.,48.,side)),mix(uPrimary,mix(uSecondary,uPrimary*.82,uKeeper),smoothstep(34.,59.,side)),uTeam);
         jersey=mix(mix(skin,jersey,shortSleeve),mix(jersey,longSleeve,smoothstep(31.,36.,side)),fullSleeve);
         jersey=mix(jersey,black,cuff*.94);
         float band=1.-smoothstep(1.35,1.68,abs(x-42.2));
@@ -661,7 +661,7 @@ function reshapeVertex(x,y,z,goalie){
 
 const kits={
   field:{skin:[.69,.41,.27],top:[.88,.69,.48],cuff:[.28,.14,.12],shorts:[.14,.10,.17],sock:[.67,.17,.14],trim:[.97,.69,.29],boot:[.89,.44,.13],sole:[.19,.10,.16],lace:[1,.86,.53]},
-  keeper:{skin:[.80,.56,.38],top:[.11,.55,.53],cuff:[.08,.36,.38],shorts:[.08,.28,.32],sock:[.12,.46,.45],trim:[.88,.60,.22],boot:[.15,.34,.41],sole:[.09,.12,.20],lace:[.86,.64,.29]}
+  keeper:{skin:[.80,.56,.38],top:[.85,.11,.48],cuff:[.64,.08,.36],shorts:[.085,.063,.103],sock:[.85,.11,.48],trim:[.12,.10,.14],boot:[.15,.34,.41],sole:[.09,.12,.20],lace:[.86,.64,.29]}
 };
 const mixColor=(a,b,t)=>a.map((value,k)=>lerp(value,b[k],t));
 
@@ -672,7 +672,7 @@ function kitVertex(name,x,y,z,normal,goalie){
   if(name.includes('Hand')){
     if(!goalie)return kit.skin;
     const finger=ramp(76,82,side),palm=ramp(.1,.84,normal[1]),pads=ramp(.16,.53,Math.sin(side*.55+z*1.4)**2);
-    return mixColor(mixColor([.23,.10,.17],[.93,.45,.19],finger*(.52+.40*pads)),[.97,.74,.44],palm*.76);
+    return mixColor(mixColor([.84,.70,.10],[.98,.86,.16],finger*(.52+.40*pads)),[1.0,.92,.30],palm*.76);
   }
   if(/Arm|Shoulder|Spine/.test(name)){
     const cuff=ramp(63,67,side);
@@ -1023,14 +1023,14 @@ function modelDetails(goalie,hairStyle){
     const foot=side+'Foot',toe=side+'ToeBase';
     if(goalie){
       const hand=side+'Hand',cuff=side+'ForeArm';
-      form([sign*72.2,144.1,-5.3],[3.60,3.72,5.12],cuff,[.17,.105,.17],'Detail');
-      form([sign*73.2,147.15,-5.35],[2.75,1.37,4.58],hand,[.89,.32,.11],'Detail');
-      form([sign*77.15,146.9,-5.35],[4.35,1.75,4.18],hand,[.94,.48,.16],'Detail');
+      form([sign*72.2,144.1,-5.3],[3.60,3.72,5.12],cuff,[.12,.11,.14],'Detail');
+      form([sign*73.2,147.15,-5.35],[2.75,1.37,4.58],hand,[.95,.82,.14],'Detail');
+      form([sign*77.15,146.9,-5.35],[4.35,1.75,4.18],hand,[.98,.86,.18],'Detail');
       for(let finger=0;finger<4;finger++){
         form([sign*(80.15-finger*.33),145.68+finger*.23,-9.15+finger*2.04],
-          [2.63,1.11,1.30],hand,[.96,.61,.26],'Detail');
+          [2.63,1.11,1.30],hand,[1.0,.90,.28],'Detail');
       }
-      form([sign*76.2,143.82,-.36],[3.1,1.91,1.71],hand,[.51,.22,.12],'Detail');
+      form([sign*76.2,143.82,-.36],[3.1,1.91,1.71],hand,[.86,.72,.12],'Detail');
     }
     for(const [z,half] of [[-4.4,1.85],[2.0,2.15],[8.0,2.61],[12.1,2.24]]){
       for(const x of [-half,half]){

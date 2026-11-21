@@ -149,14 +149,46 @@ function passPlan(passer,target,kind,direction=null,power=.5){
     advance=clamp((kind==='lob'?4.5:3.5)+power*(kind==='lob'?20:18)+d*.08+pace*.2+Math.max(0,forward),
       kind==='lob'?5.5:4.5,kind==='lob'?23:21);
     if(autonomous){
-      const roomAhead=runDirection[1]<-.2?Math.max(3,(target.z-2.8)/-runDirection[1]):18;
-      const baseDepth=pace>.55
-        ?(kind==='lob'?7.2:6.2)+pace*(kind==='lob'?1.2:1.05)+d*.12
-        :(kind==='lob'?7.5:6.5)+d*.14;
-      const minDepth=Math.min(roomAhead,kind==='lob'?7.2:6.2);
-      advance=clamp(baseDepth,minDepth,Math.min(roomAhead,kind==='lob'?19.5:17.5));
+      const baseAngle=Math.atan2(runDirection[0],runDirection[1]);
+      const toGoalLen=Math.hypot(-target.x,-Math.max(4,target.z-6))||1;
+      const goalDir=[-target.x/toGoalLen,-Math.max(4,target.z-6)/toGoalLen];
+      const dirs=[
+        runDirection,
+        [Math.sin(baseAngle-.30),Math.cos(baseAngle-.30)],
+        [Math.sin(baseAngle+.30),Math.cos(baseAngle+.30)],
+        goalDir
+      ];
+      const depths=kind==='lob'?[7.5,11,14.5,18]:[6.5,9.8,13,16];
+      let bestPoint=null,bestScore=-Infinity;
+      for(const dir of dirs){
+        const dl=Math.hypot(dir[0],dir[1])||1;
+        const ux=dir[0]/dl,uz=dir[1]/dl;
+        for(const dist of depths){
+          const cx=clamp(target.x+ux*dist,-28,28);
+          const cz=clamp(target.z+uz*dist,3.2,46);
+          const p={x:cx,z:cz};
+          const stepDist=Math.hypot(cx-target.x,cz-target.z);
+          if(stepDist<3.2)continue;
+          const align=((cx-target.x)*runDirection[0]+(cz-target.z)*runDirection[1])/stepDist;
+          const keeperGap=distance(p,keeper);
+          const passLane=Math.min(4,lane(passer,p));
+          const progress=Math.max(0,target.z-cz);
+          const score=quality(p)*1.45+space(p)*1.30+passLane*(kind==='through'?1.40:.25)
+            +align*1.15+progress*.22-Math.max(0,6.2-keeperGap)*2.5
+            -Math.max(0,stepDist-15.5)*.35;
+          if(score>bestScore){bestScore=score;bestPoint=p;}
+        }
+      }
+      if(bestPoint){
+        x=bestPoint.x;z=bestPoint.z;
+      }else{
+        const roomAhead=runDirection[1]<-.2?Math.max(3,(target.z-3.2)/-runDirection[1]):16;
+        advance=clamp(kind==='lob'?10:8.5,Math.min(roomAhead,6),Math.min(roomAhead,16));
+        x=target.x+runDirection[0]*advance;z=target.z+runDirection[1]*advance;
+      }
+    }else{
+      x=target.x+runDirection[0]*advance;z=target.z+runDirection[1]*advance;
     }
-    x=target.x+runDirection[0]*advance;z=target.z+runDirection[1]*advance;
     if(direction){
       const projection=Math.max(3,(x-passer.x)*runDirection[0]+(z-passer.z)*runDirection[1]);
       const ray=[passer.x+runDirection[0]*projection,passer.z+runDirection[1]*projection];
@@ -175,8 +207,8 @@ function passPlan(passer,target,kind,direction=null,power=.5){
     const passDist=Math.hypot(x-passer.x,z-passer.z);
     const reaction=.22+Math.max(0,5-Math.hypot(target.vx??0,target.vz??0))*.025;
     if(kind==='lob'){
-      const clearanceTime=clamp(1.52+passDist*.022,1.55,2.35);
-      flightTime=Math.max(clearanceTime,advance/5.8+reaction+.15);
+      const effPower=passer===player?power:clamp((passDist-8)/22,.25,.85);
+      flightTime=clamp(1.16+effPower*.44+passDist*.014,1.22,1.84);
     }else{
       flightTime=clamp(Math.max(.55+passDist*.028,advance/6.2+reaction),.65,2.2);
     }
@@ -263,12 +295,17 @@ function request(kind,direction,power=.5){
   if(delivery?.target!==player&&delivery&&s.ballState==='pass'){
     command={kind,power,direction:direction?[...direction]:null,until:s.clock+Math.max(1.3,delivery.time+1)};return true;
   }
+  if(s.ballState==='loose'&&chaser()&&chaser()!==player){
+    command={kind,power,direction:direction?[...direction]:null,until:s.clock+1.5};return true;
+  }
   if(kind==='shot')return false;
   if(s.ballState!=='controlled'||s.windup||s.charging||Math.hypot(s.ball[0]-player.x,s.ball[2]-player.z)>1.3)return false;
   return kick(player,select(player,kind,direction),kind,direction,power);
 }
 function preview(kind,direction,power=.5){
-  const s=state(),passer=owner??(s.ballState==='controlled'?player:delivery?.target);
+  const s=state();
+  const looseMate=s.ballState==='loose'?chaser():null;
+  const passer=owner??(s.ballState==='controlled'?player:delivery?.target??(looseMate&&looseMate!==player?looseMate:null));
   if(!passer||s.terminal||s.play?.piece)return null;
   const target=passer===player?select(passer,kind,direction):player;
   if(!target)return null;
@@ -281,19 +318,50 @@ function targetFor(a,index){
   if(a.teamTarget&&a.teamThink>0)return a.teamTarget;
   const carrier=s.ballState==='controlled'?player:owner??pursuer??{x:s.ball[0],z:s.ball[2]};
   const wide=Math.abs(carrier.x)>9&&carrier.z<14;
-  const role=[{lane:-11,depth:-3},{lane:11,depth:1},{lane:-4,depth:-6},{lane:17,depth:4}][index];
+  const isWinger=index===0||index===1;
+  const offsideLine=line()+.55;
+  const role=[
+    {lane:-18,depth:-10},
+    {lane:18,depth:-10},
+    {lane:carrier.x>2?-5:5,depth:-8},
+    {lane:carrier.x>0?-15:15,depth:-6}
+  ][index]??{lane:0,depth:-8};
   let best=null,value=-Infinity;
   for(let row=0;row<3;row++)for(let col=0;col<3;col++){
-    const x=wide?(-5+index*3.2+(col-1)*2):clamp(role.lane+carrier.x*.18+(col-1)*3.3,-28,28);
-    const desiredZ=wide?[10.8,16.7,7.2][(index+row)%3]:carrier.z+role.depth+(row-1)*4;
-    const z=clamp(Math.max(line()+.65,desiredZ),1.2,48);
-    const p={x,z};let score=space(p)*1.1+Math.min(4,lane(carrier,p))*.85-distance(p,a)*.16;
+    let x,desiredZ;
+    if(wide){
+      x=-5+index*3.2+(col-1)*2;
+      desiredZ=[10.8,16.7,7.2][(index+row)%3];
+    }else if(isWinger){
+      const wingSide=index===0?-1:1;
+      const baseWing=wingSide*(14.5+col*4.5);
+      x=clamp(baseWing+carrier.x*.10,-29,29);
+      const deepZ=Math.min(carrier.z-5.5,Math.max(offsideLine,carrier.z+role.depth));
+      desiredZ=deepZ-row*3.4;
+    }else{
+      x=clamp(role.lane+carrier.x*.18+(col-1)*3.6,-26,26);
+      desiredZ=carrier.z+role.depth+(row-1)*3.4;
+    }
+    const z=clamp(Math.max(offsideLine,desiredZ),2.4,48);
+    const p={x,z};
+    let score=space(p)*1.05+Math.min(4,lane(carrier,p))*.80-distance(p,a)*(isWinger?.05:.11);
     score-=Math.max(0,5-distance(p,carrier))*3;
-    for(const other of all())if(other!==a&&other!==carrier)score-=Math.max(0,4-distance(p,other))*2;
-    if(wide)score-=Math.abs(z-([11,16.7,7][index%3]))*.4;
+    for(const other of all())if(other!==a&&other!==carrier)score-=Math.max(0,4.2-distance(p,other))*2;
+    if(wide){
+      score-=Math.abs(z-([11,16.7,7][index%3]))*.4;
+    }else{
+      const ahead=carrier.z-p.z;
+      score+=Math.max(0,ahead)*(isWinger?.48:.26);
+      score-=Math.max(0,p.z-(carrier.z-1.2))*(isWinger?1.6:.85);
+      if(isWinger){
+        const wingWidth=Math.abs(p.x);
+        score+=clamp((wingWidth-11)/11,0,1)*1.8;
+        if(p.z<=10.5)score+=.9;
+      }
+    }
     if(score>value){best=p;value=score;}
   }
-  a.teamTarget=best;a.teamThink=.38+index*.11;
+  a.teamTarget=best;a.teamThink=.30+index*.08;
   return a.teamTarget;
 }
 function locomotionPose(a,dt){
@@ -484,7 +552,7 @@ function update(dt){
       if(d<spacing&&d>.01){dx+=(a.x-b.x)/d*(spacing-d)*2;dz+=(a.z-b.z)/d*(spacing-d)*2;}
     }
     const d=Math.hypot(dx,dz);
-    const cap=a===owner?(a.controlAge<.22?1.6:4.3):receiving?6.25:5.5;
+    const cap=a===owner?(a.controlAge<.22?1.6:4.3):receiving?6.25:(i===0||i===1)?6.0:5.65;
     const speed=receiving?Math.min(cap,d/Math.max(.14,target.time??.2)+.35):Math.min(cap,d*2.5);
     motion.move(a,{dt,direction:d>.1?[dx/d,dz/d]:[0,0],speed,sprint:speed>4.5,
       ball:s.ball,velocity:s.velocity,controlled:a===owner});

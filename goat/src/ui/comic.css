@@ -91,7 +91,7 @@ header { position: absolute; z-index: 2; top: 24px; left: 26px; right: 26px; dis
 @keyframes score-digit { from { transform: translateY(-.28em) scale(1.29); opacity: .15; } to { transform: none; opacity: 1; } }
 @keyframes score-overlay-out { to { opacity: 0; } }
 @media(prefers-reduced-motion: reduce) { .score-update * { animation-duration: .01s !important; } .score-update-particles { display: none; } }
-body[data-match-intro] :is(header,.options,.bottom,.event,#reticle,#aimSpread,#ballCue,#playerMark,#matchRibbon,#matchRating,#staminaPanel) { visibility: hidden; }
+body[data-match-intro] :is(header,.options,.bottom,.event,#reticle,#aimSpread,#ballCue,#playerMark,#teammateMarks,#matchRibbon,#matchRating,#staminaPanel) { visibility: hidden; }
 @media(max-width: 700px) {
   .match-rating { top: 76px; right: 12px; inline-size: 64px; }
   .match-rating strong { font-size: 32px; }
@@ -103,7 +103,11 @@ body[data-match-intro] :is(header,.options,.bottom,.event,#reticle,#aimSpread,#b
 .training-stadium-dialog .practice-stadium-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(130px,1fr)); gap: 7px; }
 .training-stadium-dialog [data-close-stadium] { margin-top: 14px; }
 .training-stadium-dialog .is-menu-focused { outline: 2px solid #fff1b6; outline-offset: 1px; }
-#playerMark { position: absolute; width: 11px; height: 11px; transform: translate(-50%,-125%) rotate(45deg); background: var(--amber); border: 2px solid var(--ink); pointer-events: none; }
+#playerMark { position: absolute; width: 18px; height: 26px; transform: translate(-50%,-105%); pointer-events: none; z-index: 2; }
+#playerMark svg { display: block; width: 100%; height: 100%; overflow: visible; }
+#teammateMarks { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.teammate-mark { position: absolute; width: 14px; height: 12px; transform: translate(-50%,-115%); pointer-events: none; }
+.teammate-mark svg { display: block; width: 100%; height: 100%; overflow: visible; }
 
 .overlay { position: absolute; z-index: 4; inset: 0; display: flex; align-items: center; justify-content: center; padding: clamp(18px, 5vw, 74px); background: #21142790; }
 #start { justify-content: flex-start; background: linear-gradient(90deg,#221723a8 0%,#25192724 48%,transparent 78%); }
@@ -157,7 +161,7 @@ body:has(#start:not([hidden])) .bottom { visibility: hidden; }
   .shotfooter { font-size: 7px; }
 }
 
-body[data-screen]:not([data-screen="game"]) :is(header,.options,.bottom,.event,#reticle,#aimSpread,#ballCue,#playerMark,#matchRibbon,#staminaPanel) { visibility: hidden; }
+body[data-screen]:not([data-screen="game"]) :is(header,.options,.bottom,.event,#reticle,#aimSpread,#ballCue,#playerMark,#teammateMarks,#matchRibbon,#staminaPanel) { visibility: hidden; }
 body[data-mode="career"] :is(.scoreboard,#reset,#replay) { display: none; }
 
 #start.home-screen {
