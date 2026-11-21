@@ -1,0 +1,13 @@
+GOAT
+
+DESENVOLVIMENTO
+npm run dev
+Abra http://127.0.0.1:4173
+
+PUBLICAÇÃO
+npm run build
+Os arquivos separados para publicação ficam em goat/dist/.
+npm run deploy publica no Cloudflare após login via npx wrangler@4 login.
+
+A entrada oficial é goat/src/index.html. Não existe geração de HTML único.
+Consulte goat/README.md para configuração do Cloudflare e REGRAS-DO-JOGO.md para jogabilidade.

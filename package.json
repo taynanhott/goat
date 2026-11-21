@@ -1,0 +1,10 @@
+{
+  "name": "goat-project",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix goat run dev",
+    "build": "npm --prefix goat run build",
+    "check": "npm --prefix goat run check",
+    "deploy": "npm --prefix goat run deploy"
+  }
+}

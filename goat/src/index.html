@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#1a1420">
+<title>GOAT · Futebol 3D</title>
+<link rel="icon" type="image/svg+xml" sizes="any" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cpath%20fill%3D%22%23d4562c%22%20stroke%3D%22%231a1420%22%20stroke-width%3D%224%22%20stroke-linejoin%3D%22round%22%20d%3D%22M5%2012%2017%209%2024%203%2034%208%2048%204%2052%2015%2061%2022%2056%2034%2060%2046%2049%2051%2043%2061%2031%2056%2020%2061%2014%2052%203%2049%207%2035%202%2025Z%22%2F%3E%3Ctext%20x%3D%2232%22%20y%3D%2239%22%20text-anchor%3D%22middle%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2218%22%20font-weight%3D%22900%22%20font-style%3D%22italic%22%20fill%3D%22%23ffd069%22%20stroke%3D%22%231a1420%22%20stroke-width%3D%221%22%20paint-order%3D%22stroke%22%3EGOAT%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="./ui/badge-font.css">
+<link rel="stylesheet" href="./ui/comic.css">
+</head>
+<body>
+<canvas id="game" tabindex="0" aria-label="Campo de futebol 3D"></canvas><div class="vignette"></div>
+<header><div><div class="brand">GO<b>AT</b></div></div><div class="scoreboard"><div class="stat"><strong id="goals">00</strong><span>GOLS</span></div><div class="stat"><strong id="saves">00</strong><span>DEFESAS</span></div><div class="stat"><strong id="shots">00</strong><span>CHUTES</span></div><div class="stat"><strong id="posts">00</strong><span>TRAVES</span></div></div></header>
+<div class="options"><button id="camera">Câmera: lateral</button><button id="replay" disabled>Replay · V</button><button id="reset">Nova bola · T</button></div>
+<div class="event"><div id="message"></div><div id="eventRatingDelta" class="event-rating-delta" role="status" hidden></div><div id="submessage"></div></div><div id="aimSpread" hidden aria-hidden="true"></div><div id="reticle" hidden></div><div id="ballCue" hidden aria-hidden="true"></div><div id="playerMark" hidden></div><div id="replayTag" class="replaytag" hidden>● REPLAY / CÂMERA LENTA</div>
+<div class="bottom"><div class="shotpanel"><div class="paneltop"><strong>GOAT &nbsp; FINALIZADOR</strong><span class="badge" id="range">18 m</span></div><div class="powerlabel"><span>FORÇA DO CHUTE</span><span id="powerText">0%</span></div><div class="bar"><i id="power"></i></div><div class="shotfooter"><span id="height">MEIA ALTURA</span><span id="shotHint">SEGURE X</span></div></div><div class="status"><small id="keeperState">EM POSIÇÃO</small><div id="device">● Teclado e mouse</div><span id="movementHint">WASD / setas · mover e mirar</span><span id="passHint" class="career-pass-hint">T · passe para o companheiro</span></div></div>
+<div id="controls" hidden></div>
+<div id="matchRibbon" class="match-ribbon" hidden>
+  <div><span id="matchLabel"></span><strong id="matchClubs"></strong></div>
+  <strong id="matchScore" aria-live="polite">0 × 0</strong>
+  <div><span id="matchChance"></span><strong id="matchClock" aria-label="Tempo restante">10,0 s</strong></div>
+  <div id="shootoutBoard" class="shootout-board" hidden aria-label="Placar da disputa de pênaltis">
+    <b class="shootout-label">PÊNALTIS</b>
+    <div class="shootout-team shootout-home"><span id="shootoutHomeBadge"></span><strong id="shootoutHomeName"></strong></div>
+    <div class="shootout-score shootout-match-score"><strong id="shootoutHomeMatch"></strong><span>×</span><strong id="shootoutAwayMatch"></strong></div>
+    <div class="shootout-team shootout-away"><strong id="shootoutAwayName"></strong><span id="shootoutAwayBadge"></span></div>
+    <div id="shootoutHomeKicks" class="shootout-kicks" aria-label="Cobranças do mandante"></div>
+    <div class="shootout-score shootout-penalty-score" aria-live="polite"><strong id="shootoutHomeScore"></strong><span>×</span><strong id="shootoutAwayScore"></strong></div>
+    <div id="shootoutAwayKicks" class="shootout-kicks" aria-label="Cobranças do visitante"></div>
+    <span id="shootoutTurnLabel" class="shootout-turn"></span>
+  </div>
+</div>
+<div id="matchRating" class="match-rating" hidden><span>Nota da partida</span><strong id="matchRatingValue">6,0</strong></div>
+<div id="lineupStatus" class="lineup-status" hidden></div>
+<aside id="matchObjectives" class="match-objectives" hidden aria-label="Objetivos da partida"><h2>Objetivos da partida</h2><div id="matchObjectiveItems"></div></aside>
+<section id="objectiveIntro" class="objective-intro" hidden aria-label="Objetivos desta partida"><h2>Objetivos da partida</h2><div id="objectiveIntroCards"></div></section>
+<div id="matchIntro" class="match-intro" hidden>
+  <strong id="matchIntroCaption"></strong>
+  <button type="button" id="skipMatchIntro" class="career-button quiet">Pular abertura</button>
+</div>
+<div id="scoreUpdate" class="score-update" hidden>
+  <div class="score-update-burst" aria-hidden="true"></div>
+  <div id="scoreUpdateParticles" class="score-update-particles" aria-hidden="true"></div>
+  <div class="score-update-card">
+    <h2>Placar alterado</h2>
+    <div class="score-update-line">
+      <div><span id="scoreUpdateHome"></span><strong id="scoreUpdateHomeGoals"></strong></div>
+      <b aria-hidden="true">×</b>
+      <div><span id="scoreUpdateAway"></span><strong id="scoreUpdateAwayGoals"></strong></div>
+    </div>
+    <p id="scoreUpdateStatus" role="status"></p>
+  </div>
+</div>
+<audio id="goalCheerAudio" src="../assets/audio/stadium-goal-short.mp3" preload="auto" hidden></audio>
+<audio id="stadiumAmbienceAudio" src="../assets/audio/stadium-ambience.mp3" preload="auto" hidden></audio>
+<div id="staminaPanel" class="stamina-panel" hidden>
+  <label for="staminaBar">Estamina</label><progress id="staminaBar" value="100" max="100"></progress><span id="staminaText"></span>
+</div>
+<div id="careerReplayBar" class="career-replay-bar" hidden>
+  <strong id="careerReplayTitle"></strong><span id="careerReplayCaption"></span>
+  <button id="replayExit" type="button" class="career-button">Voltar ao resultado</button>
+</div>
+<div id="start" class="overlay home-screen">
+  <div class="intro home-paper">
+    <h1>GO<em>AT</em></h1>
+    <div id="loading" role="status">Preparando o campo…</div>
+    <nav aria-label="Menu principal">
+      <button type="button" class="career-button accent" data-action="career">Carreira</button>
+      <button type="button" class="career-button" data-action="controls">Controles</button>
+      <button type="button" class="career-button" id="play" data-action="training" disabled>Treino livre</button>
+      <button type="button" class="career-button" id="openAnimLab" disabled>Animações</button>
+    </nav>
+  </div>
+</div>
+<canvas id="animSkeletonOverlay" class="anim-skeleton-overlay" hidden aria-hidden="true"></canvas>
+<section id="animLab" class="anim-lab" hidden aria-label="Validador e editor de animações">
+  <div class="anim-lab-panel">
+    <div class="anim-lab-head">
+      <div>
+        <h2>Animações do Jogo</h2>
+        <span id="animLabProgress" class="anim-lab-progress">0 / 0 validadas</span>
+      </div>
+      <button type="button" id="animLabClose" class="career-button">Voltar</button>
+    </div>
+    <div class="anim-lab-mode-tabs" role="tablist">
+      <button type="button" id="animTabValidate" aria-pressed="true">Validar</button>
+      <button type="button" id="animTabEdit" aria-pressed="false">Editar</button>
+      <button type="button" id="animTabCreate" aria-pressed="false">+ Criar</button>
+    </div>
+    <div id="animValidateView" class="anim-view-body">
+      <div id="animLabCats" class="anim-lab-cats" role="tablist">
+        <button type="button" data-cat="all" aria-pressed="true">Todas</button>
+        <button type="button" data-cat="move" aria-pressed="false">Movimentação</button>
+        <button type="button" data-cat="dribble" aria-pressed="false">Dribles</button>
+        <button type="button" data-cat="shot" aria-pressed="false">Chutes</button>
+        <button type="button" data-cat="keeper" aria-pressed="false">Goleiro</button>
+        <button type="button" data-cat="defender" aria-pressed="false">Defesa</button>
+      </div>
+      <div id="animKeeperSubs" class="anim-keeper-subs" hidden>
+        <div class="anim-keeper-sub-top">
+          <button type="button" data-sub="all" aria-pressed="true">Todos</button>
+          <button type="button" data-sub="chipLow" aria-pressed="false">Cob. Baixa</button>
+          <button type="button" data-sub="chipMid" aria-pressed="false">Cob. Média</button>
+          <button type="button" data-sub="chipHigh" aria-pressed="false">Cob. Alta</button>
+        </div>
+        <div class="anim-keeper-sub-grid" role="tablist" aria-label="Setores do gol">
+          <button type="button" data-sub="A1" aria-pressed="false">A1</button><button type="button" data-sub="B1" aria-pressed="false">B1</button><button type="button" data-sub="C1" aria-pressed="false">C1</button><button type="button" data-sub="D1" aria-pressed="false">D1</button><button type="button" data-sub="E1" aria-pressed="false">E1</button>
+          <button type="button" data-sub="A2" aria-pressed="false">A2</button><button type="button" data-sub="B2" aria-pressed="false">B2</button><button type="button" data-sub="C2" aria-pressed="false">C2</button><button type="button" data-sub="D2" aria-pressed="false">D2</button><button type="button" data-sub="E2" aria-pressed="false">E2</button>
+          <button type="button" data-sub="A3" aria-pressed="false">A3</button><button type="button" data-sub="B3" aria-pressed="false">B3</button><button type="button" data-sub="C3" aria-pressed="false">C3</button><button type="button" data-sub="D3" aria-pressed="false">D3</button><button type="button" data-sub="E3" aria-pressed="false">E3</button>
+        </div>
+      </div>
+      <input id="animLabSearch" class="anim-lab-search" type="search" placeholder="Filtrar por nome ou chave (ex: kick, dive, dribble)…">
+      <div id="animLabList" class="anim-lab-list" role="listbox" aria-label="Lista de animações"></div>
+    </div>
+    <div id="animEditView" class="anim-view-body" hidden>
+      <div class="anim-edit-row">
+        <strong id="animEditFrameLabel">Quadro 0 / 0</strong>
+        <div class="anim-edit-mini">
+          <button type="button" id="animFramePrev">◀ -1q</button>
+          <button type="button" id="animFrameNext">+1q ▶</button>
+          <button type="button" id="animCopyFrame">Copiar</button>
+          <button type="button" id="animPasteFrame">Colar</button>
+        </div>
+      </div>
+      <div class="anim-edit-row">
+        <label for="animBoneSelect">Membro / Osso</label>
+        <div class="anim-edit-mini">
+          <label class="anim-check"><input type="checkbox" id="animShowSkeleton" checked> Esqueleto</label>
+          <label class="anim-check"><input type="checkbox" id="animShowHitbox" checked> Hitbox</label>
+        </div>
+      </div>
+      <select id="animBoneSelect" class="anim-lab-search"></select>
+      <div class="anim-sliders">
+        <div class="anim-slider-row"><span>Flexão (X)</span><input id="animRotX" type="range" min="-180" max="180" step="1" value="0"><span id="animRotXVal">0°</span></div>
+        <div class="anim-slider-row"><span>Giro (Y)</span><input id="animRotY" type="range" min="-180" max="180" step="1" value="0"><span id="animRotYVal">0°</span></div>
+        <div class="anim-slider-row"><span>Inclin. (Z)</span><input id="animRotZ" type="range" min="-180" max="180" step="1" value="0"><span id="animRotZVal">0°</span></div>
+        <div class="anim-slider-row" id="animRootYRow"><span>Quadril Y</span><input id="animRootY" type="range" min="30" max="170" step="0.5" value="100"><span id="animRootYVal">100</span></div>
+      </div>
+      <div class="anim-lab-controls">
+        <button type="button" id="animPropagate" title="Cria transição suave nos 5 quadros antes e depois">Suavizar ±5q</button>
+        <button type="button" id="animPropagate1" title="Cria transição suave em 1 quadro antes e depois">Suavizar ±1q</button>
+        <button type="button" id="animDupNext" title="Copia a pose do quadro atual para o próximo quadro e avança">Duplicar → +1q</button>
+        <button type="button" id="animResetBone">Zerar osso</button>
+      </div>
+      <div class="anim-lab-validate">
+        <button type="button" id="animSaveEdits" class="anim-btn-ok">Salvar no jogo</button>
+        <button type="button" id="animRestoreClip" class="anim-btn-fix">Restaurar clipe</button>
+        <button type="button" id="animDeleteCustom" class="anim-btn-fix" hidden>Excluir</button>
+      </div>
+      <div class="anim-lab-controls">
+        <button type="button" id="animExportJson">Exportar JSON</button>
+        <button type="button" id="animImportJson">Importar JSON</button>
+        <input type="file" id="animImportFile" accept=".json,application/json" hidden>
+      </div>
+      <p id="animEditStatus" class="anim-lab-example">Clique em uma junta no jogador 3D ou escolha o membro acima para editar o quadro.</p>
+    </div>
+    <div id="animCreateView" class="anim-view-body" hidden>
+      <p class="anim-lab-example">Crie uma nova animação do zero ou clonando a atual (até 100 frames). Ela será salva automaticamente com o identificador <strong id="animNewPreview">manual-nova</strong>.</p>
+      <label class="anim-field-label" for="animNewName">Nome da animação</label>
+      <input id="animNewName" class="anim-lab-search" type="text" maxlength="32" placeholder="Ex: elastico, giro360, voleio-alto">
+      <label class="anim-field-label" for="animNewCat">Categoria</label>
+      <select id="animNewCat" class="anim-lab-search">
+        <option value="move">Movimentação / Corrida</option>
+        <option value="dribble">Dribles / Cortes</option>
+        <option value="shot">Chutes / Finalizações</option>
+        <option value="keeper">Goleiro</option>
+        <option value="defender">Defesa</option>
+      </select>
+      <div class="anim-slider-row">
+        <span>Frames</span>
+        <input id="animNewFrames" type="range" min="2" max="100" step="1" value="30">
+        <span id="animNewFramesVal">30 q</span>
+      </div>
+      <label class="anim-field-label" for="animNewBase">Pose inicial</label>
+      <select id="animNewBase" class="anim-lab-search">
+        <option value="idle">Parado (jogador de linha)</option>
+        <option value="keeperIdle">Parado (goleiro)</option>
+        <option value="__current__">Clonar animação selecionada</option>
+      </select>
+      <button type="button" id="animCreateBtn" class="career-button accent">Criar e abrir no Editor</button>
+      <p id="animCreateStatus" class="anim-lab-example"></p>
+    </div>
+    <div class="anim-lab-detail">
+      <div class="anim-lab-meta">
+        <strong id="animLabName">—</strong>
+        <span id="animLabInfo">—</span>
+      </div>
+      <p id="animLabExample" class="anim-lab-example"></p>
+      <div class="anim-lab-scrub-row">
+        <button type="button" id="animStepBack" class="anim-step-btn" title="Voltar 1 frame (,)">◀ -1</button>
+        <input id="animLabScrub" type="range" min="0" max="1000" value="0">
+        <button type="button" id="animStepFwd" class="anim-step-btn" title="Avançar 1 frame (.)">+1 ▶</button>
+        <span id="animLabTime">Q 1/1</span>
+      </div>
+      <div class="anim-lab-controls">
+        <button type="button" id="animLabPrev">◀ Ant</button>
+        <button type="button" id="animLabPlay">Pausar</button>
+        <button type="button" id="animLabNext">Próx ▶</button>
+        <button type="button" id="animLabSpeed">1.0×</button>
+        <button type="button" id="animLabMirror" aria-pressed="false">Espelhar</button>
+        <button type="button" id="animLabHitboxBtn" aria-pressed="true">Hitbox</button>
+      </div>
+      <div class="anim-lab-orbit-row">
+        <label for="animLabOrbit">Ângulo câmera</label>
+        <input id="animLabOrbit" type="range" min="-180" max="180" value="38">
+        <span id="animLabOrbitText">38°</span>
+      </div>
+      <div class="anim-lab-validate">
+        <button type="button" id="animLabOk" class="anim-btn-ok">✓ Aprovada</button>
+        <button type="button" id="animLabFix" class="anim-btn-fix">✗ Ajustar</button>
+        <button type="button" id="animLabClear">Limpar</button>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="careerScreen" class="career-screen" aria-labelledby="careerTitle" hidden>
+  <div id="careerContent" class="career-content"></div>
+  <p id="careerWarning" class="career-warning" role="status" hidden></p>
+</section>
+<div id="paused" class="overlay" hidden><div class="intro"><h2>Jogo pausado</h2>
+  <fieldset id="trainingModes" class="training-modes" hidden><legend>Modo de treino</legend><div class="training-mode-buttons">
+    <button type="button" data-practice="open" aria-pressed="true">Com bola</button>
+    <button type="button" data-practice="noBall" aria-pressed="false">Sem bola</button>
+    <button type="button" data-practice="freeKick" aria-pressed="false">Faltas</button>
+    <button type="button" data-practice="penalty" aria-pressed="false">Pênaltis</button>
+    <button type="button" data-practice="shootout" aria-pressed="false">Disputa de pênaltis</button>
+  </div></fieldset>
+  <fieldset id="trainingDefense" hidden><legend>Defensores no treino</legend><div class="training-defense-buttons">
+    <button type="button" data-defenders="0" aria-label="0 defensores" aria-pressed="true">0</button><button type="button" data-defenders="1" aria-label="1 defensor" aria-pressed="false">1</button><button type="button" data-defenders="2" aria-label="2 defensores" aria-pressed="false">2</button>
+    <button type="button" data-defenders="3" aria-label="3 defensores" aria-pressed="false">3</button><button type="button" data-defenders="4" aria-label="4 defensores" aria-pressed="false">4</button>
+    <button type="button" data-defenders="5" aria-label="5 defensores" aria-pressed="false">5</button>
+  </div></fieldset>
+  <button type="button" id="trainingStadium" class="career-button" data-action="training-stadium" aria-haspopup="dialog" hidden>Estádio</button>
+  <button id="resume" class="career-button accent">Continuar</button>
+  <button type="button" id="trainingPlayerSetup" class="career-button" data-action="training-player-paused" hidden>Jogador do Treino</button>
+  <button id="leaveGame" class="career-button">Voltar ao menu</button>
+</div></div>
+<dialog id="trainingStadiumDialog" class="training-stadium-dialog" aria-labelledby="trainingStadiumTitle">
+  <h2 id="trainingStadiumTitle">Estádio do treino</h2>
+  <div class="practice-stadium-grid" id="trainingStadiumOptions"></div>
+  <button type="button" class="career-button quiet" data-close-stadium>Voltar</button>
+</dialog>
+<div id="freeKickMarker" class="free-kick-marker" hidden></div>
+<div id="freeKickInstructions" class="free-kick-instructions" hidden>Mova a bola para fora da área · X confirma o local</div>
+<div id="matchFade" class="match-fade" hidden aria-hidden="true"></div>
+<div id="runtimeError" hidden role="alert" style="position:fixed;z-index:99;bottom:15px;left:15px;right:15px;padding:16px;background:#54242c;color:white;font:14px system-ui;border-radius:10px"></div>
+<script>addEventListener('error',function(event){var panel=document.getElementById('runtimeError');panel.hidden=false;panel.textContent='O jogo encontrou um erro: '+event.message+' · linha '+event.lineno;});</script>
+<script src="./career/goat-storage.js"></script>
+<script src="../assets/animations/animations.js"></script>
+<script src="../assets/animations/fifa16-animations.js"></script>
+<script src="../assets/animations/goalkeeper-poses.js"></script>
+<script src="../assets/animations/shot-and-crowd-animations.js"></script>
+<script src="../assets/animations/animation-overrides.js"></script>
+<script src="./ui/comic-art.js"></script>
+<script src="./rendering/mocap.js"></script>
+<script src="./rendering/net.js"></script>
+<script src="./rendering/football-hype-stadium-models.js"></script>
+<script src="./rendering/stadiums.js"></script>
+<script src="./rendering/stadium-city.js"></script>
+<script src="./gameplay/ball-physics.js"></script>
+<script src="./gameplay/football-motion.js"></script>
+<script src="./gameplay/goalkeeper-zones.js"></script>
+<script src="./gameplay/match-audio.js"></script>
+<script src="./career/career-db.js"></script>
+<script src="./career/football-hype-data.js"></script>
+<script src="./ui/competition-trophy.js"></script>
+<script src="./career/career-journey.js"></script>
+<script src="./ui/club-badge.js"></script>
+<script src="./career/career-season.js"></script>
+<script src="./career/career-replay.js"></script>
+<script src="./career/career-ui.js"></script>
+<script src="./gameplay/game.js"></script>
+</body></html>

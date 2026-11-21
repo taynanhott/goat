@@ -1,0 +1,11 @@
+{
+  "name": "goat",
+  "private": true,
+  "scripts": {
+    "dev": "node dev-server.cjs",
+    "build": "node build.cjs",
+    "check": "node build.cjs --check",
+    "predeploy": "npm run build",
+    "deploy": "npx --yes wrangler@4 deploy --config ../wrangler.jsonc"
+  }
+}
