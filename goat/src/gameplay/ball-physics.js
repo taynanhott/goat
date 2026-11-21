@@ -416,5 +416,32 @@ function crossing(position,velocity,angular,plane=.65){let p=[...position],v=[..
 function reflect(v,n,restitution=.5,friction=.08){let normal=dot(v,n);if(normal>=0)return;let tangent=v.map((x,i)=>x-normal*n[i]);for(let i=0;i<3;i++)v[i]=tangent[i]*(1-friction)-normal*restitution*n[i]}
 function closestSegments(a,b,c,d){let u=subtract(b,a),v=subtract(d,c),w=subtract(a,c),aa=dot(u,u),bb=dot(u,v),cc=dot(v,v),dd=dot(u,w),ee=dot(v,w),den=aa*cc-bb*bb,s=aa<1e-12?0:clamp(den>1e-12?(bb*ee-cc*dd)/den:-dd/aa,0,1),t=cc<1e-12?0:clamp((bb*s+ee)/cc,0,1);if(aa>1e-12)s=clamp((bb*t-dd)/aa,0,1);if(cc>1e-12)t=clamp((bb*s+ee)/cc,0,1);return{ball:a.map((x,i)=>x+u[i]*s),bar:c.map((x,i)=>x+v[i]*t),fraction:s}}
 function goalFrame(old,p,v,spin){let bars=[[[-3.66,0,0],[-3.66,2.44,0]],[[3.66,0,0],[3.66,2.44,0]],[[-3.66,2.44,0],[3.66,2.44,0]]];for(let [a,b]of bars){let hit=closestSegments(old,p,a,b),delta=subtract(hit.ball,hit.bar),distance=Math.hypot(...delta),radius=r+.06;if(distance>=radius)continue;let normal=distance>1e-6?delta.map(x=>x/distance):unit(v.map(x=>-x));if(dot(v,normal)>=0)continue;reflect(v,normal,config.postRestitution,.055);for(let i=0;i<3;i++){p[i]=hit.bar[i]+normal[i]*(radius+.001);spin[i]*=.7}return true}return false}
-return{config,step,sweepBoot,separateBoot,deflectBoot,freeBallBetweenBoots,brakeDribble,guideCharge,steadyDribble,rollUnderSole,receiveTouch,groundTouch,dribbleTouch,launch,crossing,reflect,goalFrame};
+function aerialControl(position,velocity,spin,{point,previous=point,dt,heading,pace=0,kind='chest'}){
+  if(!point||!bootContact(previous,point,position,velocity,dt,kind==='head'?.22:kind==='chest'||kind==='directed'?.36:.20))return false;
+  const incoming=Math.hypot(...velocity);
+  const speed=clamp(pace*(kind==='directed'?.95:.8)+incoming*.07,.65,kind==='directed'?5.8:3.4);
+  velocity[0]=-Math.sin(heading)*speed;
+  velocity[2]=-Math.cos(heading)*speed;
+  velocity[1]=kind==='head'?-clamp(incoming*.10,1,2.6):-clamp(Math.abs(velocity[1])*.16,.35,1.8);
+  for(let i=0;i<3;i++)spin[i]*=.12;
+  return true;
+}
+function passLaunch(origin,target,kind='pass',options={}){
+  const distance=Math.hypot(target[0]-origin[0],target[2]-origin[2]);
+  const aerial=kind==='lob'||kind==='cross';
+  const baseTime=kind==='lob'?clamp(1.45+distance*.025,1.52,2.45):aerial?clamp(.8+distance*.034,.95,2.45):clamp(.25+distance*.038,.4,1.8);
+  const time=clamp(options.time??baseTime,aerial?.8:.35,aerial?3.2:3.0);
+  const velocity=[(target[0]-origin[0])/time,aerial?(target[1]-origin[1])/time+config.gravity*time*.56:.04,
+    (target[2]-origin[2])/time];
+  const spin=aerial?[0,kind==='cross'?3.5:0,-3]:[velocity[2]/r,0,-velocity[0]/r];
+  for(let iteration=0;iteration<14;iteration++){
+    const p=[...origin],v=[...velocity],w=[...spin];
+    let elapsed=0,earlyBounce=0;
+    while(elapsed<time){const dt=Math.min(1/120,time-elapsed);step(p,v,w,dt,true);elapsed+=dt;if(aerial&&!earlyBounce&&elapsed<time-.06&&p[1]<=r+.002&&v[1]>=0)earlyBounce=time-elapsed;}
+    if(!earlyBounce&&Math.hypot(target[0]-p[0],aerial?target[1]-p[1]:0,target[2]-p[2])<.025)break;
+    for(const axis of aerial?[0,1,2]:[0,2])velocity[axis]+=(target[axis]-p[axis])/time*.9;if(earlyBounce>0)velocity[1]+=config.gravity*earlyBounce*.55;
+  }
+  return {velocity,spin,time};
+}
+return{config,step,sweepBoot,separateBoot,deflectBoot,freeBallBetweenBoots,brakeDribble,guideCharge,steadyDribble,rollUnderSole,receiveTouch,groundTouch,dribbleTouch,launch,passLaunch,aerialControl,bootContact,crossing,reflect,goalFrame};
 };

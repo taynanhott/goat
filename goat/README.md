@@ -38,7 +38,7 @@ Carreiras e replays ficam no navegador. Mudar de domínio, navegador ou origem n
 | Caminho dentro de goat/ | Conteúdo |
 | --- | --- |
 | `src/index.html` | Entrada oficial e ordem dos scripts |
-| `src/gameplay/` | Movimentação, física, controles e goleiro |
+| `src/gameplay/` | Movimentação, física, controles, goleiro e IA dos companheiros (`team-ai.js`) |
 | `src/career/` | Carreira, telas e salvamento |
 | `src/rendering/` | Rig, rede e estádios |
 | `src/ui/` | Estilos, ícones e interface |
@@ -47,3 +47,5 @@ Carreiras e replays ficam no navegador. Mudar de domínio, navegador ou origem n
 | `build.cjs` | Verificação das fontes e preparação da versão web |
 
 O guia de jogabilidade está em `REGRAS-DO-JOGO.md` na raiz.
+
+Os clipes de joelho e trote diagonal são importados dos FBX de `referencias/` por `node goat/tools/import-team-animations.cjs`, executado na raiz do repositório. O resultado separado fica em `assets/animations/team-animations.js`.

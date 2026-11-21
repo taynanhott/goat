@@ -19,10 +19,13 @@ O jogo roda no navegador a partir do HTML, com WebGL, JavaScript, CSS, dados de 
 | Cavadinha | E com X | LB com X |
 | Fake shot ou cortinho | Com X carregando, indicar a direção e apertar Espaço | Com X carregando, indicar a direção e apertar A |
 | Puxar a bola com a sola | E sem carregar o chute | LB sem carregar o chute |
-| Finalizar de primeira no rebote | Toque em X | Toque em X |
-| Passar para o companheiro, em lance aberto da carreira | T | Y |
-| Nova bola no treino | T ou B | B |
-| Replay no treino | V | A fora da carga do chute |
+| Chute de primeira em passes ou bolas soltas | Segurar X antes da chegada e soltar para preparar | Segurar X antes da chegada e soltar para preparar |
+| Passe rasteiro / pedir passe ao companheiro com a bola | Espaço | A |
+| Lançamento rasteiro em profundidade / pedir lançamento | Segurar e soltar Y | Segurar e soltar Y |
+| Lançamento aéreo em profundidade | E + segurar e soltar Y | LB + segurar e soltar Y |
+| Cruzamento / pedir cruzamento | B | B |
+| Nova bola no treino | T | R3 |
+| Replay no treino | V | L3 |
 | Trocar câmera | C | View |
 | Mirar em falta ou pênalti | A/D ou ←/→ | Analógico esquerdo na horizontal |
 | Confirmar local da falta no treino | X | X |
@@ -54,7 +57,7 @@ O movimento usa os eixos da câmera. Há câmeras **jogador**, **clássica** e *
 
 **Contato.** Soltar X prepara uma finalização e posiciona o pé de apoio. O disparo ocorre quando a chuteira em movimento encontra a bola na janela certa. Se a passada não chegar à bola, aparece **SEM CONTATO**. O contador de chutes avança quando a bola é lançada, excluindo a finalização automática do companheiro.
 
-**Rebote e voleio.** Trave e bola espalmada com as mãos abrem uma janela de rebote de até 3 s enquanto a bola permanece viva. Um toque em X solicita um chute de primeira, com potência sorteada entre 36% e 92% e uma janela curta de execução. Se a bola estiver alta no impacto previsto, o jogo seleciona o voleio. Em bola rolando, uma bola suficientemente elevada também pode levar a um voleio sem um comando dedicado.
+**Chute de primeira, voleio e cabeceio.** Sem a posse, segure X para carregar a força antes de receber um passe ou alcançar uma bola solta e solte para preparar a finalização. O jogador continua se movimentando e buscando a interceptação enquanto carrega ou aguarda. A força é a escolhida na barra, com o mesmo ritmo de carga do chute normal; não é sorteada. O comando de chute ou voleio fica aguardando por até 2,4 s após a soltura. Cabeceios usam um toque em X, sem carregar força, escolhendo Header no chão ou Soccer Header com salto pela altura prevista da bola. Segurar X não atrasa nem aumenta a força de um cabeceio. Se X foi solto antes da chegada, o domínio automático cede à finalização preparada, cujo tempo de contato é sincronizado com a interceptação prevista. Se X ainda estiver pressionado no contato, o jogador domina a bola e transfere a força acumulada para a carga normal, mantendo a direção e a velocidade de corrida escolhidas. Soltar X depois desse domínio executa o chute normal. A mecânica vale também para sobras após defesa ou trave, sem uma janela exclusiva de rebote. Uma preparação que não encontra contato expira e permite voltar a dominar normalmente.
 
 ## 5. Goleiro, defensores e companheiro
 
@@ -68,14 +71,35 @@ O movimento usa os eixos da câmera. Há câmeras **jogador**, **clássica** e *
 
 ### Defensores
 
-- O defensor mais próximo tende a iniciar a pressão. Os demais cobrem linhas e posições conforme seus papéis e distâncias. Podem disputar corpo a corpo, tentar desarme em pé, interceptar com carrinho, bloquear o corredor do chute, desviar com o corpo ou tirar uma bola baixa próxima à linha do gol.
-- A pressão aumenta a dispersão do chute, reduz o ritmo do atacante e consome estamina. **Força** aumenta a resistência à tomada de bola. Um desarme limpo pode dar domínio ao defensor, que ajeita e afasta a bola.
+- Um defensor inicia a pressão ou busca o ponto de interceptação previsto da bola. Os demais recebem alvos distintos: marcar linhas de passe para o usuário ou outros companheiros, antecipar o recebedor de um cruzamento, cobrir o gol e equilibrar os lados. Bolas altas podem ser amortecidas com joelho, peito ou cabeça; o defensor que toca recebe prioridade na disputa da bola que cai, domina embaixo e lança para afastar sem esperar uma animação longa. Os botes são mais rápidos, têm menos intervalo entre tentativas e antecipam melhor a bola exposta na condução. A atribuição considera a distância e preserva o marcador anterior quando possível para evitar trocas constantes e corridas em bloco. Podem disputar corpo a corpo, tentar desarme em pé, interceptar com carrinho, bloquear o corredor do chute, desviar com o corpo ou tirar uma bola baixa próxima à linha do gol.
+- A pressão aumenta a dispersão do chute, reduz o ritmo do atacante e consome estamina. **Força** aumenta a resistência à tomada de bola. Um desarme limpo pode dar domínio ao defensor, que faz um ajuste curto e afasta a bola. Após um carrinho com contato na bola, o afastamento acontece com a perna da disputa, antes da animação de levantar terminar. Os outros defensores abrem espaço durante a posse e o afastamento; não cercam a bola.
 - No carrinho, tocar o atacante sem tocar a bola antes de ela cruzar a linha pode gerar falta. Na carreira, a posição do atacante define pênalti na área ou falta com barreira fora dela. A cobrança substitui a fase atual do lance sem gastar uma oportunidade adicional. O cronômetro volta a 10 s na cobrança e os chutes já executados ficam contabilizados. No treino de bola rolando, o lance exibe a falta e reinicia após a espera do resultado.
 
-### Companheiro
+### Companheiros e passes
 
-- Existe um companheiro nos lances de bola rolando da carreira. **T/Y** passa para ele se o atacante estiver em domínio com a bola baixa e próxima, sem chute em preparação e dentro da distância de passe. O companheiro tenta finalizar automaticamente após receber.
-- Gol direto do atacante soma gol pessoal. Gol da finalização do companheiro soma assistência. Um chute originalmente fora do alvo que entra após desvio de um defensor pode contar como gol contra. Os três desfechos aumentam o placar da equipe.
+- Nos lances coletivos de bola rolando da carreira há três companheiros. No treino livre, o menu de pausa permite escolher de zero a quatro, com dois por padrão. A preferência do treino fica salva no navegador. Cobranças, treino sem bola e exercícios individuais mantêm suas regras próprias.
+- A / Espaço executa passe rasteiro; segurar e soltar Y carrega e executa o lançamento rasteiro; LB + segurar/soltar Y ou E + segurar/soltar Y faz o lançamento aéreo; B cruza para a região central da área. O analógico ou a direção de movimento orienta o ponto de destino. Durante a carga de Y, a barra mostra a força e a mira no campo mostra esse destino; mais força adianta o ponto no espaço. O passe só sai ao soltar Y. Durante a carga de X, A / Espaço continua sendo cortinho.
+- Durante a recepção, o usuário orienta o corpo e o olhar para a bola em passes comuns e para o ponto futuro de encontro nos lançamentos. O movimento indicado no controle é preservado para a saída do primeiro toque.
+- O recebedor de um passe é atraído para um ponto alcançável na trajetória futura da bola, usando a mesma previsão de gravidade, resistência do ar e atrito da simulação. Isso vale para o usuário, companheiros e lançamentos aéreos. O usuário pode contrariar a assistência indicando uma direção claramente oposta.
+- Cada tipo de passe calcula velocidade e trajetória pela distância e pelo destino, considerando resistência do ar, gravidade, atrito e efeito. Lançamentos escolhem um ponto futuro na direção da corrida ou da intenção do recebedor, mesmo que ele esteja parado no momento do passe; não se limitam à posição atual. Cruzamentos chegam pelo alto à região de finalização. A bola continua sujeita a interceptações, desvios, saídas e defesa do goleiro.
+- Sem dono e sem um destinatário de passe ativo, a bola é buscada pelo atacante mais próximo, considerando o usuário e os companheiros. Os demais procuram opções de passe. Cada companheiro tem corredor, profundidade e intervalo de decisão próprios, sem copiar a direção do usuário.
+- Os companheiros procuram espaço, linhas de passe e corredores alternados, mantendo separação do usuário e dos demais aliados. Seguram a corrida junto à linha de impedimento antes do passe e atacam a profundidade depois da saída da bola. Quando o portador chega à linha de fundo, oferecem opções na marca do pênalti, na entrada da área e na região do segundo poste.
+- Com a bola, escolhem corredores com menos pressão, conduzem para avançar, passam para um jogador com melhor oportunidade e correm para oferecer a devolução. Tentam finalizar com linha de chute aberta e devolvem ao usuário quando ele está melhor posicionado e o corredor do passe está livre.
+- Enquanto um companheiro tem a posse, X força a tentativa de finalização; A, Y, LB + Y e B pedem que ele execute a ação correspondente em direção ao usuário. Pedidos durante a chegada de um passe podem ficar aguardando o domínio por uma janela curta. A ação ainda depende de alcançar a bola e realizar o contato.
+- O impedimento vale também no treino livre quando há pelo menos um defensor de linha. Com zero defensores no treino, a regra fica desativada, mesmo com o goleiro presente. Registra a posição dos atacantes no instante do toque do passador ou finalizador. A referência é a bola e o penúltimo adversário, incluindo o goleiro, na metade ofensiva. Estar adiantado por si só não encerra o lance: a infração é marcada ao tocar a bola. Recuar depois do passe não apaga a posição registrada; ultrapassar a defesa depois da saída da bola é permitido. Um desvio mantém a avaliação; uma nova posse deliberada do adversário encerra a avaliação anterior. O impedimento exibe mensagem, apito e encerra a chance.
+- A recepção de um companheiro amortece o primeiro toque e reduz sua velocidade antes da condução. A manutenção do domínio usa assistência física curta junto aos pés. O intervalo de recepção do usuário diminui continuamente; um passe que expira sem recepção volta a ser bola livre, permitindo recuperar o domínio em contatos posteriores.
+- Os companheiros cancelam as ações e transitam para a postura neutra quando o lance termina, inclusive por impedimento. A velocidade de corrida é zerada no encerramento; a animação não continua uma passada com o personagem parado. Chutes e domínios encerram antes do fim estático do clipe e reiniciam os apoios ao voltar à locomoção. Nos passes, a influência da animação e do posicionamento dos pés é combinada progressivamente para evitar comandos conflitantes na perna.
+- Os companheiros usam rigs independentes e aparecem nos replays. Gol do usuário soma gol pessoal; gol de companheiro após passe do usuário soma assistência; gol de companheiro após combinação entre aliados soma apenas para a equipe.
+
+### Recepção aérea e movimentação sem posse
+
+- Em bola na altura da cabeça, um toque em X prepara o cabeceio por até 1,8 s, com força própria, sem carga. A previsão da trajetória escolhe o encontro alcançável e sincroniza a animação com esse momento: **Header** para a altura da cabeça sem salto, **Soccer Header** para a bola mais alta que exige salto. O contato é conferido pela trajetória da cabeça em cada subpasso da física. A preparação não exige repetir X nem acertar um quadro exato; uma bola fora do alcance continua podendo passar.
+- Os passes misturam a recuperação do chute com a locomoção, mantendo o deslocamento, a passada de apoio e uma saída gradual da animação. A animação termina antes de ficar presa no último quadro.
+- A recepção antecipa a queda da bola e exige contato físico com joelho, peito ou cabeça. A preparação do domínio usa o ponto de interceptação previsto, com a fase do clipe ajustada ao tempo de chegada; no chão, a pose de recepção pode ser misturada com a corrida. A velocidade de chegada é amortecida para preparar o próximo toque; a bola não é colocada instantaneamente no chão.
+- Uma bola frontal na cintura seleciona **Kneeing Soccerball**. Na região do peito, seleciona **Header Soccerball** para o domínio corporal. Bolas acima da cabeça podem exigir salto. Cabeceios de finalização têm trajetória própria e dependem do contato da cabeça.
+- Com corrida pressionada e uma direção indicada, bolas no peito ou na barriga usam **Receive** para orientar a saída para o lado escolhido. O comando pode ser atualizado durante a aproximação, antes do contato.
+- Quando um companheiro está com a bola, o usuário se desloca com o corpo voltado para ela. A direção relativa de movimento escolhe **Jog Forward**, **Jog Backward** e os clipes diagonais correspondentes.
+- A câmera lateral acompanha a bola. A câmera de jogador preserva o enquadramento anterior enquanto o usuário tem o domínio; sem a posse, parte de trás do personagem, acompanha a bola e limita a rotação para não apontar para a metade oposta do campo.
 
 ## 6. Gol, linha de fundo e encerramento do lance
 
@@ -88,13 +112,13 @@ O movimento usa os eixos da câmera. Há câmeras **jogador**, **clássica** e *
 | Trave seguida de saída | Quando a bola sai após bater na trave, o lance termina e mostra **TRAVE!** por cerca de 1,4 s antes da transição. Uma cobrança que morre após o contato com a trave também encerra com essa classificação. |
 | Encaixe ou bloqueio | Encaixe do goleiro encerra a chance. Uma defesa que devolve a bola ao campo pode continuar. Uma cobrança de bola parada bloqueada e sem possibilidade de sequência encerra a chance. |
 | Outros limites | A bola que sai lateralmente ou pelo fundo do recorte jogável também pode terminar o lance. A carreira classifica a perda da bola para fora do alcance como saída do lance. |
-| Fim do relógio | Na carreira, a chance termina por tempo se nenhuma outra condição ocorrer. Se a bola está próxima, baixa, avançando sob condução e prestes a cruzar a linha, há até 2,5 s de tolerância para completar a jogada. |
+| Fim do relógio | Na carreira e nas cobranças, um chute em preparação ou em andamento impede o encerramento por tempo até seu resultado físico: gol, saída, defesa resolvida ou bola que perdeu o movimento. A mesma proteção impede reinícios automáticos do treino durante a trajetória do chute. Sem chute pendente, a chance termina por tempo se nenhuma outra condição ocorrer. Se a bola está próxima, baixa, avançando sob condução e prestes a cruzar a linha, há até 2,5 s de tolerância para completar a jogada. |
 
 A prioridade de eventos importa. Um contato de defensor ou goleiro só pode evitar o gol se ocorrer antes do cruzamento da linha naquele subpasso de física. A condução e o trajeto de saída do atacante têm tratamento próprio para evitar que o movimento seja congelado antes da mensagem de resultado.
 
 ## 7. Treino livre
 
-- **Bola rolando.** O atacante começa em movimento e enfrenta o goleiro mais 1 a 5 defensores. O padrão é um defensor. A quantidade pode ser alterada no menu de pausa e a mudança reinicia a bola.
+- **Bola rolando.** O atacante começa em movimento e enfrenta o goleiro mais 0 a 5 defensores e 0 a 4 companheiros. O padrão é zero defensores e dois companheiros. A quantidade pode ser alterada no menu de pausa e a mudança reinicia a bola.
 - **Faltas.** Mova a bola para uma posição fora da área e confirme com X. Solte X antes de iniciar a cobrança. A barreira tem de seis a oito jogadores, conforme a distância, a cerca de 9,15 m no eixo da cobrança. Use a mira horizontal e o carregamento para definir a trajetória.
 - **Pênaltis.** Bola centralizada a 11 m. Há goleiro e não há barreira. O cobrador fica no local da cobrança. A mira gira dentro de uma faixa limitada.
 - **Jogador do Treino.** No treino aberto pelo menu inicial, o menu de pausa permite escolher pé dominante e editar seis atributos entre 50 e 99. O treino iniciado pela carreira herda os atributos e a aparência do personagem da carreira.
@@ -135,6 +159,14 @@ O geral é a média arredondada dos seis atributos. A estamina cai ao correr e s
 - **Confirmação.** Compras, aceitar ou recusar propostas e excluir a carreira exigem segurar a ação por cerca de 1,6 s.
 - **Conquistas.** Melhor do mês compara contribuição em blocos de quatro rodadas e exige pelo menos dois jogos no período da divisão. Ao fim da temporada, podem ser concedidos título, artilharia, líder de assistências e melhor jogador. A pontuação de desempenho usa 3 por gol, 2,4 por assistência e 0,85 por vitória. Os prêmios comparam o usuário a concorrentes simulados por divisão.
 
+O goleiro também prevê passes e cruzamentos próximos dentro da área: sai para o ponto de encontro, mergulha em bolas baixas e usa encaixe alto com salto quando necessário. O domínio depende do contato físico das luvas; bolas fora do alcance continuam em jogo. Os zagueiros tentam afastar bolas na altura da cabeça com cabeceio no chão ou com salto, enviando a bola para longe do gol após o contato.
+
+O noticiário publica uma matéria por partida, com um repórter responsável, e combina o resultado com a atuação do usuário quando ambos pertencem ao mesmo jogo. As manchetes e os comentários variam conforme desempenho, placar e importância do confronto. Algumas matérias exibem cenas ilustrativas renderizadas com os modelos do jogo: finalizações e comemorações nos destaques, Sad Walk/Sad Idle nas críticas. Pré-jogos de clássicos e fases decisivas podem mostrar a vista aérea do estádio específico do mandante. As imagens têm tamanho limitado nos cartões e não são gravações da partida.
+
+Após um gol da equipe do usuário, alguns defensores alternam Sad Walk e Sad Idle durante a comemoração. Os companheiros escolhem por conta própria o destino de seus lançamentos, antecipando a direção e a velocidade da corrida do recebedor. Também podem iniciar lançamentos ao identificar uma corrida em profundidade; pedir o lançamento não permite definir o ponto do passe do companheiro.
+
+Nos cruzamentos, atacantes e defensores antecipam a disputa aérea usando a trajetória física prevista e a posição da cabeça no quadro de contato do clipe. A corrida compensa o deslocamento da cabeça em relação ao corpo; o salto e a animação atingem o contato no instante de chegada. Os companheiros preparam a finalização antes da bola encostar, e os defensores preparam o afastamento. A checagem percorre o movimento da cabeça e da bola, preservando bolas fora do alcance e disputas perdidas. O tempo de voo do cruzamento também considera o deslocamento necessário do recebedor.
+
 ## 9. Mapa técnico
 
 A entrada oficial é `goat/src/index.html`. A publicação copia os recursos separados para `goat/dist/`. Os caminhos da tabela são relativos à pasta `goat/`.
@@ -144,6 +176,7 @@ A entrada oficial é `goat/src/index.html`. A publicação copia os recursos sep
 | `src/index.html` e `src/ui/comic.css` | Canvas, HUD, menus, pausa, visual | IDs do HTML e classes usadas em `career-ui.js` |
 | `src/gameplay/game.js` | Integração da partida, entradas, regra de fim de lance, IA defensiva, tiros e câmera | `frame()`, `input()`, `chancePosition()`, `advanceCareerChance()`, `queueShot()`, `launchShot()`, `chooseDive()`, `keeperAnimation()`, `physics()`, `finishEndLine()` |
 | `src/gameplay/football-motion.js` | Movimento, aceleração, passadas, giros, pé de apoio e cortes | `createFootballMotionController()`, `move()`, `locomotion()`, `planContact()`, `reverseRun()`, `lateralFakePose()` |
+| `src/gameplay/team-ai.js` | Companheiros, ocupação de espaço, passes, recepção, comandos e impedimento | `reset()`, `request()`, `update()`, `touch()` |
 | `src/gameplay/ball-physics.js` | Integração da bola, lançamento, rolagem, curva, colisão e toque | `createFootballBallPhysics()`, `step()`, `crossing()`, `sweepBoot()`, `groundTouch()`, `goalFrame()`, `launch()` |
 | `src/rendering/mocap.js` e `assets/animations/` | Rig, poses, clipes incorporados, IK, volumes de contato e espelhamento | `createFootballMocap()`, `update()`, `updateMocap()` em `game.js` |
 | `src/gameplay/goalkeeper-zones.js` e `src/rendering/net.js` | Opções de defesa por zona e resposta da rede | `goatGoalkeeperZones.locate()`, `prepareClips()`, `goalNet.contain()` |

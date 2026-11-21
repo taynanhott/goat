@@ -21,6 +21,7 @@
     return {attributes,dominantFoot:stored?.dominantFoot==='LeftFoot'?'LeftFoot':'RightFoot',stadiumId,careerStadiumId};
   }
   const holdTime = 1600;
+  const upgradeHoldTime = 700;
   const firstRepeat = 350;
   const repeatInterval = 130;
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
@@ -29,13 +30,18 @@
     ['Mover e mirar', 'W A S D / setas', 'Analógico esquerdo'],
     ['Correr', 'Shift', 'RT'],
     ['Chutar', 'X', 'X'],
+    ['Cabecear bola alta', 'Um toque em X', 'Um toque em X'],
+    ['Chute de primeira sem domínio', 'Segurar X e soltar antes da chegada', 'Segurar X e soltar antes da chegada'],
     ['Chute colocado', 'F + X', 'RB + X'],
     ['Cavadinha', 'E + X', 'LB + X'],
     ['Fake shot', 'Carregar X e apertar Espaço', 'Carregar X e apertar A'],
     ['Puxar com a sola', 'E', 'LB'],
-    ['Passe para assistência na carreira', 'T', 'Y'],
-    ['Nova bola no treino', 'T / B', 'B'],
-    ['Replay no treino', 'V', 'A'],
+    ['Passe / pedir passe ao portador', 'Espaço', 'A'],
+    ['Lançamento rasteiro / pedir lançamento', 'Segurar e soltar Y', 'Segurar e soltar Y'],
+    ['Lançamento aéreo', 'E + segurar/soltar Y', 'LB + segurar/soltar Y'],
+    ['Cruzamento / pedir cruzamento', 'B', 'B'],
+    ['Nova bola no treino', 'T', 'R3'],
+    ['Replay no treino', 'V', 'L3'],
     ['Trocar câmera', 'C', 'View'],
     ['Mirar na bola parada', 'A / D ou ← / →', 'Analógico esquerdo'],
     ['Pausar', 'Esc / P', 'Menu'],
@@ -69,8 +75,8 @@
   function keyboard() {
     const usage={
       move:['W','A','S','D','↑','←','↓','→','Shift'],
-      shot:['X','F','E'],
-      train:['T','B','V','C'],
+      shot:['X','F','E','Y','B','Espaço'],
+      train:['T','V','C'],
       menu:['Esc','P','Tab','Enter','Espaço']
     };
     const rows=[
@@ -122,7 +128,7 @@
       <g class="pad-letters"><text x="337" y="91">Y</text><text x="314" y="114">X</text><text x="360" y="114">B</text><text x="337" y="137">A</text></g>
       <g class="pad-lines"><path d="M176 45 L97 38 H19 M181 111 H104 L89 97 H19 M237 89 L104 158 H19 M330 44 L405 29 H500 M350 64 L410 56 H500 M314 110 L419 148 H500 M360 110 H500 M280 90 L407 190 H500"/></g>
       <g class="pad-labels"><text x="18" y="28">LB · Puxar</text><text x="18" y="88">Mover / mirar</text><text x="18" y="150">View · Câmera</text>
-      <text x="500" y="19" text-anchor="end">RT · Correr</text><text x="500" y="47" text-anchor="end">RB + X · Colocado</text><text x="500" y="100" text-anchor="end">B · Nova bola</text><text x="500" y="138" text-anchor="end">X · Chutar</text><text x="500" y="181" text-anchor="end">Menu · Pausa</text></g>
+      <text x="500" y="19" text-anchor="end">RT · Correr</text><text x="500" y="47" text-anchor="end">RB + X · Colocado</text><text x="500" y="100" text-anchor="end">B · Cruzamento</text><text x="500" y="138" text-anchor="end">X · Chutar</text><text x="500" y="181" text-anchor="end">Menu · Pausa</text></g>
     </svg>`;
   }
 
@@ -132,7 +138,7 @@
       <tbody>${rows.map(row=>`<tr>${row.map(value=>`<td>${esc(value)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
     return `<div class="input-panels"><article><h3>Teclado</h3>${keyboard()}</article><article><h3>Controle Xbox</h3>${xbox()}</article></div>
       <div class="controls-tables">${table(actions.slice(0,middle))}${table(actions.slice(middle))}</div>
-      <p class="controls-note">No fake shot, aponte a direção do corte enquanto carrega o chute. No rebote, dê um toque no botão de chute. Na carreira, cada oportunidade dura 10 segundos.</p>`;
+      <p class="controls-note">No fake shot, aponte a direção do corte enquanto carrega o chute. Para chutar de primeira um passe ou uma bola solta, carregue X antes da chegada e solte para preparar a finalização com a força escolhida. Se ainda estiver segurando X ao receber, o jogador domina e continua correndo com a força carregada. Na carreira, cada oportunidade dura 10 segundos.</p>`;
   }
 
   const button = (action, text, extra = '') => `<button type="button" data-action="${action}" class="career-button${extra ? ' '+extra : ''}">${text}</button>`;
@@ -244,13 +250,15 @@
     }
 
     function playerAlerts(proposals=season.activeProposals(save)) {
+      const xp=season.xpProgress(save);
+      const profile=xp.attributePoints>0&&Object.values(season.attributes).some(key=>(save.player.attributes[key]??0)<99);
       const shop=save.unreadItems.length>0, market=proposals.some(offer=>offer.seen!==true);
-      return {shop,market,player:shop||market};
+      return {profile,shop,market,player:profile||shop||market};
     }
 
     function updateAlerts() {
-      const {player,shop,market}=playerAlerts();
-      for(const [action,unread] of [['tab-player',player],['player-shop',shop],['player-market',market]]){
+      const {player,profile,shop,market}=playerAlerts();
+      for(const [action,unread] of [['tab-player',player],['player-profile',profile],['player-shop',shop],['player-market',market]]){
         const button=content.querySelector('[data-action="'+action+'"]');
         if(!button)continue;
         button.querySelector('.notification-dot').hidden=!unread;
@@ -361,15 +369,31 @@
 
     function beginHold(el) {
       if (hold || !save || el.disabled) return;
-      const {action,team,item} = el.dataset;
+      const {action,team,item,attr} = el.dataset;
       const inPlayer=screen==='hub'&&hubTab==='player';
       const allowed=['origin-club','origin-trial'].includes(action)?screen==='origin':action==='training-challenge'?screen==='hub'&&hubTab==='practice'&&practiceTab==='challenges':action==='delete'?screen==='gateway':action==='buy'?inPlayer&&playerTab==='shop':
+        action==='upgrade-attribute'?inPlayer&&playerTab==='profile':
         inPlayer&&playerTab==='market'&&['accept-offer','refuse-offer'].includes(action);
       if(!allowed||el.dataset.hold!=='true')return;
       holdButton = el;
       el.classList.add('is-holding');
       hold = setTimeout(() => {
         endHold();
+        if(action==='upgrade-attribute'){
+          if(season.upgradeAttribute(save,attr)){
+            const prevScroll=content.querySelector('.hub-content')?.scrollTop??0;
+            persist();
+            hub();
+            const scroller=content.querySelector('.hub-content');
+            if(scroller)scroller.scrollTop=prevScroll;
+            const nextEl=content.querySelector(`[data-action="upgrade-attribute"][data-attr="${attr}"]`)??content.querySelector(`[data-attr="${attr}"]`);
+            if(nextEl){
+              nextEl.classList.add('is-just-upgraded');
+              if(nextEl.matches('button'))focusOption(nextEl,{preventScroll:true});
+            }
+          }
+          return;
+        }
         if(['training-challenge','origin-club','origin-trial'].includes(action)){dispatch(action,el,true);return;}
         if(action==='buy'){
           if(season.purchase(save,item))equipItem(item,true);
@@ -390,7 +414,7 @@
           storageError = 'Não foi possível excluir a carreira.';
         }
         gateway();
-      }, holdTime);
+      }, action === 'upgrade-attribute' ? upgradeHoldTime : holdTime);
     }
 
     function showFocus(element) {
@@ -546,7 +570,6 @@
       const drills=journey.availableDrills(save);
       if(!drills.length)return emptyRecords('Nenhum treino disponível','Conclua uma partida oficial para liberar novos desafios de treino.');
       return `<div class="training-challenges">${drills.map(drill=>`<article><h3>${journey.drillNames[drill.type]}</h3><p>${drill.type==='collective'?`${drill.attempts} lances com defensores. Sua nota define o resultado.`:`${drill.attempts} tentativas. Acerte todas para a pontuação máxima.${drill.type==='freeKick'?' Com barreira.':' Sem defensores.'}`}</p>
-          <small>${drill.type==='collective'?'Nota 7: +1 · Nota 8: +2 · Nota 9: +3 · Abaixo de 6: até -4':'Nenhum acerto: -2 · Parcial: +2 · Todos: +3'}</small>
           ${drill.status==='complete'?`<strong>Concluído · ${drill.delta>0?'+':''}${drill.delta} pontos</strong>`:
             `<button type="button" class="career-button accent hold-action" data-hold="true" data-action="training-challenge" data-drill="${drill.id}" ${save.pending?'disabled':''}>${drill.status==='playing'?'Em andamento':'Segure para iniciar'}</button>`}</article>`).join('')}</div>
         `;
@@ -562,23 +585,31 @@
     }
 
     function ratingPanel(attributes,editable=false,age=null,prog=null,seasonProgress=null,average=null,xp=null) {
+      const availablePoints=!editable&&xp?Math.max(0,xp.attributePoints||0):0;
       const ratings=Object.entries(season.attributes).map(([label,key])=>{
         if(editable)return editableRating(key,label,attributes[key],attributes[key]);
         const d=prog?.deltas?.[key]??0;
         const deltaHtml=d?`<small class="stat-delta ${d>0?'is-up':'is-down'}">${d>0?'+':''}${d}</small>`:'';
-        return `<div class="rating"><span>${label}</span><strong>${attributes[key]}${deltaHtml}</strong>${attributeMeter(label,attributes[key])}</div>`;
+        if(availablePoints>0&&attributes[key]<99){
+          return `<button type="button" class="rating is-upgradable hold-action" data-action="upgrade-attribute" data-attr="${key}" data-hold="true" aria-label="Evoluir ${label} de ${attributes[key]} para ${attributes[key]+1}. Segure para confirmar">
+            <span>${label}</span><strong class="rating-value">${attributes[key]}${deltaHtml}<small class="rating-upgrade-hint">Segure +1</small></strong>${attributeMeter(label,attributes[key])}</button>`;
+        }
+        const maxed=availablePoints>0&&attributes[key]>=99;
+        return `<div class="rating${maxed?' is-maxed':''}" data-attr="${key}"><span>${label}</span><strong class="rating-value">${attributes[key]}${deltaHtml}${maxed?'<small class="rating-max-badge">MÁX</small>':''}</strong>${attributeMeter(label,attributes[key])}</div>`;
       }).join('');
       const ageBadge=age!=null?`<span class="player-age-badge">${age} anos · ${season.agePhase(age)}</span>`:'';
       const percent=seasonProgress==null?null:Math.floor(seasonProgress*100);
       const progressLabel='Evolução';
-      const progressHint='Ganhe XP por partidas e objetivos. Cada evolução aumenta os atributos elegíveis em 1 ponto.';
+      const progressHint=`Ganhe XP por partidas e objetivos. Ao completar 100%, você ganha ${season.ATTRIBUTE_POINTS_PER_LEVEL} pontos de atributo acumulativos.`;
       const progressBar=percent==null?'':`<div class="player-evolution" style="--progress-color:hsl(${Math.round(percent*1.2)} 56% 55%)" title="${progressHint}">
         <span>${progressLabel}</span><progress max="100" value="${percent}" aria-label="${progressLabel} · ${progressHint}"></progress>
         <strong>${xp?`${xp.points}/${xp.required} XP`:`${percent}%`}</strong></div>`;
       const averageStyle=average==null?'':` style="--rating-bg:${season.ratingColor(Number(average.toFixed(1)))}"`;
       const averageBadge=seasonProgress==null?'':`<div class="player-average-rating${average==null?'':' has-rating'}"${averageStyle} title="Média das partidas avaliadas nesta temporada">
         <span>Nota média</span><strong>${average==null?'—':average.toFixed(1).replace('.',',')}</strong></div>`;
-      return `<div class="player-ratings"><div class="player-rating-head"><strong${editable?' id="trainingOverall"':''}>GER ${season.overall(attributes)}</strong>${ageBadge}${progressBar}${averageBadge}</div><div class="rating-grid">${ratings}</div></div>`;
+      const anyUpgradable=Object.values(season.attributes).some(key=>attributes[key]<99);
+      const pointsBanner=availablePoints>0?`<div class="attribute-points-banner" role="status"><strong>+${availablePoints} ${availablePoints===1?'ponto':'pontos'} de atributo</strong><span>${anyUpgradable?'Segure o atributo que quiser para evoluir (+1)':'Todos os atributos estão no máximo (99)'}</span></div>`:'';
+      return `<div class="player-ratings"><div class="player-rating-head"><strong${editable?' id="trainingOverall"':''}>GER ${season.overall(attributes)}</strong>${ageBadge}${progressBar}${averageBadge}</div>${pointsBanner}<div class="rating-grid">${ratings}</div></div>`;
     }
 
     function editableRating(key,label,value,rating){
@@ -779,7 +810,7 @@
     function tournamentGames(next, club, position) {
       if(next?.national)club=season.team(next.playingClub);
       const lineup=journey.status(save);
-      const selectionPanel=`<div class="selection-status" style="--progress-color:hsl(${Math.round(lineup.points*1.2)} 56% 55%)"><strong>${lineup.label}</strong><span>${lineup.points}/100 · Titular a partir de 60 · Média ${lineup.average.toFixed(1).replace('.',',')}</span><div class="selection-meter"><progress max="100" value="${lineup.points}" aria-label="Pontos de titularidade"></progress><i aria-hidden="true"></i></div><small>${lineup.starter?'Você terá a sequência normal de lances.':'Você entrará como reserva, com 1 a 3 lances.'} Treinos opcionais ajudam a conquistar espaço.</small></div>`;
+      const selectionPanel=`<div class="selection-status" style="--progress-color:hsl(${Math.round(lineup.points*1.2)} 56% 55%)"><strong>${lineup.label}</strong><span>${lineup.points}/100 · Titular a partir de 60 · Média ${lineup.average.toFixed(1).replace('.',',')}</span><div class="selection-meter"><progress max="100" value="${lineup.points}" aria-label="Pontos de titularidade"></progress><i aria-hidden="true"></i></div><small>${lineup.starter?'Você terá a sequência normal de lances. ':''}Treinos opcionais ajudam a conquistar espaço.</small></div>`;
       const badges=next?[next.isFinal?'<span class="match-tag is-final">FINAL</span>':'',next.isClassic?'<span class="match-tag is-classic">CLÁSSICO</span>':''].filter(Boolean).join(''):'';
       const retiringNext = (save.player.age ?? 18) >= season.RETIRE_AGE - 1;
       const fixture=next
@@ -792,7 +823,7 @@
       const leaders=list.slice(0,5);
       const playerRank=list.findIndex(row=>row.player);
       if(playerRank>=5)leaders.push(list[playerRank]);
-      return `${next?.date?`<p class="fixture-date">${new Date(next.date+'T12:00:00').toLocaleDateString('pt-BR')}${save.competitions['world-cup']?' · Temporada com pausa para a Copa do Mundo':''}</p>`:''}${fixture}${selectionPanel}<div class="tournament-overview"><section><div class="section-head-row"><h3 class="hub-section-title">Últimos 3 jogos</h3></div>
+      return `${fixture}${selectionPanel}<div class="tournament-overview"><section><div class="section-head-row"><h3 class="hub-section-title">Últimos 3 jogos</h3></div>
         ${last.length?`<ul class="fixture-history">${last.map(game=>{
           const opp=season.team(game.opponent);
           const outcome=game.forGoals===game.against?'E':game.forGoals>game.against?'V':'D';
@@ -953,62 +984,146 @@
       return `${phaseNav}<div class="standings-scroll tournament-scroll" tabindex="0" aria-label="${esc(comp.name)}">${phaseBody}</div>`;
     }
 
-    function matchComment(game, author) {
-      const home=season.team(game.home).name,away=season.team(game.away).name;
-      const winner=game.h===game.a?null:game.h>game.a?home:away;
-      const total=game.h+game.a, margin=Math.abs(game.h-game.a);
-      if(author>=6){
-        if(!winner)return `${home} e ${away} somam um ponto cada na rodada ${game.round}.`;
-        return `${winner} confirma os três pontos na rodada ${game.round}, com ${margin===1?'vantagem mínima no placar':`${margin} gols de vantagem`}.`;
-      }
-      const comments=!total?[
-        'O placar fez aquecimento e ficou no banco.',
-        'Dois times, duas traves e nenhum gol pra contar.',
-        'Pode devolver o placar do jeito que veio. Nem tirou do plástico.'
-      ]:total>=5?[
-        'O operador do placar pediu substituição antes dos jogadores.',
-        'Quem saiu pra pegar café perdeu pelo menos um gol.',
-        'Finalmente um jogo que gastou todas as pilhas do controle do placar.'
-      ]:winner?[
-        `${winner} levou os três pontos. O torcedor levou o susto até o apito.`,
-        margin===1?'Um gol de diferença e uns quinze anos a menos na expectativa de vida da torcida.':'Deu pra comemorar antes do apito. Luxo raro nessa divisão.',
-        `${winner} fez a parte dele. A calculadora da tabela que lute.`
-      ]:[
-        'Dividiram os pontos. Os palpites do grupo da família seguiram perdendo.',
-        'A tabela ganhou dois pontos e a discussão no pós-jogo ganhou mais uma hora.',
-        'O empate foi o único que conseguiu sair abraçado pelos dois lados.'
-      ];
-      return comments[(game.round+author)%comments.length];
+    const newsImages=new Map();
+    function newsHash(value){
+      let hash=2166136261;
+      for(const char of String(value))hash=Math.imul(hash^char.charCodeAt(0),16777619);
+      return hash>>>0;
     }
-
+    function newsPhoto(story){
+      if(!story.media||!api.newsImage)return '';
+      const media=story.media,key=[save.year,save.player.name,JSON.stringify(save.player.look),story.key,media.kind].join('|');
+      if(!newsImages.has(key)){
+        const image=api.newsImage({...media,variant:newsHash(story.key)%6});
+        if(!image)return '';
+        if(newsImages.size>=24)newsImages.delete(newsImages.keys().next().value);
+        newsImages.set(key,image);
+      }
+      return '<figure class="news-photo"><img src="'+newsImages.get(key)+'" width="640" height="360" loading="lazy" alt="'+esc(media.alt)+'">'+(media.caption?'<figcaption>'+esc(media.caption)+'</figcaption>':'')+'</figure>';
+    }
     function newsFeed(club) {
-      const stories=[];
-      for(const day of save.rounds.slice(-4).reverse()){
+      const stories=[],seen=new Set(),usedComments=new Set();
+      const choose=(list,key)=>{
+        const offset=newsHash(key)%list.length;
+        for(let i=0;i<list.length;i++){
+          const text=list[(offset+i)%list.length];
+          if(!usedComments.has(text)){usedComments.add(text);return text;}
+        }
+        return list[offset];
+      };
+      const add=story=>{if(!seen.has(story.key)){seen.add(story.key);stories.push(story);}};
+      const next=season.opponent(save);
+      if(next&&(next.isClassic||next.isFinal||/semifinal|quartas/i.test(next.phaseLabel??''))){
+        const home=next.home?season.team(next.playingClub??club.id):next.club;
+        const away=next.home?next.club:season.team(next.playingClub??club.id);
+        const stadiumId=window.goatStadiums?.forClub(home,0),stadium=window.goatStadiums?.byId[stadiumId];
+        const key='preview:'+save.year+':'+next.competitionId+':'+next.slot.round+':'+home.id+':'+away.id;
+        const occasion=next.isFinal?'FINAL':next.isClassic?'CLÁSSICO':'JOGO DECISIVO';
+        add({key,round:save.round+1,author:newsAuthors[newsHash(key)%newsAuthors.length],club:true,player:false,
+          title:occasion+' À VISTA: '+home.name+' x '+away.name,
+          label:next.competitionShort+' · '+next.phaseLabel,
+          body:choose([
+            'Arquibancada em contagem regressiva. '+home.name+' e '+away.name+' se encontram em um jogo que promete mexer com a temporada.',
+            'O calendário guardou uma noite especial: '+home.name+' recebe '+away.name+'. Concentração e bola parada podem decidir os detalhes.',
+            'Semana de expectativa alta para '+home.name+' x '+away.name+'. O peso do confronto começa antes do primeiro toque na bola.',
+            'A conversa da torcida tem endereço: '+(stadium?.name??home.name)+'. '+home.name+' e '+away.name+' entram em campo com muito em jogo.'
+          ],key),media:stadium?.kind==='real'?{kind:'stadium',club:home,opponent:away,stadiumId,
+            alt:'Vista aérea de '+stadium.name+' no jogo',caption:stadium.name+' · Vista aérea no GOAT'}:null});
+      }
+      for(const [dayIndex,day] of save.rounds.slice(-4).reverse().entries()){
         const games=day.filter(game=>season.team(game.home)&&season.team(game.away));
         if(!games.length)continue;
         const round=games[0].seasonRound??games[0].round??1;
-        const compName=season.COMPETITION_META[games[0].compId]?.shortName??'Torneio';
-        const own=games.find(game=>game.home===club.id||game.away===club.id);
-        const others=games.filter(game=>game!==own).sort((a,b)=>(b.h+b.a)-(a.h+a.a));
-        for(const [index,author] of newsAuthors.entries()){
-          const game=((index+round)%3===0?own:null)??others[(index+round)%others.length]??own;
-          if(!game)continue;
-          stories.push({author,title:fixtureTitle(game),body:matchComment(game,index),club:game===own,round,label:`${compName} · ${game.phaseLabel||('Rodada '+game.round)}`});
-        }
         const played=save.history.find(game=>game.round===round);
-        if(played){
-          const name=save.player.name,actions=[played.goals?`${played.goals} ${played.goals===1?'gol':'gols'}`:'',
-            played.assists?`${played.assists} ${played.assists===1?'assistência':'assistências'}`:''].filter(Boolean).join(' e ');
-          stories.unshift({author:newsAuthors[round%6],title:`${name} em campo`,round,label:`${played.compName||compName} · ${played.phaseLabel||('Jogo '+round)}`,club:played.club===club.id,player:true,
-            body:actions?`${name} participou do placar com ${actions}. A bola da partida já sabe com quem vai pra casa.`:
-              `${name} passou sem gol nem assistência. A discussão no grupo da torcida durou mais que o jogo.`});
+        const own=games.find(game=>game.home===club.id||game.away===club.id)||
+          (played?games.find(game=>game.home===played.club||game.away===played.club):null);
+        const selected=[own,...games.filter(game=>game!==own).sort((a,b)=>
+          (Math.abs(b.h-b.a)*2+b.h+b.a)-(Math.abs(a.h-a.a)*2+a.h+a.a)).slice(0,3)].filter(Boolean);
+        for(const [index,game] of selected.entries()){
+          const home=season.team(game.home),away=season.team(game.away);
+          const key=[save.year,game.compId,round,game.round,game.home,game.away].join(':');
+          const compName=season.COMPETITION_META[game.compId]?.shortName??'Torneio';
+          const author=newsAuthors[(newsHash(key)+index)%newsAuthors.length];
+          const total=game.h+game.a,margin=Math.abs(game.h-game.a),winner=game.h>game.a?home:away;
+          const label=compName+' · '+(game.phaseLabel||('Rodada '+game.round));
+          const isOwn=game===own,performance=isOwn&&played&&(!played.compId||played.compId===game.compId)?played:null;
+          let title=fixtureTitle(game),body,media=null;
+          if(performance){
+            const name=save.player.name,positive=performance.goals+performance.assists>0;
+            const poor=!positive&&(performance.rating!=null?performance.rating<6:performance.forGoals<performance.against);
+            const actions=[performance.goals?performance.goals+' '+(performance.goals===1?'gol':'gols'):'',
+              performance.assists?performance.assists+' '+(performance.assists===1?'assistência':'assistências'):''].filter(Boolean).join(' e ');
+            const headlines=positive?[name+' aparece na hora decisiva',name+' faz a diferença',name+' deixa sua marca',name+' encontra o caminho do gol',name+' ganha os holofotes',name+' participa e decide']:
+              poor?[name+' fica devendo',name+' termina sob cobrança','Noite difícil para '+name,name+' busca uma resposta']:
+                [name+' participa de duelo disputado',name+' deixa o campo sem participação em gol'];
+            title=choose(headlines,key+'title');
+            const praise=[
+              'Teve presença, leitura e execução. '+name+' participou com '+actions+' e deu motivo para a torcida levantar.',
+              'Quando a bola pediu uma solução, '+name+' respondeu: '+actions+'. Atuação para rever os melhores momentos.',
+              'Não foi só aparecer na foto. '+name+' somou '+actions+' e ajudou a transformar a jogada em resultado.',
+              'A defesa tentou fechar o caminho, mas '+name+' encontrou espaço. Terminou com '+actions+'.',
+              'Movimentação que dá opção e toque que faz diferença: '+name+' saiu com '+actions+'.',
+              'A torcida tem assunto para a semana. '+name+' participou com '+actions+' e mostrou personalidade.'
+            ];
+            const criticism=[
+              name+' teve dificuldade para entrar no jogo. Faltou presença nas jogadas decisivas e sobrou cobrança no apito final.',
+              'A bola chegou, mas a resposta não veio. '+name+' precisa recuperar a confiança para a próxima partida.',
+              'Pouco espaço e decisões apressadas marcaram a noite de '+name+'. O próximo jogo pede outra postura.',
+              'Cabeça baixa no fim. '+name+' passou longe do protagonismo e agora tenta transformar a cobrança em reação.',
+              'A marcação tirou '+name+' do jogo. Procurar novos espaços será parte do trabalho para a próxima rodada.',
+              'Não deu encaixe: '+name+' encontrou dificuldades nas combinações e saiu sem participar de gol.'
+            ];
+            body=(positive?choose(praise,key):poor?choose(criticism,key):
+              name+' terminou sem gol ou assistência em uma partida de muita disputa. A avaliação também passa pela movimentação e pelo trabalho coletivo.')+' '+fixtureTitle(game)+'.';
+            if(dayIndex<3&&(positive||poor))media={kind:positive?(performance.goals&&newsHash(key)%2?'celebrate':'shoot'):'sad',
+              club:season.team(performance.club)??club,opponent:season.team(performance.opponent)??away,
+              appearance:season.paint(save.player.look,season.team(performance.club)??club),alt:positive?name+' em cena de partida':name+' e companheiros abatidos após a partida'};
+          }else{
+            const zero=[
+              'As defesas chegaram antes dos atacantes. O zero permaneceu até o fim.',
+              'O placar não saiu do lugar, mas os goleiros tiveram trabalho para manter tudo igual.',
+              'Faltou o último toque. A organização defensiva venceu a criatividade.',
+              'Um ponto para cada lado e a sensação de que dava para arriscar mais.',
+              'O torcedor esperou o grito que não veio. As redes passaram a noite em silêncio.',
+              'Os espaços foram raros e as finalizações não resolveram. Empate sem gols.'
+            ];
+            const festival=[
+              'Quem piscou perdeu um lance. Ataques inspirados e defesas expostas fizeram um jogo aberto.',
+              'Não faltou coragem para atacar. O placar contou a história de uma partida sem descanso.',
+              'As redes trabalharam mais que a defesa gostaria. Foi noite de chances dos dois lados.',
+              'O jogo trocou controle por emoção. A torcida mal teve tempo de sentar entre os ataques.',
+              'Um roteiro cheio de gols para quem gosta de futebol com risco.',
+              'A conta do placar subiu rápido. Os treinadores terão gols para comemorar e ajustes para cobrar.'
+            ];
+            const wins=[
+              winner.name+' aproveitou melhor as chances e saiu com a vitória.',
+              winner.name+' encontrou a solução no ataque e sustentou o resultado até o fim.',
+              'A noite terminou do lado de '+winner.name+'. Eficiência fez diferença no placar.',
+              winner.name+' fez valer os momentos de superioridade e levou a melhor.',
+              'O resultado recompensa '+winner.name+', que conseguiu transformar pressão em gol.',
+              winner.name+' respondeu nos detalhes e ganhou um duelo importante.',
+              'A torcida de '+winner.name+' deixou o estádio com motivos para comemorar.',
+              winner.name+' foi mais preciso na hora de decidir. Vitória construída com atenção nas duas áreas.'
+            ];
+            const draws=[
+              'Os dois lados tiveram sua vez, mas ninguém conseguiu se impor até o fim.',
+              'Equilíbrio no placar e opiniões divididas na arquibancada. O empate deixa trabalho para os dois.',
+              'Cada equipe levou um ponto e uma lista de oportunidades para lamentar.',
+              'O empate combinou com a disputa: reação de um lado, resposta do outro.',
+              'Ninguém saiu de mãos vazias, mas os dois queriam mais.',
+              'As equipes alternaram bons momentos e terminaram sem separar o placar.'
+            ];
+            body=choose(!total?zero:total>=5?festival:game.h===game.a?draws:wins,key);
+            if(index===1&&dayIndex===0&&margin>=3)media={kind:'celebrate',club:winner,opponent:winner===home?away:home,alt:'Jogadores de '+winner.name+' comemorando em cena de partida'};
+          }
+          add({key,author,title,body,club:isOwn,player:!!performance,round,label,media});
         }
       }
       const filtered=stories.filter(story=>newsTab==='all'||(newsTab==='club'?story.club:story.player)).sort((a,b)=>b.round-a.round);
-      return `<p class="news-disclaimer">Noticiário simulado da carreira. Todos os comentários são fictícios.</p>
-        ${filtered.length?`<div class="news-feed standings-scroll" tabindex="0" aria-label="Notícias da carreira">${filtered.map(({author,title,body,label})=>
-          `<article class="news-story">${newsAvatar(author)}<div><small class="news-round">${esc(label)}</small>
-          <h3><span>${esc(author[0])}</span> - ${esc(title)}</h3><p>${esc(body)}</p></div></article>`).join('')}</div>`:emptyRecords('Nenhuma notícia por enquanto','As novidades desta seção aparecerão conforme sua carreira avançar.')}`;
+      return (filtered.length?'<div class="news-feed standings-scroll" tabindex="0" aria-label="Notícias da carreira">'+filtered.map(story=>
+          '<article class="news-story">'+newsAvatar(story.author)+'<div class="news-copy"><small class="news-round">'+esc(story.label)+'</small>'+
+          '<h3><span>'+esc(story.author[0])+'</span> · '+esc(story.title)+'</h3><p>'+esc(story.body)+'</p>'+newsPhoto(story)+'</div></article>').join('')+'</div>':
+          emptyRecords('Nenhuma notícia por enquanto','As novidades desta seção aparecerão conforme sua carreira avançar.'));
     }
 
     function hub(skipNewItem=null) {
@@ -1060,6 +1175,12 @@
       const alerts=playerAlerts(proposals);
       const next = season.opponent(save);
       if(save.worldCup?.callup&&!save.worldCup.callup.seen){persist();callupScreen();return;}
+      const training=save.selection?.training;
+      if(hubTab==='practice'&&training&&training.seen!==true){
+        training.seen=true;
+        persist();
+      }
+      const trainingAlert=training?.seen!==true&&journey.availableDrills(save).some(drill=>drill.status!=='complete');
       const table = season.standings(save);
       const position = Math.max(1, table.findIndex(row => row.id === save.club) + 1);
       const comps = season.activeCompetitions(save).filter(comp => {
@@ -1073,7 +1194,7 @@
         tournaments:()=>`<nav class="${subtabClass}" aria-label="Torneios do clube">${comps.map(c=>
           `<button type="button" data-action="comp-select" data-comp="${c.id}" aria-pressed="${selectedCompId===c.id}">${esc(c.shortName)}</button>`
         ).join('')}</nav>`,
-        player:()=>tabs('Meu Jogador',[['profile','Dados Gerais'],['shop','Loja',alerts.shop],['awards','Conquistas'],
+        player:()=>tabs('Meu Jogador',[['profile','Dados Gerais',alerts.profile],['shop','Loja',alerts.shop],['awards','Conquistas'],
           ['market','Propostas',alerts.market],['edit','Editar jogador']],playerTab,'player',subtabClass),
         news:()=>tabs('Filtro do Noticiário',[['all','Todos'],['club','Meu Clube'],['player','Meu Jogador']],newsTab,'news',subtabClass),
         practice:()=>tabs('Treinos',[['challenges','Desafios de treino'],['free','Treino Livre']],practiceTab,'practice',subtabClass)
@@ -1091,7 +1212,7 @@
       activate('hub',league+' · '+save.year,
         `<div class="career-hub${hubTab==='games'?' is-no-subtabs':''}" data-panel="${hubTab==='player'?playerTab:hubTab}" style="--club-primary:${club.primary};--club-secondary:${club.secondary}">
          <div class="club-header">${medal(club,42)}<div><strong>${esc(club.name)}</strong><span>${esc(save.player.name)} · ${save.player.age} anos · ${position}º na ${league}</span></div></div>
-         ${tabs('Painel da carreira',[['games','Jogos'],['tournaments','Torneios'],['player','Meu Jogador',alerts.player],['news','Noticiário'],['practice','Treinos']],hubTab,'tab')}
+         ${tabs('Painel da carreira',[['games','Jogos'],['tournaments','Torneios'],['practice','Treinos',trainingAlert],['player','Meu Jogador',alerts.player],['news','Noticiário']],hubTab,'tab')}
          ${subtabs[hubTab]()}
          <div class="hub-content"${playerSection?' tabindex="0" aria-label="'+(playerTab==='profile'?'Dados gerais do jogador':'Conquistas do jogador')+'"':''}>${sections[hubTab]()}</div></div>`,backTarget);
       api.preview(season.paint(save.player.look,club),-.22);
@@ -1265,7 +1386,7 @@
       api.preview(null);
       const home=match.home?club:opponent,away=match.home?opponent:club;
       const score=match.home?[match.forGoals,match.against]:[match.against,match.forGoals];
-      const outcomes={goal:'Gol',assist:'Assistência',ownGoal:'Gol contra',save:'Defesa ou bloqueio',out:'Bola fora',time:'Tempo esgotado'};
+      const outcomes={goal:'Gol',assist:'Assistência',ownGoal:'Gol contra',teamGoal:'Gol do companheiro',save:'Defesa ou bloqueio',out:'Bola fora',time:'Tempo esgotado'};
       const types={play:'Bola rolando',penalty:'Pênalti',freeKick:'Falta com barreira'};
       const rows=Array.from({length:match.chances},(_,i)=>{
         const clip=reviewClips?.[i];
@@ -1275,7 +1396,8 @@
       }).join('');
       const penLine = match.penalties ? `<small class="result-penalties">Pênaltis: ${match.penalties.h} × ${match.penalties.a}</small>` : '';
       const xp=match.xpAward;
-      const xpResult=xp?`<section class="result-xp"><h3>+${xp.total} XP</h3><p>Partida +${xp.base} XP · Objetivos +${xp.bonus} XP${xp.upgrades?` · ${xp.upgrades} evolução${xp.upgrades>1?'s':''}`:''}</p><div>${xp.objectives.map(objective=>`<div class="result-objective${objective.complete?' is-complete':''}"><span>${objective.complete?'✓':'○'} ${objective.label}</span><strong>${objective.complete?'+':''}${objective.complete?objective.reward:0} XP</strong></div>`).join('')}</div></section>`:'';
+      const earnedPoints=xp?.attributePoints??(xp?.upgrades?xp.upgrades*season.ATTRIBUTE_POINTS_PER_LEVEL:0);
+      const xpResult=xp?`<section class="result-xp"><h3>+${xp.total} XP</h3><p>Partida +${xp.base} XP · Objetivos +${xp.bonus} XP${xp.upgrades?` · ${xp.upgrades} ${xp.upgrades>1?'evoluções':'evolução'} (+${earnedPoints} pts de atributo)`:''}</p><div>${xp.objectives.map(objective=>`<div class="result-objective${objective.complete?' is-complete':''}"><span>${objective.complete?'✓':'○'} ${objective.label}</span><strong>${objective.complete?'+':''}${objective.complete?objective.reward:0} XP</strong></div>`).join('')}</div></section>`:'';
       activate('result','Fim de jogo',`<div class="result-score"><div>${medal(home)}<strong>${home.name}</strong></div>
         <div class="result-score-mid"><strong aria-label="Placar final">${score[0]} × ${score[1]}</strong>${penLine}</div><div>${medal(away)}<strong>${away.name}</strong></div></div>
         ${xpResult}<div class="result-continue">${button('close-result','Continuar','accent')}</div>
@@ -1812,6 +1934,8 @@
         season.recordRatingEvents(current,ratingEvents);
         current.used++;current.shots+=shots;
         if(outcome==='goal'){current.goals++;current.forGoals++;}
+        else if(outcome==='assist'){current.assists=(current.assists??0)+1;current.forGoals++;}
+        else if(outcome==='teamGoal'||outcome==='ownGoal')current.forGoals++;
         const complete=current.used>=current.chances;
         if(complete){journey.finishDrill(save,current);save.lastTraining={...current,unseen:true};save.pending=null;}
         persist();return complete;

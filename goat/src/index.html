@@ -229,6 +229,9 @@
     <button type="button" data-defenders="3" aria-label="3 defensores" aria-pressed="false">3</button><button type="button" data-defenders="4" aria-label="4 defensores" aria-pressed="false">4</button>
     <button type="button" data-defenders="5" aria-label="5 defensores" aria-pressed="false">5</button>
   </div></fieldset>
+  <fieldset id="trainingTeammates" hidden><legend>Companheiros no treino</legend><div class="training-defense-buttons">
+<button type="button" data-teammates="0" aria-label="0 companheiros" aria-pressed="false">0</button><button type="button" data-teammates="1" aria-label="1 companheiros" aria-pressed="false">1</button><button type="button" data-teammates="2" aria-label="2 companheiros" aria-pressed="true">2</button><button type="button" data-teammates="3" aria-label="3 companheiros" aria-pressed="false">3</button><button type="button" data-teammates="4" aria-label="4 companheiros" aria-pressed="false">4</button>
+  </div></fieldset>
   <button type="button" id="trainingStadium" class="career-button" data-action="training-stadium" aria-haspopup="dialog" hidden>Estádio</button>
   <button id="resume" class="career-button accent">Continuar</button>
   <button type="button" id="trainingPlayerSetup" class="career-button" data-action="training-player-paused" hidden>Jogador do Treino</button>
@@ -243,12 +246,13 @@
 <div id="freeKickInstructions" class="free-kick-instructions" hidden>Mova a bola para fora da área · X confirma o local</div>
 <div id="matchFade" class="match-fade" hidden aria-hidden="true"></div>
 <div id="runtimeError" hidden role="alert" style="position:fixed;z-index:99;bottom:15px;left:15px;right:15px;padding:16px;background:#54242c;color:white;font:14px system-ui;border-radius:10px"></div>
-<script>addEventListener('error',function(event){var panel=document.getElementById('runtimeError');panel.hidden=false;panel.textContent='O jogo encontrou um erro: '+event.message+' · linha '+event.lineno;});</script>
+<script>addEventListener('error',function(event){var panel=document.getElementById('runtimeError');panel.hidden=false;var detail=event.error&&(event.error.stack||event.error.message)||event.message;panel.textContent='O jogo encontrou um erro: '+detail+' · linha '+event.lineno;});</script>
 <script src="./career/goat-storage.js"></script>
 <script src="../assets/animations/animations.js"></script>
 <script src="../assets/animations/fifa16-animations.js"></script>
 <script src="../assets/animations/goalkeeper-poses.js"></script>
 <script src="../assets/animations/shot-and-crowd-animations.js"></script>
+<script src="../assets/animations/team-animations.js"></script>
 <script src="../assets/animations/animation-overrides.js"></script>
 <script src="./ui/comic-art.js"></script>
 <script src="./rendering/mocap.js"></script>
@@ -268,5 +272,6 @@
 <script src="./career/career-season.js"></script>
 <script src="./career/career-replay.js"></script>
 <script src="./career/career-ui.js"></script>
+<script src="./gameplay/team-ai.js"></script>
 <script src="./gameplay/game.js"></script>
 </body></html>

@@ -1451,6 +1451,16 @@ window.createFootballMotionController = function(options) {
     player.turningAround = null;
   }
 
+  function passRecovery(actor,pose,action,dt){
+    action.age+=dt;
+    const clip=clips[action.clip],strike=shotContact(action.clip);
+    const duration=action.duration??.3;
+    const weight=smooth(action.age/.045)*(1-smooth((action.age-duration+.14)/.14));
+    if(action.age>=duration){actor.teamAction=null;return pose;}
+    const start=Math.max(0,strike.time-.065),end=Math.min(clip.duration-.001,strike.time+.18);
+    return {...pose,actionLayer:{clip:action.clip,time:mix(start,end,clamp(action.age/duration,0,1)),
+      weight,foot:strike.foot},lookTarget:action.lookTarget};
+  }
   const limits=footballPlayLimits;
-  return { move, locomotion, shotContact, contactPoint, cutExit, acceptTouch, incidentalTouch, lockCharge, reset, limits };
+  return { move, locomotion, passRecovery, shotContact, contactPoint, cutExit, acceptTouch, incidentalTouch, lockCharge, reset, limits };
 };

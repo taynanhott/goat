@@ -962,7 +962,8 @@
         age: START_AGE,
         nationality:'BR',position:'AM',
         look: availableLook(null, player.look),
-        attributes: { ...defaultAttributes }
+        attributes: { ...defaultAttributes },
+        progression: { points: 0, level: 0, total: 0, attributePoints: ATTRIBUTE_POINTS_PER_LEVEL }
       },
       stage: 'trial',
       trial: null,
@@ -1352,17 +1353,31 @@
   }
 
   // ===== EVOLUÇÃO POR IDADE E APOSENTADORIA AOS 36 ANOS =====
+  const ATTRIBUTE_POINTS_PER_LEVEL = 5;
+
   function attributeProgress(save) {
     const progress=xpProgress(save);
     return clamp(progress.points/progress.required,0,1);
   }
 
   function xpProgress(save) {
-    const progress=save.player.progression??={points:0,level:0,total:0};
+    const progress=save.player.progression??={points:0,level:0,total:0,attributePoints:0};
     progress.points=Math.max(0,Number(progress.points)||0);
     progress.level=Math.max(0,Math.floor(Number(progress.level)||0));
     progress.total=Math.max(progress.points,Number(progress.total)||0);
+    progress.attributePoints=Math.max(0,Math.floor(Number(progress.attributePoints)||0));
     return {...progress,required:2200+progress.level*350+Math.max(0,overall(save.player.attributes)-80)*100};
+  }
+
+  function upgradeAttribute(save, key) {
+    if (!save?.player?.attributes || !attributeKeys.includes(key)) return false;
+    xpProgress(save);
+    const progress = save.player.progression;
+    const current = Number(save.player.attributes[key]);
+    if (progress.attributePoints < 1 || !Number.isFinite(current) || current >= 99) return false;
+    save.player.attributes[key] = Math.min(99, Math.round(current) + 1);
+    progress.attributePoints--;
+    return true;
   }
 
   function ensureObjectives(match) {
@@ -1418,14 +1433,11 @@
     while(progress.points>=xpProgress(save).required){
       progress.points-=xpProgress(save).required;
       progress.level++;
-      const age=save.player.age??START_AGE;
-      for(const key of attributeKeys){
-        if(age>30&&['speed','acceleration','stamina','strength'].includes(key))continue;
-        save.player.attributes[key]=Math.min(99,save.player.attributes[key]+1);
-      }
+      progress.attributePoints+=ATTRIBUTE_POINTS_PER_LEVEL;
       upgrades++;
     }
-    match.xpAward={base,bonus,total:earned,upgrades,objectives};
+    const attributePoints=upgrades*ATTRIBUTE_POINTS_PER_LEVEL;
+    match.xpAward={base,bonus,total:earned,upgrades,attributePoints,objectives};
   }
 
   function applySeasonProgression(save) {
@@ -1652,7 +1664,7 @@
     match.shots += shots;
     match.penalty = false;
     match.setPiece = null;
-    if (outcome === 'goal' || outcome === 'assist' || outcome === 'ownGoal') {
+    if (outcome === 'goal' || outcome === 'assist' || outcome === 'ownGoal' || outcome === 'teamGoal') {
       match.forGoals++;
       if (outcome === 'goal') match.goals++;
       if (outcome === 'assist') match.assists++;
@@ -1959,7 +1971,7 @@
     activeCompetitions, scorers, assisters, restore, totalRounds, leagueOf, divisionOf,
     leagueCompId, salaryFor, nameOf, shop, available, purchase, edit, activeProposals,
     offerLockStatus, decide, newSeason, attributes, defaultAttributes, overall,
-    agePhase, attributeProgress, xpProgress, ensureObjectives, objectiveProgress, START_AGE, RETIRE_AGE, isWorseClub, performanceContext, defensiveProfile,
+    agePhase, attributeProgress, xpProgress, upgradeAttribute, ATTRIBUTE_POINTS_PER_LEVEL, ensureObjectives, objectiveProgress, START_AGE, RETIRE_AGE, isWorseClub, performanceContext, defensiveProfile,
     COMPETITION_META, isClassic: db.isClassic,
     needsPenaltyShootout, createShootout, shootoutNextTurn, recordShootoutKick,
     ratingAfter, ratingColor, recordRatingEvents, averageRating

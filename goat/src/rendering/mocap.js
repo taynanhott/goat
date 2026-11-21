@@ -163,7 +163,8 @@ function shotGeometry(key,time,footName,opposite=false){
   const names=['LeftFoot','RightFoot'];
   const toe=index=>point(boneMatrix(byName[names[index]]),bootMarkers[index]).map(value=>value*scale);
   const index=footName==='LeftFoot'?0:1;
-  return {boot:toe(index),support:toe(1-index)};
+  return {boot:toe(index),support:toe(1-index),
+    head:point(boneMatrix(byName.Head),[0,8,0]).map(value=>value*scale)};
 }
 
 function limitRotation(rotation,maxAngle){
@@ -1255,6 +1256,8 @@ const prevRootSnapshot=[...s.root];
 s.clip=options.clip;s.time=time;s.mirror=!!options.mirror;
 let t=loop?((time%clip.duration)+clip.duration)%clip.duration:clamp(time,0,clip.duration),f=Math.min(clip.frames-1,t*clip.fps),lo=Math.floor(f),hi=Math.min(clip.frames-1,lo+1),a=f-lo;
 const upper=options.upperBody,upperClip=upper&&pack.clips[upper.clip],upperFrame=upperClip&&sampleFrames(upperClip,upper.time);
+const actionLayer=options.actionLayer,actionClip=actionLayer&&pack.clips[actionLayer.clip];
+const actionFrame=actionClip&&sampleFrames(actionClip,actionLayer.time);
 const upperLayers=options.upperBlend?.length?options.upperBlend.map(layer=>{
   const lc=pack.clips[layer.clip];
   return lc&&layer.weight>.002?{clip:lc,frame:sampleFrames(lc,layer.time),weight:layer.weight,opposite:!!layer.opposite}:null;
@@ -1301,6 +1304,12 @@ for(let i=0;i<count;i++){
     }
   }
   if(upperFrame){const weight=upper.shot?shotUpperWeights[i]:Number(upperBodyJoints[i]);if(weight)q=qlerp(q,shotJoint(upperClip,upperFrame,i,upper.opposite),upper.weight*weight)}
+  if(actionFrame&&!options.q){
+    const name=rig[i].name,side=actionLayer.foot?.startsWith('Left')?'Left':'Right';
+    const mask=name.startsWith(side)&&/UpLeg|Leg|Foot|Toe/.test(name)?(actionLayer.legWeight??1):
+      upperBodyJoints[i]?(actionLayer.upperWeight??.45):0;
+    if(mask)q=qlerp(q,shotJoint(actionClip,actionFrame,i,false),actionLayer.weight*mask);
+  }
   if(offset)q=qm(q,qeuler(offset));
   if(options.inertia&&!options.q){
     const p=options.inertia;
@@ -1342,6 +1351,9 @@ if(options.pelvis){
 const soleFlex=[0,0];
 const clipEdited=editedClipKeys.has(options.clip);
 const ankleGoals=(clipEdited?[]:(options.ankleTargets??[])).map(target=>{
+  const actionWeight=actionFrame&&target.foot===actionLayer.foot?
+    clamp(actionLayer.weight*(actionLayer.legWeight??1),0,1):0;
+  target={...target,weight:(target.weight??1)*(1-actionWeight)};
   const side=target.foot.startsWith('Left')?'Left':'Right';
   const hip=byName[side+'UpLeg'],knee=byName[side+'Leg'],foot=byName[side+'Foot'];
   const aim=toModel(target.point);
@@ -1349,7 +1361,7 @@ const ankleGoals=(clipEdited?[]:(options.ankleTargets??[])).map(target=>{
    const heading=qeuler([0,yaw,0]),pitch=qeuler([target.pitch,0,target.bank??0]);
   const index=side==='Left'?0:1;
   const rocker=footRolls[index];
-  const roll=target.roll??0;
+  const roll=(target.roll??0)*target.weight;
   const rest=qlerp(neutralWorld[foot],bindWorld[foot],roll);
   const orientation=qm(heading,qm(pitch,rest));
   if(roll>0&&target.sole){
@@ -1371,15 +1383,16 @@ if(options.pelvis&&ankleGoals.length){
     const drop=origin[1]-aim[1];
     const distance2=thigh**2+shin**2+2*thigh*shin*Math.cos(target.kneeBend);
     const lift=Math.sqrt(Math.max(0,distance2-horizontal))-drop;
-    desired=Math.max(desired,lift*target.legExtension);
+    desired=Math.max(desired,lift*target.legExtension*target.weight);
     const reachable=Math.sqrt(Math.max(0,(thigh+shin-.75)**2-horizontal))-drop;
-    limit=Math.min(limit,lerp(maxLift,Math.max(0,reachable),target.groundWeight));
+    limit=Math.min(limit,lerp(maxLift,Math.max(0,reachable),target.groundWeight*target.weight));
   }
   s.legRaise=lerp(s.legRaise??0,clamp(desired,0,limit),1-Math.exp(-dt*22));
   s.root[1]+=s.legRaise;
   s.world=[];
 }else s.legRaise=0;
 for(const {target,side,hip,knee,foot,aim,yaw,index,rocker,roll,orientation} of ankleGoals){
+  const original=target.weight<1?[hip,knee,foot].map(bone=>[...s.q[bone]]):null;
   const H=point(world(hip),[0,0,0]),K=point(world(knee),[0,0,0]),A=point(world(foot),[0,0,0]);
   const delta=subtract(aim,H),axis=unit(delta);
   const l1=Math.hypot(...subtract(K,H)),l2=Math.hypot(...subtract(A,K));
@@ -1419,6 +1432,7 @@ for(const {target,side,hip,knee,foot,aim,yaw,index,rocker,roll,orientation} of a
     s.q[toe]=qm(qlerp(s.q[toe],rig[toe].q,roll),rotation);
     soleFlex[index]=roll;
   }
+  if(original)for(const [i,bone] of [hip,knee,foot].entries())s.q[bone]=qlerp(original[i],s.q[bone],target.weight);
   s.world=[];
 }
 const contactFeet=[],contactHands=[],contactCorrections=new Map();
