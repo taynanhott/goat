@@ -65,6 +65,94 @@
     ['TNT Sports','TNT','#83353c']
   ];
 
+  const newsJokes = {
+    bastidores: [
+      'O auxiliar pediu um tablet novo. O antigo já decorou todos os passes para trás.',
+      'O zagueiro chamou a bola de minha. A bola pediu uma segunda opinião.',
+      'O massagista foi eleito craque do treino: foi o único que desatou um nó.',
+      'O clube contratou um especialista em bola parada. Na entrevista, ele não saiu do lugar.',
+      'O roupeiro pediu direito de imagem: apareceu mais na transmissão que o centroavante.',
+      'A bola do treino sumiu. O lateral garante que o cruzamento ainda está descendo.',
+      'A diretoria prometeu um reforço de peso. Chegou uma geladeira nova ao vestiário.',
+      'O goleiro pediu silêncio no treino: estava tentando ouvir os conselhos da trave.',
+      'O gandula recebeu proposta para renovar depois de liderar as assistências no aquecimento.',
+      'O técnico escondeu a escalação até do próprio quadro tático. Nem os ímãs sabem quem joga.',
+      'O atacante treinou finalizações escondido. A vizinhança pediu a devolução das bolas.',
+      'A torcida pediu raça. O mascote interpretou literalmente e entrou com um cachorro.'
+    ],
+    neto: [
+      'O atacante está esperando a bola perfeita. Meu filho, ela já vem redonda da fábrica!',
+      'O treinador falou que faltou detalhe. O detalhe era botar a bola dentro do gol!',
+      'Esse meio-campo troca tanto passe que daqui a pouco pede comprovante de transferência!',
+      'Porra, o cara marcou a sombra! E ainda perdeu a sombra no segundo tempo!',
+      'Porra, Corinthians! Eu pedi uma jogada ensaiada, não um ensaio de como perder a bola na lateral!',
+      'Caralho, o atacante recebeu livre e resolveu dar mais um toque. Era para finalizar, não para parcelar a jogada!',
+      'Puta que pariu, esse escanteio não passou do primeiro homem! Se a ideia era acertar o marcador, foi uma cobrança perfeita.',
+      'Que merda de recuo foi esse? O goleiro pediu a bola no pé, não um teste de sobrevivência!',
+      'Neymar, o controle de videogame já está aquecido. Agora falta aquecer a chuteira! A torcida quer o drible no campo, não no menu.',
+      'Se cada rumor de volta do Neymar valesse um gol, o placar precisava de mais dois dígitos. Deixa a bola falar agora!',
+      'Corinthians, meu coração não tem banco de reservas! Resolve esse jogo antes que eu precise pedir substituição no sofá.',
+      'No Corinthians até o café do intervalo vem com emoção. Eu pedi três pontos, não três sustos e um pão de queijo!'
+    ],
+    pilhado: [
+      'A mesa pediu uma análise fria. O replay esquentou a discussão de novo.',
+      'O time está construindo desde o primeiro minuto. Falta avisar quando fica pronto.',
+      'O treinador disse que o grupo está fechado. Pela dificuldade de entrar na área, eu acredito.',
+      'Porra, esse contra-ataque tinha endereço! O último passe conseguiu errar até o bairro!',
+      'Eu vim debater futebol com calma. A calma viu a primeira substituição e foi embora do estúdio.',
+      'O time prometeu intensidade. Quem terminou suando fui eu explicando a escalação.',
+      'Tem treinador que guarda substituição como se desse para levar para o próximo campeonato.',
+      'O debate estava equilibrado até alguém perguntar quem marcava o lateral. Agora ninguém lembra a pergunta e todo mundo está gritando.',
+      'Porra, isso era um contra-ataque! Quando o time decidiu acelerar, a defesa adversária já tinha até tomado água.',
+      'Caralho, três jogadores olhando a bola passar! É defesa de futebol ou visita guiada ao gramado?',
+      'Puta que pariu, mais um passe para trás! A torcida pagou ingresso para ver o ataque, não o goleiro organizar excursão.',
+      'Que merda de saída de bola! O adversário nem precisou pressionar: recebeu em domicílio e sem taxa de entrega.'
+    ],
+    caze: [
+      'O Vasco ganhou um escanteio e eu já sentei diferente. A esperança tem ajuste de postura.',
+      'Pedi para acompanhar o Vasco de forma racional. Meu coração recusou os termos de uso.',
+      'O Vasco tem treino de recuperação amanhã. Eu precisava de um hoje, depois do apito.',
+      'Meteu essa? Disseram que o Vasco estava administrando. Aqui em casa ninguém autorizou esse sofrimento.',
+      'O Vasco ainda vai me fazer comemorar lateral no campo de ataque como se fosse título. É uma construção emocional por etapas.',
+      'O cara falou que acompanha o Vasco sem passar nervoso. Meteu essa? Eu fico tenso até na divulgação dos relacionados.',
+      'Fui assistir ao Vasco tranquilo. Durou até a primeira bola recuada para o goleiro.',
+      'Que papinho, hein? Me falaram que era só um jogo do Vasco. Então explica por que eu terminei fazendo promessa para o próximo domingo.',
+      'A vantagem de torcer para o Vasco é que o relógio da academia passa rápido. Dez minutos de jogo já equivalem a quarenta de cardio.',
+      'O forte! Muito forte esse meu otimismo com o Vasco. Sobrevive até à bola recuada aos quarenta e nove.',
+      'O Vasco pode até controlar a posse. Quem não controla nada sou eu andando pela sala.',
+      'Falaram para eu trocar de time para ter paz. Esquisito… Eu pedi uma vitória do Vasco, não uma nova identidade.',
+      'Prometi analisar o Vasco com calma. A calma pediu substituição antes do intervalo.',
+      'Na minha simulação mental, o Vasco deu um amasso. Agora falta combinar com a realidade e com o lateral adversário.',
+      'No jogo do Vasco, meu sofá tem mapa de calor. Eu já ocupei todas as posições.',
+      'O Vasco tá muito grandudo na minha expectativa. Já a tranquilidade para assistir continua pequenininha.',
+      'O Vasco sai jogando e eu saio da cadeira. Sincronia perfeita.',
+      'Ih! O Vasco vai sair tocando dentro da área. Vou levantar aqui, porque sofrer sentado já não está dando vazão.',
+      'Hoje eu só queria um jogo tranquilo do Vasco. Meu pedido continua em análise no departamento de milagres.',
+      'A bola parada do Vasco tem dois especialistas: quem cobra e eu, que fico parado sem respirar.',
+      'Se acreditar no Vasco desse ponto no campeonato, a gente já estava escolhendo a faixa.',
+      'Meu planejamento para o Vasco era simples: fazer o gol e respirar. A segunda parte exige negociação.',
+      'O Vasco entra em campo com onze. Aqui em casa entram mais três: esperança, ansiedade e o vizinho reclamando do grito.'
+    ],
+    formiga: [
+      'O Flamengo não demorou a finalizar. Estendeu a fase de elaboração da hipótese ofensiva.',
+      'A bola saiu pela lateral, mas a intenção permaneceu em campo. Precisamos separar os indicadores.',
+      'O Flamengo ocupou todos os espaços. Infelizmente, alguns eram os mesmos.',
+      'A arbitragem não interrompeu o ritmo. Sugeriu uma pausa para contemplar a dinâmica do jogo.',
+      'O Flamengo não perdeu a bola. Transferiu temporariamente a responsabilidade da construção para o adversário. É diferente.',
+      'Antes de reclamar do passe para trás do Flamengo, precisamos entender a progressão territorial em sentido filosófico.',
+      'A finalização do Flamengo foi para fora, mas o conceito entrou. Falta o placar incorporar essa métrica.',
+      'O Flamengo não estava desorganizado: testava um sistema que ainda não foi descoberto pelos próprios jogadores.',
+      'O árbitro não demorou para decidir. Abriu uma janela de reflexão coletiva sobre as regras.',
+      'O VAR levou oito minutos? Prefiro chamar de análise aprofundada com intervalo para maturação da imagem.',
+      'O juiz não inverteu o lateral. Propôs uma redistribuição democrática da posse.',
+      'O acréscimo pareceu exagerado, mas o relógio também precisa ter liberdade interpretativa.',
+      'O Flamengo recuou demais? Era um convite à pressão. O problema foi o adversário aceitar com tanta educação.',
+      'O cartão saiu tarde porque o árbitro estava respeitando o tempo de processamento emocional do atleta.',
+      'Não foi um cruzamento errado do Flamengo. Foi uma inversão tão ambiciosa que saiu do campo de análise.',
+      'O apito interrompeu uma boa jogada, mas precisamos valorizar a participação do árbitro na circulação da bola.'
+    ]
+  };
+
   function newsAvatar(author) {
     const [name,initials,color,skin,hair,details='']=author;
     return skin
@@ -161,7 +249,12 @@
     'M11 20 11 15 13 11 17 9 18 5 23 6 27 3 31 6 36 5 39 8 43 10 42 14 44 17 42 21 37 18 34 14 30 16 26 13 22 16 18 15 15 23Z',
     'M12 19 15 12 22 7 35 7 41 12 42 18 37 16 26 12 17 17Z',
     'M12 19 14 12 22 6 37 7 42 13 42 20 37 16 34 13 23 12 17 17Z',
-    'M11 20 12 14 16 12 18 8 24 7 29 4 34 7 40 8 43 14 43 21 37 16 32 17 27 13 21 16 16 16Z'
+    'M11 20 12 14 16 12 18 8 24 7 29 4 34 7 40 8 43 14 43 21 37 16 32 17 27 13 21 16 16 16Z',
+    'M22 14 24 3 31 3 33 14 29 13 26 13Z',
+    'M9 21 8 13 12 6 20 2 34 2 42 6 46 13 45 21 40 16 33 13 21 13 14 16Z',
+    'M13 19 15 11 23 6 32 6 39 11 41 19 36 14 27 12 18 14ZM23 6 25 1 31 1 33 6Z',
+    'M10 37 9 19 13 10 22 5 33 5 41 10 45 19 44 37 39 36 40 19 35 13 20 13 15 19 16 36Z',
+    'M11 33 10 18 14 9 21 5 34 5 40 9 44 18 43 33 39 32 39 17 36 14 34 31 30 14 24 14 20 31 18 14 15 17 15 32Z'
   ];
   const beardShapes = [
     '',
@@ -169,17 +262,128 @@
     'M21 29 27 27 34 28 36 30 33 31 29 30 24 31ZM23 34 27 36 33 35 35 33 34 39 29 42 24 39Z',
     'M13 22 18 26 21 29 25 28 27 27 34 28 37 27 40 22 41 30 37 38 30 43 22 42 16 36Z',
     'M13 23 18 28 22 30 27 28 34 28 40 23 40 31 37 39 30 47 24 46 17 39 14 32Z',
-    'M14 24 18 28 23 33 31 35 37 30 40 24 40 31 35 38 29 41 22 39 17 34Z'
+    'M14 24 18 28 23 33 31 35 37 30 40 24 40 31 35 38 29 41 22 39 17 34Z',
+    'M19 31 24 28 27 29 31 28 36 31 34 33 27 31 21 33Z',
+    'M20 29 27 27 34 29 35 31 27 30 20 31ZM22 34 27 35 33 34 32 45 27 47 23 45Z',
+    'M12 22 18 27 23 29 27 27 33 29 38 27 42 22 42 33 38 43 32 48 22 48 16 43 12 33Z',
+    'M13 20 17 20 17 33 13 31ZM37 20 41 20 41 31 37 33ZM19 30 25 28 27 29 30 28 35 30 33 32 27 31 21 32Z'
   ];
+
+  function consumableIcon(icon) {
+    if (icon === 'attrPoint') {
+      return `<svg viewBox="0 0 54 48" aria-hidden="true">
+        <polygon points="27,5 33,17 47,19 37,28 39,42 27,35 15,42 17,28 7,19 21,17" fill="#ffd257" stroke="#18111f" stroke-width="2.4" stroke-linejoin="round"/>
+        <path stroke="#18111f" stroke-width="3" stroke-linecap="round" d="M27 18V30M21 24H33"/>
+      </svg>`;
+    }
+    if (icon === 'kit') {
+      return `<svg viewBox="0 0 54 48" aria-hidden="true">
+        <path fill="#f0832a" stroke="#18111f" stroke-width="2" d="M12 37L19 14H23L30 37Z"/>
+        <path fill="#f7f1de" d="M15 26H27L28 30H14Z"/>
+        <rect x="8" y="37" width="26" height="4" rx="1" fill="#c9561b" stroke="#18111f" stroke-width="1.6"/>
+        <circle cx="40" cy="33" r="8" fill="#f5f3ea" stroke="#18111f" stroke-width="2"/>
+        <path fill="#18111f" d="M40 28L43 31L42 35H38L37 31Z"/>
+      </svg>`;
+    }
+    if (icon === 'minigoal') {
+      return `<svg viewBox="0 0 54 48" aria-hidden="true">
+        <path fill="none" stroke="#f5f1e4" stroke-width="3.2" stroke-linejoin="round" d="M8 38V14H46V38"/>
+        <path fill="none" stroke="#c8d2de" stroke-width="1.4" d="M12 16L16 37M18 16L21 37M24 16L26 37M30 16L31 37M36 16L36 37M42 16L40 37M10 22H44M11 28H43M12 34H42"/>
+        <path fill="none" stroke="#18111f" stroke-width="1.4" d="M6 39H48"/>
+      </svg>`;
+    }
+    if (icon === 'weights') {
+      return `<svg viewBox="0 0 54 48" aria-hidden="true">
+        <rect x="14" y="21" width="26" height="6" rx="2" fill="#d3dbe6" stroke="#18111f" stroke-width="1.8"/>
+        <rect x="8" y="13" width="7" height="22" rx="2" fill="#3a3347" stroke="#18111f" stroke-width="2"/>
+        <rect x="39" y="13" width="7" height="22" rx="2" fill="#3a3347" stroke="#18111f" stroke-width="2"/>
+        <rect x="4" y="17" width="5" height="14" rx="1.5" fill="#f0c24b" stroke="#18111f" stroke-width="1.8"/>
+        <rect x="45" y="17" width="5" height="14" rx="1.5" fill="#f0c24b" stroke="#18111f" stroke-width="1.8"/>
+      </svg>`;
+    }
+    return `<svg viewBox="0 0 54 48" aria-hidden="true">
+      <circle cx="27" cy="26" r="14" fill="#f4f0e4" stroke="#18111f" stroke-width="2.4"/>
+      <rect x="23" y="7" width="8" height="5" rx="1.5" fill="#f0c24b" stroke="#18111f" stroke-width="1.8"/>
+      <path stroke="#d03030" stroke-width="2.6" stroke-linecap="round" d="M27 26V17"/>
+      <path stroke="#18111f" stroke-width="2.2" stroke-linecap="round" d="M27 26L34 30"/>
+      <circle cx="27" cy="26" r="2.2" fill="#18111f"/>
+    </svg>`;
+  }
 
   function thumbnail(key, index, value) {
     if(key==='dominantFoot')return '<span class="foot-choice">'+(index===1?'E':'D')+'</span>';
     if (key === 'boots') {
+      const c1 = Array.isArray(value) ? value[0] : value;
+      const c2 = Array.isArray(value) ? value[1] : null;
       return `<svg viewBox="0 0 54 48" aria-hidden="true">
-        <path fill="${value}" d="M14 14H26L31 25L43 27L48 30L48 35L42 39H7L5 34L12 27Z"/>
+        <path fill="${c1}" d="M14 14H26L31 25L43 27L48 30L48 35L42 39H7L5 34L12 27Z"/>
+        ${c2 ? `<path fill="${c2}" d="M14 14H22L18 35H7L5 34L12 27Z"/><path fill="${c2}" d="M24 23L31 25L36 35H29Z"/>` : ''}
         <path fill="#504356" d="M5 34L12 35L38 35L48 32L48 36L43 39H8Z"/>
         <path fill="none" stroke="#f4ddac" d="M18 21L27 20M21 25L30 24M24 29L33 27"/>
         <path fill="#201923" d="M10 39H15V42H10ZM23 39H27V42H23ZM37 38H42V41H37Z"/>
+      </svg>`;
+    }
+    if (key === 'tankTop') {
+      if (!value) {
+        return `<svg viewBox="0 0 54 48" aria-hidden="true"><path fill="#564a66" d="M19 8H24L27 12L30 8H35L45 15L41 24L37 22V39H17V22L13 24L9 15Z"/><path stroke="#e8c78a" stroke-width="2" fill="none" d="M12 38L42 10"/></svg>`;
+      }
+      return `<svg viewBox="0 0 54 48" aria-hidden="true">
+        <path fill="${value}" stroke="#18111f" stroke-width="2" d="M17 8H22L24 16H30L32 8H37L39 18L37 21V40H17V21L15 18Z"/>
+        <path fill="none" stroke="rgba(255,255,255,.35)" stroke-width="1.4" d="M22 10L24 16H30L32 10"/>
+      </svg>`;
+    }
+    if (key === 'pants') {
+      if (!value) {
+        return `<svg viewBox="0 0 54 48" aria-hidden="true"><path fill="#564a66" d="M16 7H38L41 42H30L27 23L24 42H13Z"/><path stroke="#e8c78a" stroke-width="2" fill="none" d="M12 38L42 10"/></svg>`;
+      }
+      const { color, accent, style } = value;
+      return `<svg viewBox="0 0 54 48" aria-hidden="true">
+        <path fill="${color}" stroke="#18111f" stroke-width="2" stroke-linejoin="round" d="M16 7H38L41 42H30L27 22L24 42H13Z"/>
+        ${style === 'track' ? `<path stroke="${accent}" stroke-width="2.4" fill="none" d="M16.5 9L14.2 40M37.5 9L39.8 40"/>` : ''}
+        ${style === 'jogger' ? `<rect x="13" y="37" width="11" height="5" fill="${accent}" stroke="#18111f" stroke-width="1.4"/><rect x="30" y="37" width="11" height="5" fill="${accent}" stroke="#18111f" stroke-width="1.4"/>` : ''}
+        ${style === 'cargo' ? `<rect x="13" y="21" width="6" height="8" rx="1" fill="${accent}" stroke="#18111f" stroke-width="1.2"/><rect x="35" y="21" width="6" height="8" rx="1" fill="${accent}" stroke="#18111f" stroke-width="1.2"/>` : ''}
+        ${style === 'jeans' ? `<path stroke="${accent}" stroke-width="1.4" stroke-dasharray="2 2" fill="none" d="M18 10L16 40M36 10L38 40M27 8V22"/>` : ''}
+      </svg>`;
+    }
+    if (key === 'chain') {
+      if (!value) {
+        return `<svg viewBox="0 0 54 48" aria-hidden="true"><circle cx="27" cy="24" r="12" fill="none" stroke="#7d6e8f" stroke-width="2.2" stroke-dasharray="4 3"/><path stroke="#e8c78a" stroke-width="2" d="M15 36L39 12"/></svg>`;
+      }
+      return `<svg viewBox="0 0 54 48" aria-hidden="true">
+        <path fill="none" stroke="${value}" stroke-width="4.2" stroke-linecap="round" d="M13 12C15 31 21 37 27 37C33 37 39 31 41 12"/>
+        <path fill="none" stroke="#18111f" stroke-width="1.2" stroke-dasharray="2.5 2.5" d="M13 12C15 31 21 37 27 37C33 37 39 31 41 12"/>
+        <circle cx="27" cy="37" r="3.4" fill="${value}" stroke="#18111f" stroke-width="1.4"/>
+      </svg>`;
+    }
+    if (key === 'earring') {
+      if (!value) {
+        return `<svg viewBox="0 0 54 48" aria-hidden="true"><circle cx="27" cy="24" r="10" fill="none" stroke="#7d6e8f" stroke-width="2.2" stroke-dasharray="4 3"/><path stroke="#e8c78a" stroke-width="2" d="M15 36L39 12"/></svg>`;
+      }
+      return `<svg viewBox="0 0 54 48" aria-hidden="true">
+        <circle cx="19" cy="25" r="7" fill="${value}" stroke="#18111f" stroke-width="2"/>
+        <circle cx="35" cy="25" r="7" fill="${value}" stroke="#18111f" stroke-width="2"/>
+        <circle cx="17" cy="22" r="2" fill="#ffffff" opacity=".75"/>
+        <circle cx="33" cy="22" r="2" fill="#ffffff" opacity=".75"/>
+      </svg>`;
+    }
+    if (key === 'glasses') {
+      if (!value) {
+        return `<svg viewBox="0 0 54 48" aria-hidden="true"><rect x="10" y="18" width="14" height="11" rx="3" fill="none" stroke="#7d6e8f" stroke-width="2"/><rect x="30" y="18" width="14" height="11" rx="3" fill="none" stroke="#7d6e8f" stroke-width="2"/><path stroke="#e8c78a" stroke-width="2" d="M14 36L40 12"/></svg>`;
+      }
+      return `<svg viewBox="0 0 54 48" aria-hidden="true">
+        <rect x="6" y="16" width="17" height="14" rx="4" fill="#171b24" stroke="${value}" stroke-width="3"/>
+        <rect x="31" y="16" width="17" height="14" rx="4" fill="#171b24" stroke="${value}" stroke-width="3"/>
+        <path stroke="${value}" stroke-width="3" fill="none" d="M23 22H31"/>
+        <path stroke="#ffffff" stroke-width="1.5" opacity=".45" d="M10 20L15 26M35 20L40 26"/>
+      </svg>`;
+    }
+    if (key === 'bracelet') {
+      if (!value) {
+        return `<svg viewBox="0 0 54 48" aria-hidden="true"><ellipse cx="27" cy="25" rx="14" ry="8" fill="none" stroke="#7d6e8f" stroke-width="2.5" stroke-dasharray="4 3"/><path stroke="#e8c78a" stroke-width="2" d="M15 36L39 12"/></svg>`;
+      }
+      return `<svg viewBox="0 0 54 48" aria-hidden="true">
+        <ellipse cx="27" cy="25" rx="15" ry="9" fill="none" stroke="#18111f" stroke-width="8"/>
+        <ellipse cx="27" cy="25" rx="15" ry="9" fill="none" stroke="${value}" stroke-width="5"/>
       </svg>`;
     }
     if (key === 'socks') {
@@ -227,11 +431,13 @@
     const warning = document.querySelector('#careerWarning');
     const pauseMenu = document.querySelector('#paused');
     const stadiumDialog = document.querySelector('#trainingStadiumDialog');
+    const playerDialog = document.querySelector('#trainingPlayerDialog');
     let careerPractice = false;
     let stadiumTrigger = null;
+    let playerDialogTrigger = null;
     let trainingStepTimer = null;
     let trainingStepPointer = null;
-    let save = null, look = null, creatorName = '', screen = 'home', hubTab = 'games', playerTab = 'profile',
+    let save = null, look = null, creatorName = '', screen = 'home', hubTab = 'games', playerTab = 'profile', shopCategory = 'appearance',
       selectedCompId = null, compPhase = 'table', selectedGroup = 'ALL', selectedKoRound = null,
       gamesStatTab = 'goals', newsTab = 'all', editing = false;
     let orbitAngle = 0, orbitDirection = 0, orbitHeldAt = 0, orbitLast = 0;
@@ -448,8 +654,9 @@
       if (!panel.hidden) {
         content.innerHTML = `<div class="career-top">${button(back,'← Voltar','quiet')}<h2 id="careerTitle">${title}</h2></div>${body}`;
         panel.scrollTop = 0;
-        const selector = page==='training-player'?'[data-training-stat]':page === 'creator' ? (editing?'[data-look-panel]:not([hidden]) [data-look]':'#athleteName') : page==='result'?'[data-action="close-result"]':'button:not(.quiet)';
-        focusOption(content.querySelector(selector) ?? content.querySelector('button'),{preventScroll:true});
+        const selector = page==='training-player'?'[data-training-stat]':page === 'creator' ? (editing?'[data-look-panel]:not([hidden]) [data-look]':'#athleteName') : page==='result'?'[data-action="close-result"]':'button:not(.quiet):not(:disabled)';
+        const firstVisible = list => [...list].find(el => !el.disabled && !el.closest('[hidden]') && el.getBoundingClientRect().width > 0);
+        focusOption(firstVisible(content.querySelectorAll(selector)) ?? firstVisible(content.querySelectorAll('button:not(:disabled)')) ?? content.querySelector(selector) ?? content.querySelector('button'),{preventScroll:true});
       }
       notify();
     }
@@ -457,7 +664,7 @@
     function home() {
       activate('home');
       api.preview(null);
-      focusOption(menu.querySelector('button:not(:disabled)'),{preventScroll:true});
+      focusOption(menu.querySelector('button:not(:disabled):not([hidden])'),{preventScroll:true});
     }
 
     function gateway() {
@@ -492,8 +699,9 @@
           </div></fieldset>`;
       };
       const sections = [
-        ['appearance','Aparência',['hair','hairColor','skin','beard','beardColor']],
-        ['equipment','Equipamento',['dominantFoot','boots','socks','shorts','sleeves','shirt']]
+        ['appearance','Características',['dominantFoot','hair','hairColor','skin','beard','beardColor']],
+        ['equipment','Equipamento',['boots','socks','shorts','sleeves','shirt']],
+        ['style','Estilo',['tankTop','pants','chain','earring','glasses','bracelet']]
       ];
       const sectionButtons = sections.map(([id,label],index)=>`<button type="button" class="career-button" data-look-section="${id}"
         id="creator-tab-${id}" role="tab" aria-selected="${index===0}" aria-controls="creator-${id}" aria-pressed="${index===0}">${label}</button>`).join('');
@@ -503,7 +711,7 @@
         <div class="creator-sections" role="tablist" aria-label="Personalização">${sectionButtons}</div>
         <div class="creator-fields-area">${fields}</div>
         <p class="creator-help">LT / RT: trocar categoria <span>LB / RB ou arrastar: girar jogador</span></p>
-        <div class="creator-commit">${button('save-look',edit?'Salvar aparência':'Concluir criação','accent')}</div></div>
+        <div class="creator-commit">${button('save-look',edit?'Salvar alterações':'Concluir criação','accent')}</div></div>
         <div class="creator-stage"><div class="orbit-control" role="group" aria-label="Girar jogador">
           <button type="button" class="career-button" data-orbit="-1" aria-label="Girar para a esquerda" data-keyboard="←" data-gamepad="LB">←</button>
           <button type="button" class="career-button" data-orbit="1" aria-label="Girar para a direita" data-keyboard="→" data-gamepad="RB">→</button>
@@ -532,47 +740,120 @@
       api.preview(null);
     }
 
+    function callupCoachAvatar(nation,code){
+      const primary=nation?.primary??'#1d6b3b';
+      const tag=esc((nation?.short??code??'TEC').slice(0,3).toUpperCase());
+      return `<div class="callup-avatar-wrap" aria-hidden="true">
+        <span class="news-avatar news-portrait callup-coach-portrait" style="--avatar-bg:${primary};--avatar-skin:#e0a77f;--avatar-hair:#3a3240"><i><b></b></i><small>${tag}</small></span>
+      </div>`;
+    }
+
     function callupScreen(){
       const callup=save.worldCup.callup;
       const nation=season.team('national-'+callup.nationality);
-      activate('callup',`Convocação · ${nation?.name??callup.nationality}`,`<div class="callup-header">${medal(nation,60)}<div><strong>Copa do Mundo ${save.year}</strong><p>Os 26 nomes para representar a seleção</p></div><b id="callupCount">0/26</b></div>
-        <div id="callupList" class="callup-list" aria-live="polite"></div><div id="callupDecision" class="callup-decision" hidden></div>
-        <button type="button" class="career-button accent" data-action="callup-complete" disabled>Continuar</button>`,'career');
+      const nationName=nation?.name??callup.nationality;
+      const section=position=>position==='GK'?'Goleiros':['CB','LB','RB'].includes(position)?'Defensores':journey.groupOf(position)==='MID'?'Meias':'Atacantes';
+      const positionLabels={GK:'GOL',CB:'ZAG',LB:'LE',RB:'LD',DM:'VOL',CM:'MC',AM:'MEI',LW:'PE',RW:'PD',ST:'ATA'};
+      activate('callup',`Convocação · ${nationName}`,`<div class="callup-shell">
+        <section class="callup-stage is-speaking" id="callupStage">
+          <div class="callup-coach">
+            ${callupCoachAvatar(nation,callup.nationality)}
+            <div class="callup-coach-meta">
+              ${medal(nation,26)}
+              <div><strong>Técnico</strong><small>${esc(nationName)}</small></div>
+            </div>
+          </div>
+          <div class="callup-bubble" role="status" aria-live="polite">
+            <div class="callup-bubble-meta">
+              <span>COLETIVA · COPA DO MUNDO</span>
+              <b>${save.year}</b>
+            </div>
+            <p id="callupSpeech" class="callup-speech">Atenção! Vou anunciar os 26 convocados para defender a seleção na Copa do Mundo ${save.year}...</p>
+          </div>
+        </section>
+        <div id="callupList" class="callup-list" aria-live="polite">
+          <section class="callup-group" data-group="Goleiros"><h3 class="callup-position">Goleiros</h3><div class="callup-group-rows"></div></section>
+          <section class="callup-group" data-group="Defensores"><h3 class="callup-position">Defensores</h3><div class="callup-group-rows"></div></section>
+          <section class="callup-group" data-group="Meias"><h3 class="callup-position">Meias</h3><div class="callup-group-rows"></div></section>
+          <section class="callup-group" data-group="Atacantes"><h3 class="callup-position">Atacantes</h3><div class="callup-group-rows"></div></section>
+        </div>
+        <div id="callupDecision" class="callup-decision${callup.selected?' is-selected':''}" hidden></div>
+        <div class="callup-actions">
+          <button type="button" class="career-button" data-action="callup-skip">Pular revelação</button>
+          <button type="button" class="career-button accent" data-action="callup-complete" disabled>Continuar</button>
+        </div>
+      </div>`,'career');
       api.preview(null);
       let index=0;
+      const revealNext=()=>{
+        const player=callup.roster[index];
+        if(!player)return false;
+        const list=content.querySelector('#callupList');
+        const groupName=section(player.position);
+        const targetGroup=list.querySelector(`[data-group="${groupName}"] .callup-group-rows`)??list;
+        const positionLabel=positionLabels[player.position]??player.position;
+        const row=document.createElement('div');
+        row.className='callup-row'+(player.user?' is-user':'');
+        row.innerHTML=`<span class="callup-num">${index+1}</span><small class="callup-pos">${esc(positionLabel)}</small><strong class="callup-name" title="${esc(player.name)}">${esc(player.name)}</strong><b class="callup-ovr">${player.user?'VOCÊ':player.generated?'GERADO':player.overall}</b>`;
+        targetGroup.append(row);
+        index++;
+        const speech=content.querySelector('#callupSpeech');
+        if(speech){
+          speech.classList.remove('is-pop');
+          void speech.offsetWidth;
+          speech.innerHTML=player.user
+            ?`E vestindo a nossa camisa... <mark class="callup-speech-user">${esc(player.name.toUpperCase())}</mark> ESTÁ CONVOCADO!`
+            :`Em <strong>${esc(groupName)}</strong>, o escolhido nº ${index} é <strong>${esc(player.name)}</strong> <span class="callup-speech-pos">${esc(positionLabel)}</span>!`;
+          speech.classList.add('is-pop');
+        }
+        return true;
+      };
+      const finishReveal=()=>{
+        if(callupTimer){clearInterval(callupTimer);callupTimer=null;}
+        const stage=content.querySelector('#callupStage');
+        if(stage)stage.classList.remove('is-speaking');
+        const speech=content.querySelector('#callupSpeech');
+        if(speech){
+          speech.innerHTML=callup.selected
+            ?`Parabéns, <mark class="callup-speech-user">${esc(save.player.name)}</mark>! Você está entre os 26 para a Copa do Mundo ${save.year}!`
+            :`Lista fechada! Estes são os 26 nomes que vão representar a seleção na Copa do Mundo ${save.year}.`;
+        }
+        const decision=content.querySelector('#callupDecision');
+        decision.hidden=false;
+        decision.innerHTML=`<strong>${callup.selected?'VOCÊ FOI CONVOCADO!':'Você não foi convocado.'}</strong> <span>${esc(callup.reason)}</span>`;
+        const skipButton=content.querySelector('[data-action="callup-skip"]');
+        if(skipButton)skipButton.hidden=true;
+        const continueButton=content.querySelector('[data-action="callup-complete"]');
+        continueButton.disabled=false;
+        focusOption(continueButton);
+      };
+      const skipButton=content.querySelector('[data-action="callup-skip"]');
+      if(skipButton){
+        skipButton.addEventListener('click',()=>{
+          while(index<callup.roster.length)revealNext();
+          finishReveal();
+        });
+      }
       callupTimer=setInterval(()=>{
         if(screen!=='callup'){clearInterval(callupTimer);callupTimer=null;return;}
-        const player=callup.roster[index];
-        if(player){
-          const list=content.querySelector('#callupList');
-          const section=position=>position==='GK'?'Goleiros':['CB','LB','RB'].includes(position)?'Defensores':journey.groupOf(position)==='MID'?'Meias':'Atacantes';
-          if(index===0||section(callup.roster[index-1].position)!==section(player.position)){
-            const heading=document.createElement('h3');heading.className='callup-position';heading.textContent=section(player.position);list.append(heading);
-          }
-          const positionLabel={GK:'GOL',CB:'ZAG',LB:'LE',RB:'LD',DM:'VOL',CM:'MC',AM:'MEI',LW:'PE',RW:'PD',ST:'ATA'}[player.position]??player.position;
-          const row=document.createElement('div');
-          row.className='callup-row'+(player.user?' is-user':'');
-          row.innerHTML=`<span>${index+1}</span><small>${esc(positionLabel)}</small><strong>${esc(player.name)}</strong><b>${player.user?'VOCÊ':player.generated?'GERADO':player.overall}</b>`;
-          list.append(row);list.scrollTop=list.scrollHeight;
-          index++;content.querySelector('#callupCount').textContent=`${index}/26`;
-        }
-        if(index===callup.roster.length){
-          clearInterval(callupTimer);callupTimer=null;
-          const decision=content.querySelector('#callupDecision');decision.hidden=false;
-          decision.textContent=(callup.selected?'VOCÊ FOI CONVOCADO! ':'Você não foi convocado. ')+callup.reason;
-          const continueButton=content.querySelector('[data-action="callup-complete"]');
-          continueButton.disabled=false;focusOption(continueButton);
-        }
+        revealNext();
+        if(index>=callup.roster.length)finishReveal();
       },420);
     }
 
     function trainingChallenges(){
       const drills=journey.availableDrills(save);
-      if(!drills.length)return emptyRecords('Nenhum treino disponível','Conclua uma partida oficial para liberar novos desafios de treino.');
+      const boosts=season.trainingBoosts(save);
+      const boostsHtml=`<section class="training-boosts" aria-label="Itens de treino adquiridos">
+        <div class="training-boosts-head"><h3>Itens de treino adquiridos</h3><span class="training-boost-total">${boosts.totalPct>0?`+${boosts.totalPct}% XP nos treinos`:'Sem bônus ativo'}</span></div>
+        ${boosts.items.length
+          ? `<div class="training-boost-list">${boosts.items.map(item=>`<div class="training-boost-chip">${consumableIcon(item.icon)}<div><strong>${esc(item.name)}</strong><small>+${item.xpBonusPct}% XP</small></div></div>`).join('')}</div>`
+          : `<p class="training-boost-empty">Compre kits de treino, mini gols, pesos ou personal na aba <strong>Loja → Consumíveis</strong> para ganhar bônus de XP.</p>`}
+      </section>`;
+      if(!drills.length)return `${emptyRecords('Nenhum treino disponível','Conclua uma partida oficial para liberar novos desafios de treino.')}${boostsHtml}`;
       return `<div class="training-challenges">${drills.map(drill=>`<article><h3>${journey.drillNames[drill.type]}</h3><p>${drill.type==='collective'?`${drill.attempts} lances com defensores. Sua nota define o resultado.`:`${drill.attempts} tentativas. Acerte todas para a pontuação máxima.${drill.type==='freeKick'?' Com barreira.':' Sem defensores.'}`}</p>
-          ${drill.status==='complete'?`<strong>Concluído · ${drill.delta>0?'+':''}${drill.delta} pontos</strong>`:
-            `<button type="button" class="career-button accent hold-action" data-hold="true" data-action="training-challenge" data-drill="${drill.id}" ${save.pending?'disabled':''}>${drill.status==='playing'?'Em andamento':'Segure para iniciar'}</button>`}</article>`).join('')}</div>
-        `;
+          ${drill.status==='complete'?`<strong>Concluído · ${drill.delta>0?'+':''}${drill.delta} pontos${drill.xp?` · +${drill.xp} XP${drill.bonusPct?` (+${drill.bonusPct}%)`:''}`:''}</strong>`:
+            `<button type="button" class="career-button accent hold-action" data-hold="true" data-action="training-challenge" data-drill="${drill.id}" ${save.pending?'disabled':''}>${drill.status==='playing'?'Em andamento':'Segure para iniciar'}</button>`}</article>`).join('')}</div>${boostsHtml}`;
     }
 
     function summary(match) {
@@ -671,6 +952,40 @@
       stadiumTrigger=null;
     });
 
+    function openTrainingPlayerDialog(trigger){
+      if(!playerDialog)return;
+      playerDialogTrigger=trigger??document.querySelector('#trainingPlayerSetup');
+      const body=playerDialog.querySelector('#trainingPlayerBody');
+      body.innerHTML=`${ratingPanel(trainingPlayer.attributes,true)}${editableRating('dominantFoot','Pé dominante',trainingFootLabel(trainingPlayer.dominantFoot))}`;
+      body.querySelectorAll('[data-training-stat]').forEach(updateTrainingRating);
+      if(!playerDialog.open)playerDialog.showModal();
+      focusOption(body.querySelector('[data-training-stat]'),{preventScroll:true});
+    }
+    if(playerDialog){
+      playerDialog.addEventListener('click',event=>{
+        const closeBtn=event.target.closest('[data-close-training-player]');
+        if(closeBtn){playerDialog.close();return;}
+        const step=event.target.closest('[data-training-step]');
+        if(step)adjustTrainingRating(step.closest('[data-training-stat]'),Number(step.dataset.trainingStep));
+      });
+      playerDialog.addEventListener('input',event=>{
+        const range=event.target.closest('input[type="range"]');
+        if(range)adjustTrainingRating(range.closest('[data-training-stat]'),0,Number(range.value));
+      });
+      playerDialog.addEventListener('keydown',event=>{
+        const row=event.target.closest?.('[data-training-stat]');
+        if(row&&(event.key==='ArrowLeft'||event.key==='ArrowRight')){
+          event.preventDefault();
+          adjustTrainingRating(row,event.key==='ArrowRight'?1:-1);
+        }
+      });
+      playerDialog.addEventListener('close',()=>{
+        api.updateTrainingPlayer(trainingPlayer);
+        focusOption(playerDialogTrigger,{preventScroll:true});
+        playerDialogTrigger=null;
+      });
+    }
+
     function trainingPlayerScreen(){
       const back='return-practice-pause';
       activate('training-player','Jogador do Treino',`<div class="training-profile">${ratingPanel(trainingPlayer.attributes,true)}
@@ -746,21 +1061,49 @@
     function myPlayer(club,proposals) {
       if(playerTab==='shop'){
         const lookPaint=season.paint(save.player.look,club);
-        const cards=season.shop.map(item=>{
+        const categories=season.shopCategories||[];
+        if(!categories.some(c=>c.id===shopCategory))shopCategory=categories[0]?.id||'appearance';
+        const catNav=`<nav class="tournament-phases shop-cats" aria-label="Setores da loja">${categories.map(cat=>{
+          const hasUnread=season.shop.some(it=>it.category===cat.id&&save.unreadItems.includes(it.id));
+          return `<button type="button" data-action="shop-cat" data-cat="${cat.id}" aria-pressed="${shopCategory===cat.id}">${cat.label}${badge(hasUnread)}</button>`;
+        }).join('')}</nav>`;
+        const items=season.shop.filter(item=>item.category===shopCategory);
+        const cards=items.map(item=>{
+          const own=save.owned.includes(item.id),unread=save.unreadItems.includes(item.id);
+          const canBuy=!own&&save.balance>=item.price;
+          if(item.consumable){
+            if(item.repeatable){
+              const pts=season.xpProgress(save).attributePoints||0;
+              const maxed=!Object.values(season.attributes).some(k=>(save.player.attributes[k]??0)<99);
+              const buyable=!maxed&&save.balance>=item.price;
+              const action=buyable?'buy':'preview-item';
+              return `<button type="button" class="shop-item ${buyable?'hold-action':''}" data-action="${action}" data-item="${item.id}"
+                ${buyable?'data-hold="true"':''}>${consumableIcon(item.icon)}
+                <span><strong>${esc(item.name)}</strong><small>${esc(item.description)}${pts?` · ${pts} disponível(is)`:''}</small></span>
+                <span class="shop-price"><strong>${maxed?'Máximo':cash(item.price)}</strong>
+                  <small>${maxed?'Todos em 99':buyable?'Segure para comprar':'Saldo insuficiente'}</small></span></button>`;
+            }
+            const action=canBuy?'buy':'preview-item';
+            return `<button type="button" class="shop-item ${canBuy?'hold-action':''}" data-action="${action}" data-item="${item.id}"
+              ${canBuy?'data-hold="true"':''} ${unread?'data-unread="true"':''}>${badge(unread)}${consumableIcon(item.icon)}
+              <span><strong>${esc(item.name)}</strong><small>${esc(item.description)}</small></span>
+              <span class="shop-price"><strong>${own?'Ativo':cash(item.price)}</strong>
+                ${own?'<small>Bônus aplicado</small>':`<small>${canBuy?'Segure para comprar':'Saldo insuficiente'}</small>`}</span></button>`;
+          }
           const group=season.appearance[item.key];
           const name=(group.names??group.values)[item.index];
-          const own=save.owned.includes(item.id),unread=save.unreadItems.includes(item.id);
           const equipped=own&&save.player.look[item.key]===item.index;
-          const canBuy=!own&&save.balance>=item.price;
-          const action=canBuy?'buy':own&&!equipped?'equip':'preview-item';
+          const removable=['socks','shirt','sleeves','tankTop','pants','chain','earring','glasses','bracelet'].includes(item.key);
+          const action=canBuy?'buy':own&&!equipped?'equip':own&&equipped&&removable?'unequip':'preview-item';
           return `<button type="button" class="shop-item ${canBuy?'hold-action':''}" data-action="${action}" data-item="${item.id}"
             ${canBuy?'data-hold="true"':''} ${unread?'data-unread="true"':''}>${badge(unread)}${thumbnail(item.key,item.index,group.values[item.index])}
             <span><strong>${name}</strong><small>${group.label}</small></span>
             <span class="shop-price"><strong>${equipped?'Equipado':own?'Equipar':cash(item.price)}</strong>
-              ${own?'':`<small>${canBuy?'Segure para comprar':'Saldo insuficiente'}</small>`}</span></button>`;
+              ${own?(equipped&&removable?'<small>Clique para remover</small>':''):`<small>${canBuy?'Segure para comprar':'Saldo insuficiente'}</small>`}</span></button>`;
         }).join('');
-        return `<div class="shop-summary"><span>Saldo <strong>${cash(save.balance)}</strong></span>
-          <span>Selecione um item para ver no modelo 3D.</span></div><div class="standings-scroll shop-scroll" tabindex="0" aria-label="Itens da loja">
+        const hint=shopCategory==='consumables'?'Itens de treino aumentam o XP dos desafios automaticamente.':'Selecione um item para ver no modelo 3D.';
+        return `${catNav}<div class="shop-summary"><span>Saldo <strong>${cash(save.balance)}</strong></span>
+          <span>${hint}</span></div><div class="standings-scroll shop-scroll" tabindex="0" aria-label="Itens da loja">
           <div class="shop-grid" style="--preview-skin:${lookPaint.skin};--preview-hair:${lookPaint.hairColor};--preview-beard:${lookPaint.beardColor}">${cards}</div></div>`;
       }
       if(playerTab==='awards')return journey.gallery(save);
@@ -956,11 +1299,15 @@
         if(comp.national)phaseButtons.splice(1,0,['thirds','Melhores terceiros']);
         if (compPhase === 'groups') {
           const groups = season.groupTables(save, comp.id);
-          const groupNav = `<div class="tournament-phases group-pills" role="group" aria-label="Grupos">${[
-            ['ALL', 'Todos os grupos'], ...groups.map(g => [g.group, `Grupo ${g.group}`])
-          ].map(([gKey, gLabel]) => `<button type="button" data-action="comp-group" data-group="${gKey}" aria-pressed="${selectedGroup === gKey}">${gLabel}</button>`).join('')}</div>`;
-          const visible = selectedGroup === 'ALL' ? groups : groups.filter(g => g.group === selectedGroup);
-          phaseBody = `${groupNav}<div class="cup-groups-list">${visible.map(g => renderStandingsTable(g.table, comp.id, g.group)).join('')}</div>`;
+          if (!groups.length) {
+            phaseBody = emptyRecords('Grupos aguardando a Pré-Libertadores', 'O sorteio dos grupos acontece assim que os confrontos da Pré-Libertadores forem definidos.');
+          } else {
+            const groupNav = `<div class="tournament-phases group-pills" role="group" aria-label="Grupos">${[
+              ['ALL', 'Todos os grupos'], ...groups.map(g => [g.group, `Grupo ${g.group}`])
+            ].map(([gKey, gLabel]) => `<button type="button" data-action="comp-group" data-group="${gKey}" aria-pressed="${selectedGroup === gKey}">${gLabel}</button>`).join('')}</div>`;
+            const visible = selectedGroup === 'ALL' ? groups : groups.filter(g => g.group === selectedGroup);
+            phaseBody = `${groupNav}<div class="cup-groups-list">${visible.map(g => renderStandingsTable(g.table, comp.id, g.group)).join('')}</div>`;
+          }
         } else if(compPhase==='thirds'&&comp.national){
           const thirds=season.groupTables(save,comp.id).map(group=>({...group.table[2],name:group.table[2].name+' · '+group.group})).sort((a,b)=>b.p-a.p||b.sg-a.sg||b.gp-a.gp||a.id.localeCompare(b.id));
           phaseBody=renderStandingsTable(thirds,comp.id,'Melhores terceiros');
@@ -1011,24 +1358,67 @@
         }
         return list[offset];
       };
-      const add=story=>{if(!seen.has(story.key)){seen.add(story.key);stories.push(story);}};
+      const add=story=>{
+        if(seen.has(story.key))return;
+        if(story.club&&story.player)story.club=false;
+        seen.add(story.key);stories.push(story);
+      };
+      const authorByName=name=>newsAuthors.find(a=>a[0]===name)??newsAuthors[0];
+      if(save.worldCup?.year===save.year&&save.worldCup.callup?.selected){
+        const nation=season.team('national-'+save.worldCup.callup.nationality);
+        const nationName=nation?.name??save.worldCup.callup.nationality;
+        const callupKey='callup:'+save.year+':'+save.worldCup.callup.nationality;
+        add({
+          key:callupKey,round:save.round+1.5,author:authorByName('Marcelo Bechler'),club:false,player:true,
+          title:save.player.name+' é convocado para a Copa do Mundo '+save.year+'!',
+          label:'Seleção · Copa do Mundo '+save.year,
+          body:'Lista oficial anunciada! '+save.player.name+' está entre os 26 convocados de '+nationName+' para defender o país na Copa do Mundo '+save.year+'. '+save.worldCup.callup.reason,
+          media:nation?{kind:'celebrate',club:nation,opponent:club,
+            appearance:season.paint(save.player.look,nation),alt:save.player.name+' comemorando convocação para a Copa do Mundo'}:null
+        });
+      }
       const next=season.opponent(save);
-      if(next&&(next.isClassic||next.isFinal||/semifinal|quartas/i.test(next.phaseLabel??''))){
+      if(next){
         const home=next.home?season.team(next.playingClub??club.id):next.club;
         const away=next.home?next.club:season.team(next.playingClub??club.id);
         const stadiumId=window.goatStadiums?.forClub(home,0),stadium=window.goatStadiums?.byId[stadiumId];
         const key='preview:'+save.year+':'+next.competitionId+':'+next.slot.round+':'+home.id+':'+away.id;
+        const bigMatch=next.isClassic||next.isFinal||/semifinal|quartas/i.test(next.phaseLabel??'');
         const occasion=next.isFinal?'FINAL':next.isClassic?'CLÁSSICO':'JOGO DECISIVO';
         add({key,round:save.round+1,author:newsAuthors[newsHash(key)%newsAuthors.length],club:true,player:false,
-          title:occasion+' À VISTA: '+home.name+' x '+away.name,
+          title:bigMatch?(occasion+' À VISTA: '+home.name+' x '+away.name):club.name+' foca no duelo contra '+next.club.name,
           label:next.competitionShort+' · '+next.phaseLabel,
-          body:choose([
+          body:bigMatch?choose([
             'Arquibancada em contagem regressiva. '+home.name+' e '+away.name+' se encontram em um jogo que promete mexer com a temporada.',
             'O calendário guardou uma noite especial: '+home.name+' recebe '+away.name+'. Concentração e bola parada podem decidir os detalhes.',
             'Semana de expectativa alta para '+home.name+' x '+away.name+'. O peso do confronto começa antes do primeiro toque na bola.',
             'A conversa da torcida tem endereço: '+(stadium?.name??home.name)+'. '+home.name+' e '+away.name+' entram em campo com muito em jogo.'
-          ],key),media:stadium?.kind==='real'?{kind:'stadium',club:home,opponent:away,stadiumId,
+          ],key):choose([
+            'A comissão técnica do '+club.name+' fechou os ajustes finais para enfrentar o '+next.club.name+(next.home?' diante da sua torcida.':' fora de casa.'),
+            club.name+' vira a chave e concentra as atenções no confronto com o '+next.club.name+' pela '+next.competitionShort+'.',
+            'Clima de foco no CT: o '+club.name+' busca consistência defensiva e eficiência no ataque contra o '+next.club.name+'.',
+            'O '+club.name+' quer somar pontos importantes diante do '+next.club.name+' para ganhar força na sequência da temporada.'
+          ],key),media:bigMatch&&stadium?.kind==='real'?{kind:'stadium',club:home,opponent:away,stadiumId,
             alt:'Vista aérea de '+stadium.name+' no jogo',caption:stadium.name+' · Vista aérea no GOAT'}:null});
+      }
+      const leagueTable=season.standings(save);
+      const clubPos=leagueTable.findIndex(r=>r.id===club.id)+1;
+      const clubRow=clubPos?leagueTable[clubPos-1]:null;
+      const recentClubGames=save.history.filter(g=>g.club===club.id&&!g.national).slice(-3);
+      const streakWins=recentClubGames.length>=2&&recentClubGames.every(g=>g.win);
+      if(clubRow&&save.round>=2){
+        const sitKey='club-moment:'+save.year+':'+save.round+':'+club.id;
+        const sitTitle=streakWins?club.name+' embala com sequência de vitórias'
+          :clubPos===1?club.name+' sustenta a liderança na tabela'
+          :clubPos<=4?club.name+' segue firme no G-4 da competição'
+          :clubPos>=leagueTable.length-3?'Alerta ligado: '+club.name+' busca reação na tabela'
+          :club.name+' avalia campanha e mira salto na classificação';
+        const sitBody=streakWins?'Com '+recentClubGames.length+' vitórias seguidas, o '+club.name+' ganha confiança coletiva e ocupa a '+clubPos+'ª posição com '+clubRow.p+' pontos.'
+          :clubPos<=4?'Somando '+clubRow.p+' pontos em '+clubRow.j+' jogos, o '+club.name+' aparece em '+clubPos+'º lugar e anima a arquibancada na briga lá em cima.'
+          :clubPos>=leagueTable.length-3?'Na '+clubPos+'ª colocação com '+clubRow.p+' pontos, o '+club.name+' trata as próximas rodadas como decisivas para respirar na tabela.'
+          :'O '+club.name+' ocupa o '+clubPos+'º lugar com '+clubRow.p+' pontos ('+clubRow.v+'V, '+clubRow.e+'E, '+clubRow.d+'D) e busca regularidade nas próximas rodadas.';
+        add({key:sitKey,round:save.round+.6,author:newsAuthors[(newsHash(sitKey)+2)%newsAuthors.length],club:true,player:false,
+          title:sitTitle,label:'Momento do clube · Rodada '+save.round,body:sitBody,media:null});
       }
       for(const [dayIndex,day] of save.rounds.slice(-4).reverse().entries()){
         const games=day.filter(game=>season.team(game.home)&&season.team(game.away));
@@ -1116,7 +1506,50 @@
             body=choose(!total?zero:total>=5?festival:game.h===game.a?draws:wins,key);
             if(index===1&&dayIndex===0&&margin>=3)media={kind:'celebrate',club:winner,opponent:winner===home?away:home,alt:'Jogadores de '+winner.name+' comemorando em cena de partida'};
           }
-          add({key,author,title,body,club:isOwn,player:!!performance,round,label,media});
+          add({key,author,title,body,club:isOwn&&!performance,player:!!performance,round,label,media});
+          if(isOwn&&performance){
+            const oppTeam=home.id===club.id?away:home;
+            const clubGoals=home.id===club.id?game.h:game.a, oppGoals=home.id===club.id?game.a:game.h;
+            const clubKey=key+':club';
+            const clubAuthor=newsAuthors[(newsHash(clubKey)+3)%newsAuthors.length];
+            const clubTitle=clubGoals>oppGoals?club.name+' supera '+oppTeam.name+' por '+clubGoals+' × '+oppGoals
+              :clubGoals<oppGoals?club.name+' perde para '+oppTeam.name+' ('+clubGoals+' × '+oppGoals+')'
+              :club.name+' e '+oppTeam.name+' ficam no '+clubGoals+' × '+oppGoals;
+            const clubBody=clubGoals>oppGoals?choose([
+              'Atuação segura do '+club.name+', que controlou os momentos-chave e garantiu o resultado diante do '+oppTeam.name+'.',
+              'Com organização coletiva e eficiência na área, o '+club.name+' saiu de campo comemorando sobre o '+oppTeam.name+'.',
+              'A torcida do '+club.name+' aprovou a postura da equipe na vitória sobre o '+oppTeam.name+' pela '+compName+'.'
+            ],clubKey):clubGoals<oppGoals?choose([
+              'O '+club.name+' sofreu com os espaços cedidos e acabou superado pelo '+oppTeam.name+'. A comissão promete ajustes.',
+              'Noite de cobrança no '+club.name+' após o revés diante do '+oppTeam.name+'. O elenco já mira resposta na próxima rodada.',
+              'Faltou equilíbrio ao '+club.name+' para segurar o ritmo do '+oppTeam.name+' na '+compName+'.'
+            ],clubKey):choose([
+              'Jogo equilibrado do início ao fim: o '+club.name+' somou um ponto diante do '+oppTeam.name+'.',
+              'O '+club.name+' alternou bons momentos e saiu com o empate frente ao '+oppTeam.name+' pela '+compName+'.',
+              'Igualdade no placar entre '+club.name+' e '+oppTeam.name+', deixando sensação de que dava para arriscar mais.'
+            ],clubKey);
+            add({key:clubKey,author:clubAuthor,title:clubTitle,body:clubBody,club:true,player:false,round:round-.05,label,media:null});
+          }
+        }
+        const jokeColumns=[
+          {author:authorByName('Cazé'),title:'Resenha do Cazé',pool:newsJokes.caze},
+          {author:authorByName('Bruno Formiga'),title:'Na Prancheta',pool:newsJokes.formiga},
+          {author:authorByName('Craque Neto'),title:'Os Donos da Resenha',pool:newsJokes.neto},
+          {author:authorByName('Pilhado'),title:'Resenha de Bancada',pool:newsJokes.pilhado},
+          {author:newsAuthors[6+(newsHash('net:'+save.year+':'+round)%3)],title:'Resenha do Vestiário',pool:newsJokes.bastidores}
+        ];
+        const jokeBase=newsHash('resenha:'+save.year+':'+round);
+        const jokeCount=2+(jokeBase%2);
+        for(let j=0;j<jokeCount;j++){
+          const col=jokeColumns[(jokeBase+j)%jokeColumns.length];
+          const jKey='resenha:'+save.year+':'+round+':'+j;
+          const jokeBody=choose(col.pool,jKey);
+          const mentionsClub=club?.name&&jokeBody.toLowerCase().includes(club.name.toLowerCase());
+          add({
+            key:jKey,author:col.author,title:col.title,body:jokeBody,
+            club:Boolean(mentionsClub),player:false,round:round+.15+j*.01,
+            label:'Resenha · Rodada '+round,media:null
+          });
         }
       }
       const filtered=stories.filter(story=>newsTab==='all'||(newsTab==='club'?story.club:story.player)).sort((a,b)=>b.round-a.round);
@@ -1185,6 +1618,7 @@
       const position = Math.max(1, table.findIndex(row => row.id === save.club) + 1);
       const comps = season.activeCompetitions(save).filter(comp => {
         if(comp.id==='world-cup')return save.worldCup?.year===save.year&&save.worldCup.callup?.selected===true;
+        if(comp.id==='pre-libertadores'&&comp.knockout?.[0]?.length&&comp.knockout[0].every(t=>t.winner))return false;
         return !comp.national&&comp.participants?.includes(save.club);
       });
       if (!comps.some(c => c.id === selectedCompId)) selectedCompId = comps.find(comp=>comp.id===season.leagueCompId(div))?.id??comps[0]?.id??null;
@@ -1234,6 +1668,7 @@
       activate('game');
       const club = season.team(play.kind === 'trial' ? save.trial : play.playingClub??save.club);
       const opponent=season.team(play.opponent);
+      play.playerName = save.player.name;
       api.playMatch(play, club, opponent, season.paint(save.player.look, club),save.player.attributes,matchKey(play,club.id));
     }
 
@@ -1379,6 +1814,42 @@
       return [save.seed,save.year,match.kind,match.round??0,club,match.opponent].join(':');
     }
 
+    function collectMatchHighlights(match,club,opponent){
+      if(!reviewClips)return null;
+      const oppKeeper=opponent.players?.find(p=>p[1]==='GK'||p[1]==='GOL')?.[0]??`Goleiro (${opponent.abbr||opponent.name})`;
+      const items=[];
+      for(let i=0;i<match.chances;i++){
+        const clip=reviewClips[i];
+        if(!clip)continue;
+        const out=clip.outcome, kind=clip.kind;
+        const isGoal=['goal','assist','teamGoal','ownGoal'].includes(out);
+        const nearGoal=clip.hitPost||clip.nearGoal||(out==='out'&&clip.frames?.some(f=>f[7]<=1.2&&Math.abs(f[5])<=5.6&&f[6]<=3.6));
+        const isHighlight=isGoal||kind==='penalty'||kind==='freeKick'||out==='save'||nearGoal;
+        if(!isHighlight)continue;
+        const min=clip.minute??Math.max(4,Math.min(89,Math.round(8+((i+.55)/Math.max(1,match.chances))*79)));
+        let title='Finalização', sub='', tone='close', icon='↗', actorName=clip.playerName||save.player.name, actorBadge=club, isKeeper=false;
+        if(kind==='penalty'){
+          title='Pênalti';
+          if(isGoal){sub='Gol';tone='goal';icon='⚽';}
+          else{sub=out==='save'?'Defendido':'Pra fora';tone='miss';icon='✖';}
+        }else if(isGoal){
+          title='Gol';
+          sub=out==='assist'?'Assistência':out==='teamGoal'?'Gol da equipe':out==='ownGoal'?'Gol contra':kind==='freeKick'?'De falta':'';
+          tone='goal';icon='⚽';
+        }else if(kind==='freeKick'){
+          title='Falta';
+          if(out==='save'){sub='Defesa do goleiro';tone='save';icon='🧤';actorName=oppKeeper;actorBadge=opponent;isKeeper=true;}
+          else{sub=clip.hitPost?'Na trave':'Passou perto';tone='close';icon='↗';}
+        }else if(out==='save'){
+          title='Defesa';sub='Grande defesa';tone='save';icon='🧤';actorName=oppKeeper;actorBadge=opponent;isKeeper=true;
+        }else{
+          title='Finalização';sub=clip.hitPost?'Na trave':'Passou perto';tone='close';icon='↗';
+        }
+        items.push({index:i,min,title,sub,tone,icon,actorName,actorBadge,isKeeper});
+      }
+      return items;
+    }
+
     function resultScreen(){
       const match=save?.last, review=match?.review;
       const club=season.team(review?.club),opponent=season.team(match?.opponent);
@@ -1386,28 +1857,169 @@
       api.preview(null);
       const home=match.home?club:opponent,away=match.home?opponent:club;
       const score=match.home?[match.forGoals,match.against]:[match.against,match.forGoals];
-      const outcomes={goal:'Gol',assist:'Assistência',ownGoal:'Gol contra',teamGoal:'Gol do companheiro',save:'Defesa ou bloqueio',out:'Bola fora',time:'Tempo esgotado'};
-      const types={play:'Bola rolando',penalty:'Pênalti',freeKick:'Falta com barreira'};
-      const rows=Array.from({length:match.chances},(_,i)=>{
-        const clip=reviewClips?.[i];
-        const label=clip?`${types[clip.kind]} · ${outcomes[clip.outcome]??''}`:reviewClips?'Replay indisponível':'Carregando replay…';
-        return `<button type="button" class="result-replay" data-action="watch-chance" data-index="${i}" ${clip?'':'disabled'}>
-          <strong>Chance ${i+1}</strong><span>${label}</span><span aria-hidden="true">▶</span></button>`;
-      }).join('');
-      const penLine = match.penalties ? `<small class="result-penalties">Pênaltis: ${match.penalties.h} × ${match.penalties.a}</small>` : '';
+      const highlights=collectMatchHighlights(match,club,opponent);
+      const availableClips=highlights?highlights.length:0;
+      const highlightSub=highlights?(availableClips?`${availableClips} ${availableClips===1?'lance disponível':'lances disponíveis'} · assistir replays`:'Nenhum grande lance nesta partida'):'Carregando replays…';
+      const penLine=match.penalties?` · Pên. ${match.penalties.h} × ${match.penalties.a}`:'';
+      const stadiumId=window.goatStadiums?.forClub(home,0),stadium=window.goatStadiums?.byId?.[stadiumId];
+      const dateLabel=match.date?new Date(match.date+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'}):`${save.year}`;
+      const compLabel=match.kind==='trial'?'Seletiva':(match.competitionName||match.competitionShort||('Série '+club.league));
+      const metaLine=[dateLabel,stadium?.name||'Estádio',compLabel].join('  |  ');
+      const sim=match.simLog?.stats;
+      const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+      const seed=newsHash(review.key);
+      const uPoss=sim?.userPoss??clamp(Math.round(50+((club.strength??70)-(opponent.strength??70))*.4+(match.home?3:-3)),34,66);
+      const hPoss=match.home?uPoss:100-uPoss, aPoss=100-hPoss;
+      const uBaseShots=Math.max(match.forGoals+4+((seed>>>1)%6),(sim?.userShots??0)+4+((seed>>>3)%5));
+      const oBaseShots=Math.max(match.against+4+((seed>>>2)%6),(sim?.oppShots??0)+4+((seed>>>4)%5));
+      const hShots=match.home?uBaseShots:oBaseShots, aShots=match.home?oBaseShots:uBaseShots;
+      const hOnTarget=clamp(Math.max(score[0]+((seed>>>5)%3),Math.round(hShots*(.38+((seed>>>6)%24)*.01))),score[0],hShots);
+      const aOnTarget=clamp(Math.max(score[1]+((seed>>>7)%3),Math.round(aShots*(.38+((seed>>>8)%24)*.01))),score[1],aShots);
+      const hTackles=7+((seed>>>9)%10), aTackles=7+((seed>>>11)%10);
+      const hFouls=5+((seed>>>13)%10), aFouls=5+((seed>>>15)%10);
+      const hCorners=2+((seed>>>17)%7), aCorners=2+((seed>>>19)%7);
+      const hShotAcc=hShots?Math.round((hOnTarget/hShots)*100):0;
+      const aShotAcc=aShots?Math.round((aOnTarget/aShots)*100):0;
+      const hPassAcc=clamp(76+Math.round(((home.strength??70)-65)*.22)+((seed>>>21)%8),74,93);
+      const aPassAcc=clamp(76+Math.round(((away.strength??70)-65)*.22)+((seed>>>23)%8),74,93);
+      const statRows=[
+        [hShots,'Finalizações',aShots],
+        [hOnTarget,'Finalizações certas',aOnTarget],
+        [hPoss,'Posse de bola %',aPoss],
+        [hTackles,'Divididas',aTackles],
+        [hFouls,'Faltas',aFouls],
+        [hCorners,'Escanteios',aCorners],
+        [hShotAcc,'Precisão nas finalizações',aShotAcc],
+        [hPassAcc,'Precisão no passe',aPassAcc]
+      ].map(([l,name,r])=>`<div class="pm-stat-row"><b>${l}</b><span>${name}</span><b>${r}</b></div>`).join('');
+      const ratingVal=match.rating!=null?Number(match.rating).toFixed(1).replace('.',','):'—';
       const xp=match.xpAward;
       const earnedPoints=xp?.attributePoints??(xp?.upgrades?xp.upgrades*season.ATTRIBUTE_POINTS_PER_LEVEL:0);
-      const xpResult=xp?`<section class="result-xp"><h3>+${xp.total} XP</h3><p>Partida +${xp.base} XP · Objetivos +${xp.bonus} XP${xp.upgrades?` · ${xp.upgrades} ${xp.upgrades>1?'evoluções':'evolução'} (+${earnedPoints} pts de atributo)`:''}</p><div>${xp.objectives.map(objective=>`<div class="result-objective${objective.complete?' is-complete':''}"><span>${objective.complete?'✓':'○'} ${objective.label}</span><strong>${objective.complete?'+':''}${objective.complete?objective.reward:0} XP</strong></div>`).join('')}</div></section>`:'';
-      activate('result','Fim de jogo',`<div class="result-score"><div>${medal(home)}<strong>${home.name}</strong></div>
-        <div class="result-score-mid"><strong aria-label="Placar final">${score[0]} × ${score[1]}</strong>${penLine}</div><div>${medal(away)}<strong>${away.name}</strong></div></div>
-        ${xpResult}<div class="result-continue">${button('close-result','Continuar','accent')}</div>
-        <h3 class="result-replay-title">Replays das chances</h3><div class="result-replays">${rows}</div>`,'close-result');
+      const completedObjs=xp?xp.objectives.filter(o=>o.complete).length:0;
+      const totalObjs=xp?xp.objectives.length:0;
+      const heatCells=Array.from({length:24},(_,idx)=>{
+        const col=idx%6,row=Math.floor(idx/6);
+        const hot=(col>=3&&row>=1&&row<=2)?3:(col>=2?2:(col>=1&&row===1?1:0));
+        return `<i class="pm-heat-${hot}"></i>`;
+      }).join('');
+      const look=save.player.look??{};
+      const skinHex=season.skins?.[look.skin]??'#d5a07a';
+      const hairHex=season.hairs?.[look.hairColor]??'#2a2126';
+      const initials=save.player.name.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('')||'P';
+      activate('result','Fim de jogo',`<div class="pm-layout">
+        <div class="pm-banner">
+          <div class="pm-banner-badge">${medal(home,58)}</div>
+          <div class="pm-banner-center">
+            <div class="pm-banner-meta">${esc(metaLine)}</div>
+            <div class="pm-banner-clock">90:00${esc(penLine)}</div>
+            <div class="pm-banner-score">
+              <span class="pm-banner-team pm-banner-home">${esc(home.name)}</span>
+              <strong aria-label="Placar final">${score[0]} <em>—</em> ${score[1]}</strong>
+              <span class="pm-banner-team pm-banner-away">${esc(away.name)}</span>
+            </div>
+          </div>
+          <div class="pm-banner-badge">${medal(away,58)}</div>
+        </div>
+        <div class="pm-grid">
+          <div class="pm-left">
+            <button type="button" class="pm-tile pm-tile-advance" data-action="close-result">
+              <span class="pm-tile-title">AVANÇAR</span>
+              <svg class="pm-advance-icon" viewBox="0 0 40 40" width="38" height="38" aria-hidden="true">
+                <path d="M8 7 H24 V14 H20 V11 H12 V29 H20 V26 H24 V33 H8 Z" fill="currentColor"/>
+                <path d="M18 17 H28 V12 L36 20 L28 28 V23 H18 Z" fill="currentColor"/>
+              </svg>
+            </button>
+            <button type="button" class="pm-tile pm-tile-highlights" data-action="open-highlights">
+              <div class="pm-highlights-head">
+                <div>
+                  <h3>MELHORES MOMENTOS</h3>
+                  <p>${esc(highlightSub)}</p>
+                </div>
+                <svg class="pm-reel-icon" viewBox="0 0 44 44" width="44" height="44" aria-hidden="true">
+                  <circle cx="22" cy="22" r="18" fill="#fffaf0" stroke="#1a1420" stroke-width="3"/>
+                  <circle cx="22" cy="11" r="3.5" fill="#1a1420"/><circle cx="22" cy="33" r="3.5" fill="#1a1420"/>
+                  <circle cx="11" cy="22" r="3.5" fill="#1a1420"/><circle cx="33" cy="22" r="3.5" fill="#1a1420"/>
+                  <circle cx="22" cy="22" r="3" fill="#b93926"/>
+                </svg>
+              </div>
+            </button>
+            <div class="pm-bottom-row">
+              <section class="pm-tile pm-tile-rating">
+                <h3>AVALIAÇÃO</h3>
+                <div class="pm-rating-body">
+                  <span class="news-avatar news-portrait pm-player-avatar" aria-hidden="true" style="--avatar-bg:${club.primary??'#1d444e'};--avatar-skin:${skinHex};--avatar-hair:${hairHex}"><i><b></b></i><small>${esc(initials)}</small></span>
+                  <div>
+                    <strong class="pm-player-name">${esc(save.player.name)}</strong>
+                    <b class="pm-rating-num">${ratingVal}</b>
+                    <small class="pm-rating-sub">${match.goals||0}G · ${match.assists||0}A</small>
+                  </div>
+                </div>
+              </section>
+              <section class="pm-tile pm-tile-perf">
+                <h3>DESEMPENHO</h3>
+                <div class="pm-perf-body">
+                  <div class="pm-heatmap" aria-hidden="true">${heatCells}</div>
+                  <div class="pm-perf-meta">
+                    ${xp?`<strong>+${xp.total} XP</strong><small>${completedObjs}/${totalObjs} objetivos${earnedPoints?` · +${earnedPoints} pts`:''}</small>`:`<strong>${match.shots||0} chutes</strong><small>${match.chances} lances</small>`}
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+          <section class="pm-tile pm-tile-stats">
+            <h3>ESTATÍSTICAS</h3>
+            <div class="pm-stats-teams"><span>${esc(home.name)}</span><span>${esc(away.name)}</span></div>
+            <div class="pm-stats-list">${statRows}</div>
+          </section>
+        </div>
+      </div>`,'close-result');
       if(reviewClips)return;
       Promise.all(Array.from({length:match.chances},(_,i)=>window.careerReplayStore.read(review.key,i+1))).then(clips=>{
-        if(screen!=='result'||save?.last?.review?.key!==review.key)return;
+        if((screen!=='result'&&screen!=='highlights')||save?.last?.review?.key!==review.key)return;
         reviewClips=clips;
-        resultScreen();
+        if(screen==='highlights')highlightsScreen();else resultScreen();
       });
+    }
+
+    function highlightsScreen(){
+      const match=save?.last, review=match?.review;
+      const club=season.team(review?.club),opponent=season.team(match?.opponent);
+      if(!club||!opponent||!review?.key){hub();return;}
+      api.preview(null);
+      const look=save.player.look??{};
+      const skinHex=season.skins?.[look.skin]??'#d5a07a';
+      const hairHex=season.hairs?.[look.hairColor]??'#2a2126';
+      const highlights=collectMatchHighlights(match,club,opponent);
+      const cards=!highlights
+        ?'<div class="hl-empty">Carregando melhores momentos…</div>'
+        :!highlights.length
+          ?'<div class="hl-empty">Nenhum grande lance registrado nesta partida.</div>'
+          :highlights.map(item=>{
+            const initials=item.actorName.split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join('')||'P';
+            const avatarBg=item.isKeeper?(opponent.primary??'#2e3848'):(club.primary??'#1d444e');
+            const avatarSkin=item.isKeeper?'#c99672':skinHex;
+            const avatarHair=item.isKeeper?'#2c2429':hairHex;
+            return `<button type="button" class="hl-card hl-tone-${item.tone}" data-action="watch-chance" data-index="${item.index}">
+              <span class="hl-corner" aria-hidden="true"><i>${item.icon}</i></span>
+              <div class="hl-card-head">
+                <strong>${esc(item.title)}</strong>
+                <span class="hl-min">${item.min}'</span>
+              </div>
+              ${item.sub?`<small class="hl-sub">${esc(item.sub)}</small>`:''}
+              <div class="hl-card-foot">
+                <span class="news-avatar news-portrait hl-avatar" aria-hidden="true" style="--avatar-bg:${avatarBg};--avatar-skin:${avatarSkin};--avatar-hair:${avatarHair}"><i><b></b></i><small>${esc(initials)}</small></span>
+                <b class="hl-actor">${esc(item.actorName)}</b>
+                <span class="hl-badge">${medal(item.actorBadge,36)}</span>
+              </div>
+            </button>`;
+          }).join('');
+      activate('highlights','Melhores Momentos',`<div class="hl-layout">
+        <div class="hl-bar">
+          <button type="button" class="career-button quiet hl-back" data-action="back-result">← Voltar</button>
+          <span>MELHORES MOMENTOS · ${esc(club.name)} × ${esc(opponent.name)}</span>
+        </div>
+        <div class="hl-grid">${cards}</div>
+      </div>`,'back-result');
     }
 
     function controls(origin = 'home') {
@@ -1431,18 +2043,27 @@
     function previewItem(id) {
       if(screen!=='hub'||hubTab!=='player'||playerTab!=='shop')return;
       const item=season.shop.find(entry=>entry.id===id);
-      const preview=item?{...save.player.look,[item.key]:item.index}:save.player.look;
+      const preview=item&&!item.consumable?{...save.player.look,[item.key]:item.index}:save.player.look;
       api.preview(season.paint(preview,season.team(save.club)),-.22);
       content.querySelectorAll('[data-item]').forEach(element=>element.classList.toggle('is-previewing',element.dataset.item===id));
     }
 
     function equipItem(id,justPurchased=false) {
       const item=season.shop.find(entry=>entry.id===id);
-      if(!item||!save.owned.includes(item.id))return;
-      season.edit(save,save.player.name,{...save.player.look,[item.key]:item.index});
-      if(!justPurchased)markShopItemSeen(id);
+      if(!item||(!item.repeatable&&!save.owned.includes(item.id)))return;
+      if(!item.consumable)season.edit(save,save.player.name,{...save.player.look,[item.key]:item.index});
+      if(!justPurchased&&!item.repeatable)markShopItemSeen(id);
       persist();
-      hub(justPurchased?id:null);
+      hub(justPurchased&&!item.repeatable?id:null);
+      focusOption(content.querySelector(`button[data-item="${id}"]`));
+    }
+
+    function unequipItem(id) {
+      const item=season.shop.find(entry=>entry.id===id);
+      if(!item||item.consumable||!save.owned.includes(item.id))return;
+      season.edit(save,save.player.name,{...save.player.look,[item.key]:0});
+      persist();
+      hub();
       focusOption(content.querySelector(`button[data-item="${id}"]`));
     }
 
@@ -1452,8 +2073,7 @@
         case 'career': gateway(); break;
         case 'controls': controls(); break;
         case 'training-player-paused':
-          pauseMenu.hidden=true;
-          trainingPlayerScreen();
+          openTrainingPlayerDialog(target);
           break;
         case 'return-practice-pause':
           api.updateTrainingPlayer(trainingPlayer);
@@ -1519,6 +2139,8 @@
           resultScreen();
           break;
         }
+        case 'open-highlights': highlightsScreen(); break;
+        case 'back-result': resultScreen(); break;
         case 'close-result': {
           const match=save?.last,review=match?.review;
           if(!review)break;
@@ -1538,11 +2160,15 @@
         case 'player-edit': if(save?.club)creator(true);break;
         case 'player-profile': case 'player-shop': case 'player-awards': case 'player-market':
           hubTab='player';playerTab=action.slice(7);hub();focusOption(content.querySelector(`[data-action="${action}"]`));break;
+        case 'shop-cat':
+          shopCategory=target.dataset.cat||'appearance';
+          hub();focusOption(content.querySelector(`[data-action="shop-cat"][data-cat="${shopCategory}"]`),{preventScroll:true});break;
         case 'buy': case 'preview-item':
           previewItem(target.dataset.item);
           if(markShopItemSeen(target.dataset.item))updateAlerts();
           break;
         case 'equip': equipItem(target.dataset.item);break;
+        case 'unequip': unequipItem(target.dataset.item);break;
         case 'return-match': activate('game'); api.closeControls(); break;
         case 'comp-select':
           selectedCompId=target.dataset.comp;
@@ -1707,7 +2333,8 @@
     window.addEventListener('blur',stopTrainingStep);
 
     function back() {
-      if(screen==='review'){api.leaveMatch();resultScreen();return;}
+      if(screen==='review'){api.leaveMatch();highlightsScreen();return;}
+      if(screen==='highlights'){resultScreen();return;}
       if (screen === 'home' || screen === 'game' || screen === 'shootout') return;
       dispatch(content.querySelector('button.quiet')?.dataset.action);
     }
@@ -1737,12 +2364,22 @@
         const dx = r.left + r.width / 2 - a.left - a.width / 2;
         const dy = r.top + r.height / 2 - a.top - a.height / 2;
         const along = dx * x + dy * y;
-        if (along <= 4) continue;
+        if (along <= (x ? 12 : 4)) continue;
         const cross = Math.abs(x ? dy : dx);
         const score = along + cross * 3;
         if (score < bestScore) {
           best = element;
           bestScore = score;
+        }
+      }
+      if (!best && x && !y) {
+        const verticalOnly = elements.every(el => {
+          const r = el.getBoundingClientRect();
+          return Math.abs((r.left + r.width / 2) - (a.left + a.width / 2)) <= 24;
+        });
+        if (verticalOnly) {
+          focusOption(active);
+          return;
         }
       }
       const fallback = elements[(index + (x || y) + elements.length) % elements.length];
@@ -1768,6 +2405,19 @@
       const shoulders=[4,5,6,7].map(index=>!!buttons[index]);
       const [lb,rb,lt,rt]=shoulders.map((pressed,index)=>Number(pressed&&!previous.shoulders[index]));
       nav = { confirm, back: goBack, x, y, shoulders, repeatAt: moving ? now + (changed ? firstRepeat : repeatInterval) : previous.repeatAt };
+      if(playerDialog?.open){
+        if(goBack&&!previous.back){playerDialog.close();return;}
+        const options=[...playerDialog.querySelectorAll('[data-training-stat], [data-close-training-player]')];
+        const current=options.indexOf(document.activeElement);
+        if(moving&&y&&options.length){
+          const next=current<0?0:(current+y+options.length)%options.length;
+          focusOption(options[next]);
+        }
+        const activeRow=document.activeElement?.closest?.('[data-training-stat]');
+        if(moving&&activeRow&&x)adjustTrainingRating(activeRow,x);
+        if(confirm&&!previous.confirm&&document.activeElement?.matches?.('[data-close-training-player]'))playerDialog.close();
+        return;
+      }
       if(stadiumDialog.open){
         if(goBack&&!previous.back){stadiumDialog.close();return;}
         const options=[...stadiumDialog.querySelectorAll('button')];
@@ -1798,7 +2448,11 @@
         return;
       }
       const current = screen === 'game' ? pauseMenu : screen === 'home' ? menu : content;
-      const elements = [...current.querySelectorAll('button:not(:disabled):not([data-training-step]),input:not(:disabled):not(.training-range),select:not(:disabled),.standings-scroll,.hub-content[tabindex],[data-training-stat]')].filter(element=>!element.closest('[hidden]'));
+      const elements = [...current.querySelectorAll('button:not(:disabled):not([data-training-step]),input:not(:disabled):not(.training-range),select:not(:disabled),.standings-scroll,.hub-content[tabindex],[data-training-stat]')].filter(element=>{
+        if(element.closest('[hidden]'))return false;
+        const r=element.getBoundingClientRect();
+        return r.width>0&&r.height>0;
+      });
       const active = elements.includes(document.activeElement) ? document.activeElement
         : elements.includes(focusedOption) ? focusedOption : null;
       if (active) showFocus(active);
@@ -1928,7 +2582,7 @@
       rotate(turn*amount);
     }
 
-    function commit(outcome, shots, ratingEvents) {
+    function commit(outcome, shots, ratingEvents, scorerName = null) {
       const current = save.pending;
       if(current?.training){
         season.recordRatingEvents(current,ratingEvents);
@@ -1942,7 +2596,7 @@
       }
       const club=current.kind==='trial'?save.trial:current.playingClub??save.club;
       season.recordRatingEvents(current,ratingEvents);
-      const complete = season.chance(save, outcome, shots);
+      const complete = season.chance(save, outcome, shots, scorerName);
       if (complete){
         if (season.needsPenaltyShootout(save, current)) {
           season.createShootout(save, current);
@@ -2006,7 +2660,7 @@
 
     home();
     document.querySelector('#replayExit').onclick=back;
-    return { get screen(){return screen;}, get creatorFrame(){return creatorFrame;}, get stadiumOpen(){return stadiumDialog.open;},
+    return { get screen(){return screen;}, get creatorFrame(){return creatorFrame;}, get stadiumOpen(){return stadiumDialog.open||Boolean(playerDialog?.open);},
       back, controls, leaveMatch, commit, commitShootoutKick, returnToShootout, awardSetPiece, finish, gamepad, rotateWithKey, persistIntro:persist };
   }
 

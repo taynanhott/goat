@@ -12,7 +12,7 @@
 <header><div><div class="brand">GO<b>AT</b></div></div><div class="scoreboard"><div class="stat"><strong id="goals">00</strong><span>GOLS</span></div><div class="stat"><strong id="saves">00</strong><span>DEFESAS</span></div><div class="stat"><strong id="shots">00</strong><span>CHUTES</span></div><div class="stat"><strong id="posts">00</strong><span>TRAVES</span></div></div></header>
 <div class="options"><button id="replay" disabled>Replay · V</button><button id="reset">Nova bola · T</button></div>
 <div class="event"><div id="message"></div><div id="eventRatingDelta" class="event-rating-delta" role="status" hidden></div><div id="submessage"></div></div><div id="aimSpread" hidden aria-hidden="true"></div><div id="reticle" hidden></div><div id="ballCue" hidden aria-hidden="true"></div><div id="teammateMarks" aria-hidden="true"></div><div id="playerMark" hidden aria-hidden="true"><svg viewBox="0 0 24 34" width="18" height="26"><polygon points="12,1.5 14.7,7.2 21,8 16.4,12.2 17.6,18.4 12,15.3 6.4,18.4 7.6,12.2 3,8 9.3,7.2" fill="#ffd93d" stroke="#1a1420" stroke-width="2" stroke-linejoin="round"/><polygon points="5,21 19,21 12,32.5" fill="#ffd93d" stroke="#1a1420" stroke-width="2" stroke-linejoin="round"/></svg></div><div id="replayTag" class="replaytag" hidden>● REPLAY / CÂMERA LENTA</div>
-<div class="bottom"><div class="shotpanel"><div class="paneltop"><strong>GOAT &nbsp; FINALIZADOR</strong><span class="badge" id="range">18 m</span></div><div class="powerlabel"><span>FORÇA DO CHUTE</span><span id="powerText">0%</span></div><div class="bar"><i id="power"></i></div><div class="shotfooter"><span id="height">MEIA ALTURA</span><span id="shotHint">SEGURE X</span></div></div><div class="status"><small id="keeperState">EM POSIÇÃO</small><div id="device">● Teclado e mouse</div><span id="movementHint">WASD / setas · mover e mirar</span><span id="passHint" class="career-pass-hint">T · passe para o companheiro</span></div></div>
+<div class="bottom"><div class="shotpanel"><div class="paneltop"><strong>GOAT &nbsp; FINALIZADOR</strong><span class="badge" id="range">18 m</span></div><div class="powerlabel"><span>FORÇA DO CHUTE · <b id="dominantFootLabel">PÉ DIREITO</b></span><span id="powerText">0%</span></div><div class="bar"><i id="power"></i></div><div class="shotfooter"><span id="height">MEIA ALTURA</span><span id="shotHint">SEGURE X</span></div></div><div class="status"><small id="keeperState">EM POSIÇÃO</small><div id="device">● Teclado e mouse</div><span id="movementHint">WASD / setas · mover e mirar</span><span id="passHint" class="career-pass-hint">T · passe para o companheiro</span></div></div>
 <div id="controls" hidden></div>
 <div id="matchRibbon" class="match-ribbon" hidden>
   <div><span id="matchLabel"></span><strong id="matchClubs"></strong></div>
@@ -50,6 +50,46 @@
     <p id="scoreUpdateStatus" role="status"></p>
   </div>
 </div>
+<section id="matchTimeline" class="match-timeline" hidden aria-label="Histórico da partida">
+  <div class="mt-shell">
+    <div class="mt-comp" id="mtComp"></div>
+    <div class="mt-scorebar">
+      <div class="mt-team mt-team-home">
+        <strong id="mtHomeName"></strong>
+        <span class="mt-dot" id="mtHomeDot"></span>
+        <span class="mt-badge" id="mtHomeBadge"></span>
+      </div>
+      <div class="mt-scorebox">
+        <div class="mt-score" aria-live="polite"><span id="mtHomeScore">0</span><b>×</b><span id="mtAwayScore">0</span></div>
+        <div class="mt-clock" id="mtClock">00:00</div>
+      </div>
+      <div class="mt-team mt-team-away">
+        <span class="mt-badge" id="mtAwayBadge"></span>
+        <span class="mt-dot" id="mtAwayDot"></span>
+        <strong id="mtAwayName"></strong>
+      </div>
+    </div>
+    <div class="mt-grid">
+      <aside class="mt-stats" aria-label="Estatísticas do seu time">
+        <div class="mt-stat"><span>Posse de bola %</span><strong id="mtHomePoss">50</strong></div>
+        <div class="mt-stat"><span>Chutes</span><strong id="mtHomeShots">0</strong></div>
+        <div class="mt-stat"><span>Chances</span><strong id="mtHomeChances">0</strong></div>
+      </aside>
+      <div class="mt-feed-card">
+        <div id="mtFeed" class="mt-feed" aria-live="polite"></div>
+      </div>
+      <aside class="mt-stats" aria-label="Estatísticas do adversário">
+        <div class="mt-stat"><span>Posse de bola %</span><strong id="mtAwayPoss">50</strong></div>
+        <div class="mt-stat"><span>Chutes</span><strong id="mtAwayShots">0</strong></div>
+        <div class="mt-stat"><span>Chances</span><strong id="mtAwayChances">0</strong></div>
+      </aside>
+    </div>
+    <div class="mt-footer">
+      <span id="mtStatus" class="mt-status">Acompanhando a partida...</span>
+      <button type="button" id="mtAdvance" class="mt-advance">Avançar · Espaço</button>
+    </div>
+  </div>
+</section>
 <audio id="goalCheerAudio" src="../assets/audio/stadium-goal-short.mp3" preload="auto" hidden></audio>
 <audio id="stadiumAmbienceAudio" src="../assets/audio/stadium-ambience.mp3" preload="auto" hidden></audio>
 <div id="staminaPanel" class="stamina-panel" hidden>
@@ -65,9 +105,9 @@
     <div id="loading" role="status">Preparando o campo…</div>
     <nav aria-label="Menu principal">
       <button type="button" class="career-button accent" data-action="career">Carreira</button>
-      <button type="button" class="career-button" data-action="controls">Controles</button>
       <button type="button" class="career-button" id="play" data-action="training" disabled>Treino livre</button>
-      <button type="button" class="career-button" id="openAnimLab" disabled>Animações</button>
+      <button type="button" class="career-button" data-action="controls">Controles</button>
+      <button type="button" class="career-button" id="openAnimLab" disabled hidden>Animações</button>
     </nav>
   </div>
 </div>
@@ -216,8 +256,17 @@
   <div id="careerContent" class="career-content"></div>
   <p id="careerWarning" class="career-warning" role="status" hidden></p>
 </section>
-<div id="cameraPreview" class="camera-preview" hidden><div><button id="cameraPrevious" aria-label="Câmera anterior">◀</button><strong id="cameraName">Lateral</strong><button id="cameraNext" aria-label="Próxima câmera">▶</button></div><button id="cameraFocus">Foco: bola</button><p>← / → ou analógico · selecionar · Select / C · foco</p><div><button id="cameraConfirm">A / Enter · Confirmar</button><button id="cameraCancel">B / Esc · Voltar</button></div></div>
-<div id="paused" class="overlay" hidden><div class="intro"><h2>Jogo pausado</h2>
+<div id="cameraPreview" class="camera-preview" hidden><div><button id="cameraPrevious" aria-label="Câmera anterior">◀</button><strong id="cameraName">Lateral</strong><button id="cameraNext" aria-label="Próxima câmera">▶</button></div><button id="cameraFocus">Foco: bola</button><p id="cameraHint">← / → · selecionar · C · foco</p><div><button id="cameraConfirm">Enter · Confirmar</button><button id="cameraCancel">Esc · Voltar</button></div></div>
+<div id="paused" class="overlay" hidden><div class="intro">
+  <div id="pauseMainView">
+    <h2>Jogo pausado</h2>
+    <button id="resume" class="career-button accent">Continuar</button>
+    <button type="button" id="openTrainingSettings" class="career-button" hidden>Configurações do treino</button>
+    <button type="button" id="camera" class="career-button">Câmera</button>
+    <button id="leaveGame" class="career-button danger">Voltar ao menu</button>
+  </div>
+  <div id="pauseTrainingView" hidden>
+    <h2>Configurações do treino</h2>
   <fieldset id="trainingModes" class="training-modes" hidden><legend>Modo de treino</legend><div class="training-mode-buttons">
     <button type="button" data-practice="open" aria-pressed="true">Com bola</button>
     <button type="button" data-practice="noBall" aria-pressed="false">Sem bola</button>
@@ -234,15 +283,19 @@
 <button type="button" data-teammates="1" aria-label="1 companheiros" aria-pressed="false">1</button><button type="button" data-teammates="2" aria-label="2 companheiros" aria-pressed="true">2</button><button type="button" data-teammates="3" aria-label="3 companheiros" aria-pressed="false">3</button>
   </div></fieldset>
   <button type="button" id="trainingStadium" class="career-button" data-action="training-stadium" aria-haspopup="dialog" hidden>Estádio</button>
-  <button type="button" id="camera" class="career-button">Câmera</button>
-  <button id="resume" class="career-button accent">Continuar</button>
-  <button type="button" id="trainingPlayerSetup" class="career-button" data-action="training-player-paused" hidden>Jogador do Treino</button>
-  <button id="leaveGame" class="career-button">Voltar ao menu</button>
+  <button type="button" id="trainingPlayerSetup" class="career-button" data-action="training-player-paused" aria-haspopup="dialog" hidden>Jogador do Treino</button>
+  <button type="button" id="closeTrainingSettings" class="career-button accent">Voltar</button>
+  </div>
 </div></div>
 <dialog id="trainingStadiumDialog" class="training-stadium-dialog" aria-labelledby="trainingStadiumTitle">
   <h2 id="trainingStadiumTitle">Estádio do treino</h2>
   <div class="practice-stadium-grid" id="trainingStadiumOptions"></div>
   <button type="button" class="career-button quiet" data-close-stadium>Voltar</button>
+</dialog>
+<dialog id="trainingPlayerDialog" class="training-stadium-dialog training-player-dialog" aria-labelledby="trainingPlayerTitle">
+  <h2 id="trainingPlayerTitle">Jogador do Treino</h2>
+  <div id="trainingPlayerBody" class="training-profile"></div>
+  <button type="button" class="career-button accent" data-close-training-player>Aplicar e voltar</button>
 </dialog>
 <div id="freeKickMarker" class="free-kick-marker" hidden></div>
 <div id="freeKickInstructions" class="free-kick-instructions" hidden>Mova a bola para fora da área · X confirma o local</div>

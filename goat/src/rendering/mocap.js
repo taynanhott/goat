@@ -359,11 +359,11 @@ gl.attachShader(program,shader(gl.FRAGMENT_SHADER,`
   uniform float uShirtNumber;
   uniform float uCustom;
   uniform float uTeam;
-  uniform float uKitPattern,uHasTertiary,uHasBadge;
+  uniform float uKitPattern,uHasTertiary,uHasBadge,uHasBoot2,uHasTankTop,uPantsStyle;
   uniform sampler2D uClubBadge;
-  uniform vec3 uTertiary;
+  uniform vec3 uTertiary,uBoot2,uTankTop,uPants,uPants2;
   uniform vec3 uSkin,uHair,uBeard,uBoot,uPrimary,uSecondary;
-  uniform vec4 uLook;
+  uniform vec4 uLook,uAcc;
   uniform vec2 uKitFit;
   uniform float uMirrorSign;
   uniform mediump float uInk;
@@ -467,12 +467,40 @@ gl.attachShader(program,shader(gl.FRAGMENT_SHADER,`
       float stripeShorts=smoothstep(10.1,11.8,abs(x))*(1.-smoothstep(13.,14.,abs(x)));
       vec3 legShorts=mix(shorts,uPrimary,stripeShorts*.72*uTeam*(1.-uKeeper));
       material=mix(material,mix(legShorts,black,(1.-smoothstep(.4,1.2,y-hem))*.55),fabric);
+      if(uPantsStyle>.5&&uKeeper<.5){
+        float pMask=smoothstep(8.2,9.2,y);
+        vec3 pCol=uPants;
+        if(uPantsStyle<1.5){
+          float pStripe=smoothstep(10.4,11.8,abs(x))*(1.-smoothstep(13.2,14.2,abs(x)));
+          pCol=mix(pCol,uPants2,pStripe*.90);
+        }else if(uPantsStyle<2.5){
+          float ankleCuff=1.-smoothstep(13.5,15.5,y);
+          pCol=mix(pCol,uPants2,ankleCuff*.92);
+        }else if(uPantsStyle<3.5){
+          float pocket=smoothstep(9.8,11.2,abs(x))*(1.-smoothstep(54.,56.,abs(y-63.)))*smoothstep(51.,53.,y)*(1.-smoothstep(71.,73.,y));
+          float flap=smoothstep(9.8,11.2,abs(x))*(1.-smoothstep(.5,1.2,abs(y-71.)));
+          pCol=mix(pCol,uPants2,clamp(pocket*.48+flap*.85,0.,1.));
+        }else{
+          float denim=wash(vec2(x*1.1+z*.6,y*.9));
+          float seam=1.-smoothstep(.35,.9,abs(abs(x)-11.8));
+          pCol=mix(pCol*(.88+denim*.24),uPants2,seam*.55);
+        }
+        float bottomHem=1.-smoothstep(.4,1.3,abs(y-9.5));
+        pCol=mix(pCol,black,bottomHem*.45);
+        material=mix(material,pCol,pMask);
+      }
     }
     if(region>3.7&&region<4.3&&uCustom>.5){
       float upper=smoothstep(.98,2.42,y);
       float trim=etchedLine(z*.35+x*.22,.12);
       float stitch=1.-smoothstep(.12,.4,abs(y-2.65));
-      material=mix(vC*.62,mix(uBoot*.49,uBoot,upper),.91);
+      vec3 bootBase=uBoot;
+      if(uHasBoot2>.5){
+        float heelBand=1.-smoothstep(-1.2,1.6,z-y*.85);
+        float stripe=1.-smoothstep(.45,.95,abs(z-1.9-y*.42));
+        bootBase=mix(uBoot,uBoot2,clamp(max(heelBand*.92,stripe*.95),0.,1.));
+      }
+      material=mix(vC*.62,mix(bootBase*.49,bootBase,upper),.91);
       material=mix(material,bone,(trim*.28+stitch*.47)*upper);
     }
     if(region>4.7&&region<5.3&&uCustom>.5){
@@ -487,9 +515,21 @@ gl.attachShader(program,shader(gl.FRAGMENT_SHADER,`
       if(uLook.y<1.5)material=mix(skin,material,.62);
     }
     if(region>5.7&&region<6.3)material=mix(vC,skin,uCustom*.92);
-    if(region>6.7&&region<7.3&&(uTeam>.5||uKeeper>.5)){
-      float strip=smoothstep(10.1,11.8,abs(x))*(1.-smoothstep(13.,14.,abs(x)));
-      material=mix(shorts,uPrimary,strip*.72*(1.-uKeeper));
+    if(region>6.7&&region<7.3&&(uTeam>.5||uKeeper>.5||uPantsStyle>.5)){
+      if(uPantsStyle>.5&&uKeeper<.5){
+        vec3 pCol=uPants;
+        if(uPantsStyle<1.5){
+          float pStripe=smoothstep(10.4,11.8,abs(x))*(1.-smoothstep(13.2,14.2,abs(x)));
+          pCol=mix(pCol,uPants2,pStripe*.90);
+        }else if(uPantsStyle>3.5){
+          float denim=wash(vec2(x*1.1+z*.6,y*.9));
+          pCol=pCol*(.88+denim*.24);
+        }
+        material=pCol;
+      }else{
+        float strip=smoothstep(10.1,11.8,abs(x))*(1.-smoothstep(13.,14.,abs(x)));
+        material=mix(shorts,uPrimary,strip*.72*(1.-uKeeper));
+      }
     }
     if(shirt+sleeve>.5){
       float left=1.-smoothstep(-1.2,1.2,x-.32*(y-125.)+z*.32);
@@ -512,7 +552,18 @@ gl.attachShader(program,shader(gl.FRAGMENT_SHADER,`
       jersey=mix(jersey,black,seam*(1.-uKeeper*.72)*.78*(1.-uTeam));
       float collar=(1.-smoothstep(.34,1.2,abs(y-149.7+front*4.-abs(x)*.18)))*(1.-smoothstep(7.8,11.,abs(x)));
       float hem=1.-smoothstep(.26,.98,abs(y-102.2));
+      if(uHasTankTop>.5&&uKeeper<.5){
+        jersey=uTankTop;
+        float armhole=smoothstep(10.8,14.2,abs(x))*smoothstep(134.,144.,y);
+        jersey=mix(jersey,skin,armhole*(1.-sleeve));
+      }
       jersey=mix(jersey,mix(black,trophy,uKeeper),max(collar*.91,hem*.55));
+      if(shirt>.5&&uAcc.x>.5&&uKeeper<.5){
+        vec3 chainCol=uAcc.x<1.5?vec3(.94,.76,.29):uAcc.x<2.5?vec3(.85,.88,.92):vec3(.16,.16,.20);
+        float neckArc=1.-smoothstep(.38,.92,abs(y-(142.8+abs(x)*.78)));
+        float chainMask=front*neckArc*(1.-smoothstep(6.2,8.4,abs(x)));
+        jersey=mix(jersey,chainCol,chainMask*.96);
+      }
       vec2 p=vec2(-x+.13*(y-125.),y-125.);
       float plate=panel(p,vec2(8.45,7.55));
       if(back*plate>0.){
@@ -547,11 +598,20 @@ gl.attachShader(program,shader(gl.FRAGMENT_SHADER,`
         float fullSleeve=max(uKeeper,uKitFit.y);
         float cuff=1.-smoothstep(.42,1.07,abs(side-mix(32.4,66.4,fullSleeve)));
         vec3 longSleeve=mix(mix(keep,vec3(.72,.09,.40),smoothstep(34.,48.,side)),mix(uPrimary,mix(uSecondary,uPrimary*.82,uKeeper),smoothstep(34.,59.,side)),uTeam);
-        jersey=mix(mix(skin,jersey,shortSleeve),mix(jersey,longSleeve,smoothstep(31.,36.,side)),fullSleeve);
-        jersey=mix(jersey,black,cuff*.94);
-        float band=1.-smoothstep(1.35,1.68,abs(x-42.2));
-        float pin=1.-smoothstep(.07,.21,abs(x-41.3));
-        jersey=mix(jersey,mix(trophy,black,pin),band*(1.-fullSleeve));
+        if(uHasTankTop>.5&&uKeeper<.5){
+          jersey=skin;
+        }else{
+          jersey=mix(mix(skin,jersey,shortSleeve),mix(jersey,longSleeve,smoothstep(31.,36.,side)),fullSleeve);
+          jersey=mix(jersey,black,cuff*.94);
+          float band=1.-smoothstep(1.35,1.68,abs(x-42.2));
+          float pin=1.-smoothstep(.07,.21,abs(x-41.3));
+          jersey=mix(jersey,mix(trophy,black,pin),band*(1.-fullSleeve));
+        }
+        if(uAcc.w>.5&&uKeeper<.5){
+          vec3 brCol=uAcc.w<1.5?vec3(.94,.76,.29):uAcc.w<2.5?vec3(.13,.14,.17):vec3(.94,.94,.92);
+          float wrist=1.-smoothstep(.95,1.55,abs(side-63.5));
+          jersey=mix(jersey,brCol,wrist*.95);
+        }
       }
       material=jersey;
     }
@@ -581,6 +641,25 @@ gl.attachShader(program,shader(gl.FRAGMENT_SHADER,`
       vec3 hair=mix(mix(vec3(.105,.063,.067),vec3(.23,.118,.065),uKeeper),uHair,uCustom);
       material=mix(material,hair*(.90+strand*.25),scalp);
     }
+    if(face>.5&&uCustom>.5){
+      float ax=abs(vBind.x);
+      if(uAcc.z>.5){
+        float frontG=smoothstep(4.5,7.8,z);
+        vec3 gFrame=uAcc.z<1.5?vec3(.10,.10,.13):uAcc.z<2.5?vec3(.88,.68,.24):vec3(.16,.58,.90);
+        vec3 gLens=uAcc.z<1.5?vec3(.07,.08,.11):uAcc.z<2.5?vec3(.22,.16,.08):vec3(.10,.34,.58);
+        float lens=oval(vec2(ax-3.45,y-168.1),vec2(2.15,1.15));
+        float frame=oval(vec2(ax-3.45,y-168.1),vec2(2.55,1.48))-lens;
+        float bridge=(1.-smoothstep(1.15,1.45,ax))*(1.-smoothstep(.26,.48,abs(y-168.45)));
+        float temple=smoothstep(5.4,6.4,ax)*(1.-smoothstep(.28,.55,abs(y-168.55)))*smoothstep(-1.5,5.5,z);
+        material=mix(material,gLens,frontG*lens*.88);
+        material=mix(material,gFrame,clamp(max(frontG*max(frame,bridge),temple),0.,1.)*.96);
+      }
+      if(uAcc.y>.5){
+        vec3 earCol=uAcc.y<1.5?vec3(.96,.78,.28):uAcc.y<2.5?vec3(.90,.97,1.):vec3(.12,.12,.16);
+        float stud=oval(vec2(z-1.2,y-163.2),vec2(1.05,1.05))*smoothstep(6.8,7.9,ax);
+        material=mix(material,earCol,stud*.96);
+      }
+    }
     vec2 paper=vec2(x+z*.32,y+z*.13)*.31;
     vec3 color=printShade(material,n,paper,face>1.5?.24:.90);
     float rim=1.-abs(dot(n,normalize(uEye-vP)));
@@ -593,7 +672,7 @@ gl.linkProgram(program);
 if(!gl.getProgramParameter(program,gl.LINK_STATUS))throw Error('Modelo 3D: '+gl.getProgramInfoLog(program));
 const loc={};
 for(const name of ['aP','aN','aC','aJ','aW','aBind','aDetail'])loc[name]=gl.getAttribLocation(program,name);
-for(const name of ['uM','uVP','uEye','uKeeper','uShirtNumber','uInk','uCustom','uTeam','uSkin','uHair','uBeard','uBoot','uPrimary','uSecondary','uTertiary','uKitPattern','uHasTertiary','uClubBadge','uHasBadge','uLook','uKitFit','uMirrorSign','uB[0]'])loc[name]=gl.getUniformLocation(program,name);
+for(const name of ['uM','uVP','uEye','uKeeper','uShirtNumber','uInk','uCustom','uTeam','uSkin','uHair','uBeard','uBoot','uBoot2','uHasBoot2','uTankTop','uHasTankTop','uPants','uPants2','uPantsStyle','uAcc','uPrimary','uSecondary','uTertiary','uKitPattern','uHasTertiary','uClubBadge','uHasBadge','uLook','uKitFit','uMirrorSign','uB[0]'])loc[name]=gl.getUniformLocation(program,name);
 const sourceMeshes=pack.meshes.map(m=>({...m,p:decode(m.positions),n:decode(m.normals),j:decode(m.joints),w:decode(m.weights),ix:decode(m.indices,Uint16Array)}));
 const bootShapes=['Left','Right'].map(side=>{
   const foot=byName[side+'Foot'];
@@ -915,9 +994,9 @@ function classicHead(hairStyle,beardStyle){
   }
 
   if(beard){
-    const width=[0,1.62,.60,1.66,1.61,1.57][beardStyle];
-    const length=[0,0,0,.2,5.5,0][beardStyle];
-    const depth=[0,.18,.48,1.09,1.49,.53][beardStyle];
+    const width=[0,1.62,.60,1.66,1.61,1.57,0,.58,1.72,1.64][beardStyle];
+    const length=[0,0,0,.2,5.5,0,0,4.2,8.4,0][beardStyle];
+    const depth=[0,.18,.48,1.09,1.49,.53,.82,.95,1.95,.68][beardStyle];
     function strip(span,lower,upper,boost){
       const rows=5,cols=24;
       const vertices=Array.from({length:rows+1},(_,row)=>Array.from({length:cols+1},(_,col)=>{
@@ -942,29 +1021,96 @@ function classicHead(hairStyle,beardStyle){
       }
     }
     const short=beardStyle===1||beardStyle===5;
-    const goat=beardStyle===2;
-    strip(width,s=>goat?156.3+s*.75:155.1+6.2*s**2-length*(1-s*s),
-      s=>goat?159.45+.14*Math.cos(s*Math.PI):159.65+(short?7.6:9.4)*s**1.7,depth);
-    if(!short)strip(goat?.53:.54,s=>161.55-.59*s*s, s=>162.65-.78*s*s,depth*.49);
+    const goat=beardStyle===2||beardStyle===7;
+    const mustacheOnly=beardStyle===6;
+    const sideburns=beardStyle===9;
+    if(sideburns){
+      for(const dir of [-1,1]){
+        const rows=4,cols=8;
+        const verts=Array.from({length:rows+1},(_,row)=>Array.from({length:cols+1},(_,col)=>{
+          const angle=dir*(1.05+(col/cols)*.62),t=row/rows,side=Math.abs(col/cols-.5)*2;
+          const y=lerp(158.8,169.4,t);
+          const p=headSurface(y,angle);
+          const off=.22+depth*(.35+.65*Math.sin(t*Math.PI)*(1-side*side));
+          return [p[0]+Math.sin(angle)*off,y,p[2]+Math.cos(angle)*off];
+        }));
+        for(let row=0;row<rows;row++)for(let col=0;col<cols;col++){
+          const a=verts[row][col],b=verts[row][col+1],c=verts[row+1][col+1],d=verts[row+1][col];
+          polygon([a,b,c,d],[dir,0,.15],.9+.15*Math.cos(col*.9+row*.5));
+        }
+      }
+      strip(.64,s=>161.3-.75*s*s,s=>162.85-.82*s*s,depth*.78);
+    }else if(mustacheOnly){
+      strip(.68,s=>161.15-.95*s*s,s=>162.95-.78*s*s,depth);
+    }else{
+      strip(width,s=>goat?156.3+s*.75-length*(1-s*s):155.1+6.2*s**2-length*(1-s*s),
+        s=>goat?159.45+.14*Math.cos(s*Math.PI):159.65+(short?7.6:9.4)*s**1.7,depth);
+      if(!short)strip(goat?.56:.58,s=>161.55-.59*s*s,s=>162.75-.78*s*s,depth*(beardStyle===8?.68:.49));
+    }
   }else if(hair){
-    const lift=[2.75,0,.9,2.0,1.65,2.10,2.62][hairStyle];
-    const fringe=[173.8,0,175.3,173.6,175.1,174.7,173.4][hairStyle];
-    const nape=[163.7,0,166.9,164.6,169.4,165.8,164.2][hairStyle];
+    const lift=[2.75,0,.9,2.0,1.65,2.10,2.62,4.55,4.45,1.25,1.95,2.45][hairStyle];
+    const fringe=[173.8,0,175.3,173.6,175.1,174.7,173.4,174.2,172.8,175.4,173.2,173.9][hairStyle];
+    const nape=[163.7,0,166.9,164.6,169.4,165.8,164.2,167.2,162.2,166.2,155.4,161.8][hairStyle];
+    const mohawk=hairStyle===7,afro=hairStyle===8,bun=hairStyle===9,longHair=hairStyle===10,dreads=hairStyle===11;
     const rings=headAngles.map(angle=>{
-      const sin=Math.sin(angle), cos=Math.cos(angle), front=Math.max(0,cos);
-      const curls=hairStyle===3||hairStyle===6;
-      const wave=curls?.51*Math.sin(angle*7+.8)+.40*Math.sin(angle*11):.20*Math.sin(angle*3);
+      const sin=Math.sin(angle), cos=Math.cos(angle), front=Math.max(0,cos), back=Math.max(0,-cos);
+      const curls=hairStyle===3||hairStyle===6||afro;
+      const wave=afro?.65*Math.sin(angle*9+.5)+.50*Math.sin(angle*13)
+        :dreads?.72*Math.sin(angle*12)+.32*Math.cos(angle*6)
+        :curls?.51*Math.sin(angle*7+.8)+.40*Math.sin(angle*11)
+        :.20*Math.sin(angle*3);
       const swept=(hairStyle===0||hairStyle===5)?sin*front*1.38:0;
-      const edge=lerp(nape,fringe,front**.61)+wave*.52+swept;
+      const edge=lerp(nape,fringe,front**.61)+wave*.52+swept-(longHair?back*4.5:0);
       return [0,.28,.57,.82,1].map(t=>{
-        const y=lerp(edge,180.45,t),p=headSurface(y,angle);
+        const y=lerp(edge,180.45,t),p=headSurface(clamp(y,154.5,180.45),angle);
         const part=hairStyle===5?.80*Math.exp(-((angle-.41)**2)/.013)*Math.sin(t*Math.PI):0;
-        const gain=Math.sin(t*Math.PI*.79)*(lift+wave*.55)*(front*.27+.63);
-        const fullness=.22+gain*.72-part;
-        return [p[0]+sin*fullness+swept*t*.40,p[1]+gain*.89,p[2]+cos*fullness];
+        const crest=mohawk?Math.exp(-((Math.abs(sin)/.34)**2)):1;
+        const gain=Math.sin(t*Math.PI*.79)*(lift*crest+wave*(mohawk?.25:.55))*(front*.27+.63);
+        const sideBoost=afro?2.2*Math.sin(t*Math.PI*.85):longHair?(1-t)*1.8*(.4+back*.8):dreads?(1-t)*1.25:0;
+        const fullness=(mohawk?.08:.22)+gain*.72+sideBoost-part;
+        const dropY=longHair&&t<.5?-(.5-t)*5.2*(.35+back*.9):0;
+        return [p[0]+sin*fullness+swept*t*.40,p[1]+gain*.89+dropY,p[2]+cos*fullness-(longHair?back*(1-t)*1.8:0)];
       });
     });
-    cover([0,1,2,3,4].map(row=>rings.map(column=>column[row])),[hairStyle===0?1.0:0,181.15+lift*.47,-.65],[0,171.4,-1.5]);
+    cover([0,1,2,3,4].map(row=>rings.map(column=>column[row])),[hairStyle===0?1.0:0,181.15+lift*(mohawk?.72:.47),mohawk?-.3:-.65],[0,171.4,-1.5]);
+    if(bun){
+      const cx=0,cy=179.4,cz=-8.2,rx=2.85,ry=2.55,rz=2.65,sides=10,stacks=6;
+      const bRings=Array.from({length:stacks-1},(_,r)=>{
+        const phi=Math.PI*(r+1)/stacks,sr=Math.sin(phi),cr=Math.cos(phi);
+        return Array.from({length:sides},(_,i)=>{
+          const th=Math.PI*2*i/sides;
+          return [cx+Math.cos(th)*sr*rx,cy+cr*ry,cz+Math.sin(th)*sr*rz];
+        });
+      });
+      const bTop=[cx,cy+ry,cz],bBot=[cx,cy-ry,cz];
+      for(let r=0;r<bRings.length;r++)for(let i=0;i<sides;i++){
+        const ni=(i+1)%sides,a=bRings[r][i],b=bRings[r][ni];
+        if(r===0)polygon([bTop,a,b],[0,1,0],1.04);
+        if(r===bRings.length-1)polygon([a,bBot,b],[0,-1,0],.86);
+        else polygon([a,bRings[r+1][i],bRings[r+1][ni],b],[a[0]-cx,a[1]-cy,a[2]-cz],.92+.12*Math.cos(i*2));
+      }
+    }
+    if(dreads){
+      for(let d=0;d<12;d++){
+        const ang=-Math.PI*.88+d*(Math.PI*1.76/11);
+        if(Math.abs(ang)<.42)continue;
+        const s0=headSurface(173.8,ang),s1=headSurface(161.2,ang);
+        const dir=[Math.sin(ang),0,Math.cos(ang)];
+        const segs=4,rad=.92;
+        const drings=Array.from({length:segs+1},(_,k)=>{
+          const u=k/segs,bx=lerp(s0[0],s1[0],u)+dir[0]*(.85+u*1.15),by=lerp(s0[1],s1[1]-2.4,u),bz=lerp(s0[2],s1[2],u)+dir[2]*(.85+u*1.15);
+          const rr=rad*(1-u*.28);
+          return Array.from({length:6},(_,i)=>{
+            const a=Math.PI*2*i/6;
+            return [bx+Math.cos(a)*rr,by,bz+Math.sin(a)*rr];
+          });
+        });
+        for(let k=0;k<segs;k++)for(let i=0;i<6;i++){
+          const ni=(i+1)%6;
+          polygon([drings[k][i],drings[k+1][i],drings[k+1][ni],drings[k][ni]],dir,.88+.14*(k%2));
+        }
+      }
+    }
   }else{
     cover(faceRings,[0,180.85,-.7],[0,151.3,-1.5]);
     for(const side of [-1,1]){
@@ -1064,8 +1210,8 @@ function create(goalie,shared){
   const rig=goalie?keeperRig:fieldRig;
   const instance={goalie,bones:rig,sole:shared?.sole??soleSamples.map(({mesh,index,bind})=>({mesh,index,position:rebindVertex(bind,mesh,index,rig)})),clip:null,time:0,mirror:false,root:[0,100,0],q:rig.map(b=>[...b.q]),world:[],palette:new Float32Array(count*16),meshes:shared?.meshes??[],key:null,blend:1};
   if(shared)return instance;
-  const head=goalie?[modelDetails(true,0)]:[classicHead(),...[0,2,3,4,5,6].map(style=>classicHead(style)),
-    ...[1,2,3,4,5].map(style=>classicHead(undefined,style))];
+  const head=goalie?[modelDetails(true,0)]:[classicHead(),...[0,2,3,4,5,6,7,8,9,10,11].map(style=>classicHead(style)),
+    ...[1,2,3,4,5,6,7,8,9].map(style=>classicHead(undefined,style))];
   for(const base of [...(goalie?anatomy:fieldAnatomy),kitSurface(goalie),modelDetails(goalie),...head]){
     const model={...base,p:new Float32Array(base.p),n:new Float32Array(base.n),ix:outwardIndices(base)};
     const data=new Float32Array(base.count*modelStride);
@@ -1783,6 +1929,15 @@ function draw(h,vp,eye){
   gl.uniform1f(loc.uKitPattern,kitPatterns[look?.pattern]??0);
   gl.uniform1f(loc.uHasTertiary,look?.tertiary?1:0);
   gl.uniform3fv(loc.uTertiary,pigment(look?.tertiary));
+  gl.uniform1f(loc.uHasBoot2,look?.bootsSecondary?1:0);
+  gl.uniform3fv(loc.uBoot2,pigment(look?.bootsSecondary));
+  gl.uniform1f(loc.uHasTankTop,look?.tankTop?1:0);
+  gl.uniform3fv(loc.uTankTop,pigment(look?.tankTop));
+  const pantsStyleCode=look?.pantsStyle==='track'?1:look?.pantsStyle==='jogger'?2:look?.pantsStyle==='cargo'?3:look?.pantsStyle==='jeans'?4:0;
+  gl.uniform1f(loc.uPantsStyle,pantsStyleCode);
+  gl.uniform3fv(loc.uPants,pigment(look?.pantsColor));
+  gl.uniform3fv(loc.uPants2,pigment(look?.pantsAccent));
+  gl.uniform4f(loc.uAcc,look?.chain??0,look?.earring??0,look?.glasses??0,look?.bracelet??0);
   gl.uniform1f(loc.uCustom,look?.skin?1:0);
   gl.uniform1f(loc.uTeam,look?.primary?1:0);
   gl.uniform4f(loc.uLook,look?.hair??0,look?.beard??0,look?.socks??0,look?.shirt??0);

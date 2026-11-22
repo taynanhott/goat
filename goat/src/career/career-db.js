@@ -587,13 +587,13 @@
     ],
     'libertadores': [
       'cruzeiro','independiente-del-valle','boca-juniors','lanus','river-plate','racing',
-      'vasco','cerro-porteno','palmeiras','estudiantes','botafogo-rj','atletico-nacional',
-      'flamengo','penarol','junior','atletico-mg'
+      'vasco','cerro-porteno','palmeiras','estudiantes','atletico-nacional',
+      'flamengo','penarol','junior'
     ],
     'sul-americana': [
       'rosario-central','gremio','independiente','america-cali','bahia','velez-sarsfield',
-      'bragantino','santa-fe','corinthians','millonarios','belgrano','olimpia',
-      'fluminense','santos','talleres','nacional'
+      'bragantino','santa-fe','millonarios','belgrano','olimpia',
+      'fluminense','talleres','nacional'
     ],
     'pre-libertadores': ['corinthians','atletico-mg','santos','botafogo-rj'],
     'copa-sul-sudeste': [

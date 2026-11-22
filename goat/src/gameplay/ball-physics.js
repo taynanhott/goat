@@ -457,7 +457,7 @@ function passLaunch(origin,target,kind='pass',options={}){
   const aerial=kind==='lob'||kind==='cross';
   const baseTime=kind==='lob'?clamp(1.18+distance*.020,1.25,1.85):aerial?clamp(.8+distance*.034,.95,2.45):clamp(.25+distance*.038,.4,1.8);
   const crossCap=clamp(.45+distance*.040,.50,2.15);
-  const time=clamp(options.time??baseTime,kind==='cross'?.40:aerial?.8:.35,kind==='cross'?crossCap:aerial?3.2:3.0);
+  const time=clamp(options.time??baseTime,kind==='cross'?.40:aerial?.8:.28,kind==='cross'?crossCap:aerial?3.2:3.0);
   const velocity=[(target[0]-origin[0])/time,aerial?(target[1]-origin[1])/time+config.gravity*time*.56:.04,
     (target[2]-origin[2])/time];
   const dirLen=Math.max(.001,distance),hx=(target[0]-origin[0])/dirLen,hz=(target[2]-origin[2])/dirLen;

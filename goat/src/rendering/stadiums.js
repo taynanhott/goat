@@ -189,7 +189,7 @@
     const seats = safe.flatMap((seat, index) => occupied[index] ? [{
       ...seat, z:seat.z + pitch.centerZ, visitor:visitorCrowdSeat(seat), sourceIndex:index
     }] : []);
-    const bounds = info.kind === 'real' ? new THREE.Box3() : null;
+    const bounds = new THREE.Box3();
     const layers = meshLayers(structure, bounds);
     const aerialBounds = bounds && !bounds.isEmpty() ? {
       center: bounds.getCenter(new THREE.Vector3()).toArray(),

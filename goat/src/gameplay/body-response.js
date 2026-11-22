@@ -198,18 +198,18 @@ function response(actor,pose,dt,rig,clip){
     }
   }
   if(!actor.goalie&&!fall&&!getup&&!pose.authoredGround&&pose.ankleTargets?.length){
-    const adjust=clamp(balance+landing*.35+recovery*.18,0,.5)*contactGuard;
+    const adjust=clamp(balance+landing*.35+recovery*.18,0,.4)*contactGuard;
     if(adjust>.015)patch.ankleTargets=pose.ankleTargets.map(target=>{
       const swing=1-clamp(target.groundWeight??1,0,1);
       if(swing<.1)return target;
-      const distance=clamp(anatomySide*.18,-.045,.045)*adjust*swing;
+      const distance=clamp(anatomySide*.09,-.022,.022)*adjust*swing;
       const point=[...target.point];
       point[0]+=sideX*distance;point[2]+=sideZ*distance;
-      return {...target,point,kneeBend:(target.kneeBend??0)+adjust*swing*.10};
+      return {...target,point,kneeBend:Math.min(1.1,(target.kneeBend??0)+adjust*swing*.06)};
     });
   }
   if(!pose.authoredGround&&!pose.pelvis&&!fall&&!getup&&!activeAction&&!airborne&&!pose.ankleTargets?.length&&
-    !pose.footPlant&&!pose.footPlants&&!pose.ballContacts?.length&&speed<1.2&&rig.feet?.length===2){
+    !pose.footPlant&&!pose.footPlants&&!pose.ballContacts?.length&&speed<1.2&&proximity<.12&&rig.feet?.length===2){
     if(landing>.1||recovery>.25||balance>.12){
       if(!s.support){
         const index=rig.feet[0][1]<rig.feet[1][1]?0:1;
@@ -218,15 +218,15 @@ function response(actor,pose,dt,rig,clip){
       }
       const support=s.support;support.age+=dt;
       const gap=Math.hypot(support.point[0]-actor.x,support.point[2]-actor.z);
-      if(gap<.55&&support.age<.45)patch.footPlants=[{foot:support.index===0?'LeftFoot':'RightFoot',
-        point:support.point,weight:smooth(support.age/.06)*(1-smooth((support.age-.25)/.20))*.65}];
+      if(gap<.42&&support.age<.40)patch.footPlants=[{foot:support.index===0?'LeftFoot':'RightFoot',
+        point:support.point,weight:smooth(support.age/.06)*(1-smooth((support.age-.22)/.18))*.55}];
     }else s.support=null;
   }else s.support=null;
   if(pose.ankleTargets?.length&&!fall&&!getup&&!activeAction&&!airborne){
     const targets=patch.ankleTargets??pose.ankleTargets;
-    const adjustment=(brake*.06+anticipation*.04+landing*.07)*contactGuard;
+    const adjustment=(brake*.05+anticipation*.04+landing*.06)*contactGuard;
     if(adjustment>.002)patch.ankleTargets=targets.map(target=>({...target,
-      kneeBend:(target.kneeBend??0)+adjustment,
+      kneeBend:Math.min(1.1,(target.kneeBend??0)+adjustment),
       pitch:(target.pitch??0)-anticipation*ballFront*.025*(1-(target.groundWeight??1))}));
   }
   Object.assign(s,{x:actor.x,z:actor.z,vx,vz,yaw,air:airborne,time:pose.time??0,clip:pose.clip,action:activeAction});

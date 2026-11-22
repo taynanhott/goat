@@ -85,15 +85,34 @@
   // Aparência e loja (preços rebalanceados para progressão de várias temporadas)
   const appearance = {
     dominantFoot: { label: 'Pé dominante', values: ['Direito', 'Esquerdo'] },
-    hair: { label: 'Cabelo', values: ['Topete', 'Raspado', 'Curto', 'Cacheado', 'Degradê lateral', 'Risco lateral', 'Ondulado'] },
+    hair: { label: 'Cabelo', values: ['Topete', 'Raspado', 'Curto', 'Cacheado', 'Degradê lateral', 'Risco lateral', 'Ondulado', 'Moicano', 'Black Power', 'Coque Samurai', 'Longo', 'Dreads'] },
     skin: { label: 'Cor da pele', values: ['#efb18b', '#b9754d', '#8b4d35', '#63382e', '#402726'] },
-    beard: { label: 'Barba', values: ['Sem barba', 'Por fazer', 'Cavanhaque', 'Cheia', 'Longa', 'Baixa alinhada'] },
-    boots: { label: 'Chuteira', values: ['#e49439', '#393645', '#f3e9d1', '#38c4b8', '#ea5467', '#83a8f2',
-      '#f4c04c', '#8361bb', '#b4d345', '#ce4a42', '#d8e2ee', '#ee79ae'] },
+    beard: { label: 'Barba', values: ['Sem barba', 'Por fazer', 'Cavanhaque', 'Cheia', 'Longa', 'Baixa alinhada', 'Bigode', 'Cavanhaque longo', 'Viking', 'Costeleta & Bigode'] },
+    boots: { label: 'Chuteira', values: [
+      '#e49439', '#393645', '#f3e9d1', '#38c4b8', '#ea5467', '#83a8f2',
+      '#f4c04c', '#8361bb', '#b4d345', '#ce4a42', '#d8e2ee', '#ee79ae',
+      '#22a866', '#26d9e8', '#7e1d36', '#f5f7fa',
+      ['#18181f', '#f4c04c'], ['#f5f7fa', '#ce2a3b'], ['#1c5bd9', '#38e0d0'], ['#1b8c4c', '#c6ef3e'],
+      ['#6838b8', '#f06ba8'], ['#d42626', '#18181f'], ['#f07d22', '#f5f7fa'], ['#f4c04c', '#18181f']
+    ] },
     socks: { label: 'Meião', values: ['Normal', 'Curta', 'Longa'] },
     shorts: { label: 'Short', values: ['Curto', 'Longo'] },
     sleeves: { label: 'Manga', values: ['Curta', 'Longa'] },
     shirt: { label: 'Camisa', values: ['Para fora', 'Por dentro'] },
+    tankTop: { label: 'Regata', values: ['', '#1c1d24', '#f2f0ea', '#1b478c'] },
+    pants: { label: 'Calça', values: [
+      '',
+      { color: '#1b1c24', accent: '#f0f0f0', style: 'track' },
+      { color: '#1b3568', accent: '#f4c04c', style: 'track' },
+      { color: '#474c58', accent: '#1c1d24', style: 'jogger' },
+      { color: '#314933', accent: '#1e2c1f', style: 'cargo' },
+      { color: '#2b4d7e', accent: '#6287bd', style: 'jeans' },
+      { color: '#c4ae8c', accent: '#8c7554', style: 'cargo' }
+    ] },
+    chain: { label: 'Cordão', values: ['', '#f0c24b', '#d9e0ea', '#252630'] },
+    earring: { label: 'Brinco', values: ['', '#f0c24b', '#e6f5ff', '#22222b'] },
+    glasses: { label: 'Óculos', values: ['', '#1d1e26', '#d8a63c', '#2998e8'] },
+    bracelet: { label: 'Pulseira', values: ['', '#f0c24b', '#22232c', '#f2f0ea'] },
     hairColor: { label: 'Cor do cabelo', values: ['#261824', '#593128', '#9b482c', '#d5974d', '#c4bbaf', '#412e69', '#dccab1', '#175d65'] },
     beardColor: { label: 'Cor da barba', values: ['#261824', '#593128', '#9b482c', '#d5974d', '#c4bbaf', '#412e69', '#704c87', '#e2c5a0'] }
   };
@@ -102,14 +121,69 @@
   appearance.skin.names = colors;
   appearance.hairColor.names = [...hairColors, 'Platinado', 'Petróleo'];
   appearance.beardColor.names = [...hairColors, 'Ameixa', 'Areia'];
-  appearance.boots.names = ['Laranja', 'Preta', 'Creme', 'Turquesa', 'Coral', 'Azul', 'Ouro', 'Violeta', 'Lima', 'Rubi', 'Prata', 'Rosa'];
+  appearance.boots.names = [
+    'Laranja', 'Preta', 'Creme', 'Turquesa', 'Coral', 'Azul',
+    'Ouro', 'Violeta', 'Lima', 'Rubi', 'Prata', 'Rosa',
+    'Esmeralda', 'Ciano', 'Vinho', 'Branca Neve',
+    'Preta & Ouro', 'Branca & Rubi', 'Azul & Ciano', 'Verde & Lima',
+    'Roxa & Rosa', 'Rubi & Preta', 'Laranja & Branca', 'Ouro & Preta'
+  ];
+  appearance.tankTop.names = ['Uniforme do clube', 'Regata Preta', 'Regata Branca', 'Regata Azul'];
+  appearance.pants.names = ['Short do clube', 'Esportiva Preta', 'Esportiva Azul', 'Jogger Cinza', 'Cargo Verde', 'Jeans Azul', 'Cargo Bege'];
+  appearance.chain.names = ['Sem cordão', 'Cordão de Ouro', 'Cordão de Prata', 'Cordão Ônix'];
+  appearance.earring.names = ['Sem brinco', 'Brinco de Ouro', 'Brinco Diamante', 'Brinco Preto'];
+  appearance.glasses.names = ['Sem óculos', 'Óculos Escuro', 'Óculos Dourado', 'Óculos Esportivo'];
+  appearance.bracelet.names = ['Sem pulseira', 'Pulseira de Ouro', 'Pulseira Preta', 'Pulseira Branca'];
 
-  const shop = [
-    ['hair', 4, 18500], ['hair', 5, 24000], ['hair', 6, 29500], ['beard', 4, 22500], ['beard', 5, 16000],
-    ['boots', 6, 52000], ['boots', 7, 36000], ['boots', 8, 28500], ['boots', 9, 33000], ['boots', 10, 44000], ['boots', 11, 39500],
-    ['hairColor', 6, 11500], ['hairColor', 7, 10500], ['beardColor', 6, 9800], ['beardColor', 7, 9200]
-  ].map(([key, index, price]) => ({ id: key + ':' + index, key, index, price }));
+  const shopCategories = [
+    { id: 'appearance', label: 'Aparência' },
+    { id: 'boots', label: 'Chuteiras' },
+    { id: 'clothes', label: 'Roupas' },
+    { id: 'accessories', label: 'Acessórios' },
+    { id: 'consumables', label: 'Consumíveis' }
+  ];
+
+  const wearableShop = [
+    ['hair', 4, 18500, 'appearance'], ['hair', 5, 24000, 'appearance'], ['hair', 6, 29500, 'appearance'],
+    ['hair', 7, 26000, 'appearance'], ['hair', 8, 28000, 'appearance'], ['hair', 9, 32000, 'appearance'],
+    ['hair', 10, 27500, 'appearance'], ['hair', 11, 35000, 'appearance'],
+    ['beard', 4, 22500, 'appearance'], ['beard', 5, 16000, 'appearance'],
+    ['beard', 6, 13500, 'appearance'], ['beard', 7, 19500, 'appearance'], ['beard', 8, 29000, 'appearance'], ['beard', 9, 17500, 'appearance'],
+    ['hairColor', 5, 9500, 'appearance'], ['hairColor', 6, 11500, 'appearance'], ['hairColor', 7, 10500, 'appearance'],
+    ['beardColor', 5, 8500, 'appearance'], ['beardColor', 6, 9800, 'appearance'], ['beardColor', 7, 9200, 'appearance'],
+    ['boots', 6, 52000, 'boots'], ['boots', 7, 36000, 'boots'], ['boots', 8, 28500, 'boots'],
+    ['boots', 9, 33000, 'boots'], ['boots', 10, 44000, 'boots'], ['boots', 11, 39500, 'boots'],
+    ['boots', 12, 31000, 'boots'], ['boots', 13, 34500, 'boots'], ['boots', 14, 37500, 'boots'], ['boots', 15, 41000, 'boots'],
+    ['boots', 16, 58000, 'boots'], ['boots', 17, 54000, 'boots'], ['boots', 18, 49500, 'boots'], ['boots', 19, 48000, 'boots'],
+    ['boots', 20, 51500, 'boots'], ['boots', 21, 53000, 'boots'], ['boots', 22, 47000, 'boots'], ['boots', 23, 62000, 'boots'],
+    ['socks', 1, 6500, 'clothes'], ['socks', 2, 7500, 'clothes'],
+    ['shirt', 1, 8000, 'clothes'], ['sleeves', 1, 11000, 'clothes'],
+    ['tankTop', 1, 14500, 'clothes'], ['tankTop', 2, 14500, 'clothes'], ['tankTop', 3, 15500, 'clothes'],
+    ['pants', 1, 16000, 'clothes'], ['pants', 2, 17000, 'clothes'], ['pants', 3, 16500, 'clothes'],
+    ['pants', 4, 18500, 'clothes'], ['pants', 5, 19500, 'clothes'], ['pants', 6, 18500, 'clothes'],
+    ['chain', 1, 26000, 'accessories'], ['chain', 2, 21000, 'accessories'], ['chain', 3, 19500, 'accessories'],
+    ['earring', 1, 16000, 'accessories'], ['earring', 2, 22000, 'accessories'], ['earring', 3, 13500, 'accessories'],
+    ['glasses', 1, 18000, 'accessories'], ['glasses', 2, 23500, 'accessories'], ['glasses', 3, 20500, 'accessories'],
+    ['bracelet', 1, 15000, 'accessories'], ['bracelet', 2, 11500, 'accessories'], ['bracelet', 3, 11500, 'accessories']
+  ].map(([key, index, price, category]) => ({ id: key + ':' + index, key, index, price, category }));
+
+  const consumableShop = [
+    { id: 'consumable:attr-point', category: 'consumables', consumable: true, repeatable: true, icon: 'attrPoint', name: 'Ponto de Atributo (+1)', description: '+1 ponto para evoluir qualquer atributo', price: 15000 },
+    { id: 'consumable:kit-treino', category: 'consumables', consumable: true, icon: 'kit', name: 'Kit de Treino', description: '+5% de XP nos treinos', xpBonusPct: 5, price: 12000 },
+    { id: 'consumable:mini-gols', category: 'consumables', consumable: true, icon: 'minigoal', name: 'Mini Gols', description: '+5% de XP nos treinos', xpBonusPct: 5, price: 16500 },
+    { id: 'consumable:pesos-academia', category: 'consumables', consumable: true, icon: 'weights', name: 'Pesos de Academia', description: '+10% de XP nos treinos', xpBonusPct: 10, price: 28000 },
+    { id: 'consumable:personal', category: 'consumables', consumable: true, icon: 'personal', name: 'Personal Trainer', description: '+10% de XP nos treinos', xpBonusPct: 10, price: 42000 }
+  ];
+
+  const shop = [...wearableShop, ...consumableShop];
   const storeById = new Map(shop.map(item => [item.id, item]));
+
+  function trainingBoosts(save) {
+    const owned = save?.owned || [];
+    const items = consumableShop.filter(item => owned.includes(item.id));
+    const totalPct = items.reduce((sum, item) => sum + (item.xpBonusPct || 0), 0);
+    return { items, totalPct };
+  }
 
   const attributes = { Chute: 'shot', Estamina: 'stamina', Força: 'strength', Frieza: 'composure', Velocidade: 'speed', Aceleração: 'acceleration', Falta: 'freeKick', Pênalti: 'penalty' };
   const defaultAttributes = { shot: 74, stamina: 71, strength: 68, composure: 70, speed: 72, acceleration: 65, freeKick: 68, penalty: 72 };
@@ -125,10 +199,19 @@
 
   function paint(look, club) {
     const p = normalLook(look);
+    const bootVal = appearance.boots.values[p.boots];
+    const boots = Array.isArray(bootVal) ? bootVal[0] : bootVal;
+    const bootsSecondary = Array.isArray(bootVal) ? bootVal[1] : null;
+    const pantsVal = appearance.pants.values[p.pants] || null;
     return {
       hair: p.hair, beard: p.beard, socks: p.socks, shirt: p.shirt, shorts: p.shorts, sleeves: p.sleeves,
+      tankTop: appearance.tankTop.values[p.tankTop] || null,
+      pantsColor: pantsVal?.color || null,
+      pantsAccent: pantsVal?.accent || null,
+      pantsStyle: pantsVal?.style || null,
+      chain: p.chain, earring: p.earring, glasses: p.glasses, bracelet: p.bracelet,
       dominantFoot: p.dominantFoot === 1 ? 'LeftFoot' : 'RightFoot',
-      skin: appearance.skin.values[p.skin], boots: appearance.boots.values[p.boots],
+      skin: appearance.skin.values[p.skin], boots, bootsSecondary,
       hairColor: appearance.hairColor.values[p.hairColor], beardColor: appearance.beardColor.values[p.beardColor],
       primary: club?.primary ?? '#efd9a8', secondary: club?.secondary ?? '#bd442e',
       tertiary:club?.tertiary,pattern:club?.pattern??'solid',clubId:club?.id
@@ -166,10 +249,10 @@
     const base = positionPlayers[slot]?.[2] ?? (role === 'GOL' ? club.strength : defensiveStrength) + variation;
     const rate = offset => clamp(Math.round(base + offset + (rng() - .5) * 10), 45, 99);
     if (role === 'GOL') return { jump: rate(0), reflex: rate(0) };
-    const centreBack = role === 'ZAG';
+    const centreBack = role === 'ZAG', fullBack = role === 'LE' || role === 'LD';
     return {
-      speed: rate(centreBack ? -2 : 4),
-      tackling: rate(centreBack ? 4 : 1),
+      speed: rate(centreBack ? -2 : fullBack ? 3 : 1),
+      tackling: rate(centreBack ? 4 : fullBack ? -6 : 1),
       aggression: rate(centreBack ? 2 : 0),
       intelligence: rate(centreBack || role === 'VOL' ? 3 : 1)
     };
@@ -248,7 +331,7 @@
     let total = 0;
     const weights = players.map(([name, pos, ovr]) => {
       if (excludeName && name === excludeName) return 0;
-      const quality = Math.pow(Math.max(1, ovr - 48), 2.15);
+      const quality = Math.pow(Math.max(1, (Number(ovr) || 65) - 48), 2.15);
       const w = quality * (multMap[pos] ?? 0.5);
       total += w;
       return w;
@@ -275,14 +358,26 @@
     save.playerStats[compId][key] = entry;
   }
 
-  function assignSimulatedGoalEvents(save, compId, clubId, goalCount, rng, userGoals = 0, userAssists = 0) {
+  function assignSimulatedGoalEvents(save, compId, clubId, goalCount, rng, userGoals = 0, userAssists = 0, teamScorers = []) {
     if (userGoals > 0 || userAssists > 0) {
       recordPlayerStat(save, compId, clubId, save.player.name, userGoals, userAssists, true);
     }
     const club = team(clubId);
     const roster = club?.players || [];
-    const remainingGoals = Math.max(0, goalCount - userGoals);
+    let remainingGoals = Math.max(0, goalCount - userGoals);
     let remainingUserAssists = userAssists;
+    const recordedTeam = Array.isArray(teamScorers) ? teamScorers.slice(0, remainingGoals) : [];
+    for (const item of recordedTeam) {
+      const scorer = item?.name || pickWeightedPlayer(roster, POS_GOAL_MULT, rng);
+      if (scorer) recordPlayerStat(save, compId, clubId, scorer, 1, 0, false);
+      remainingGoals--;
+      if (item?.assisted && remainingUserAssists > 0) {
+        remainingUserAssists--;
+      } else if (rng() < 0.72) {
+        const assister = pickWeightedPlayer(roster, POS_ASSIST_MULT, rng, scorer);
+        if (assister) recordPlayerStat(save, compId, clubId, assister, 0, 1, false);
+      }
+    }
     for (let g = 0; g < remainingGoals; g++) {
       const scorer = pickWeightedPlayer(roster, POS_GOAL_MULT, rng);
       if (scorer) recordPlayerStat(save, compId, clubId, scorer, 1, 0, false);
@@ -386,11 +481,166 @@
     };
   }
 
+  function buildPendingGroupsCompetition(compId, baseTeamIds) {
+    const meta = COMPETITION_META[compId];
+    return {
+      id: compId,
+      name: meta.name,
+      shortName: meta.shortName,
+      format: 'groups-knockout',
+      participants: [...new Set(baseTeamIds)],
+      national: false,
+      awaitingPreLibertadores: true,
+      groups: {},
+      groupRounds: [],
+      groupResults: [],
+      knockout: []
+    };
+  }
+
+  function seedContinentalFromPreLibertadores(save) {
+    const pre = save?.competitions?.['pre-libertadores'];
+    const ties = pre?.knockout?.[0] || [];
+    if (!ties.length || !ties.every(t => t.winner)) return;
+    const preParticipants = new Set(pre.participants || []);
+    const winners = ties.map(t => t.winner).filter(Boolean);
+    const losers = ties.map(t => t.winner === t.home ? t.away : t.home).filter(Boolean);
+
+    const fillTo16 = (baseList, added, forbidden) => {
+      const result = [];
+      const seen = new Set(forbidden);
+      const pushUnique = id => {
+        if (id && !seen.has(id) && result.length < 16) {
+          seen.add(id);
+          result.push(id);
+        }
+      };
+      for (const id of baseList) pushUnique(id);
+      for (const id of added) pushUnique(id);
+      for (const id of foreignPool) pushUnique(id);
+      return result;
+    };
+
+    const lib = save.competitions['libertadores'];
+    if (lib && !(lib.groupResults?.length > 0)) {
+      const libBase = (lib.participants || []).filter(id => !preParticipants.has(id));
+      const libTeams = fillTo16(libBase, winners, losers);
+      save.competitions['libertadores'] = buildGroupsCompetition('libertadores', libTeams, save.seed, save.year);
+    }
+    const sula = save.competitions['sul-americana'];
+    if (sula && !(sula.groupResults?.length > 0)) {
+      const libNow = new Set(save.competitions['libertadores']?.participants || []);
+      const sulaBase = (sula.participants || []).filter(id => !preParticipants.has(id) && !libNow.has(id));
+      const sulaTeams = fillTo16(sulaBase, losers, libNow);
+      save.competitions['sul-americana'] = buildGroupsCompetition('sul-americana', sulaTeams, save.seed, save.year);
+    }
+  }
+
+  function replaceClubInCompetition(comp, fromId, toId) {
+    if (!comp || !fromId || !toId || fromId === toId) return;
+    if (Array.isArray(comp.participants)) {
+      comp.participants = comp.participants.map(id => id === fromId ? toId : id);
+    }
+    if (comp.groups && typeof comp.groups === 'object') {
+      for (const letter of Object.keys(comp.groups)) {
+        comp.groups[letter] = comp.groups[letter].map(id => id === fromId ? toId : id);
+      }
+    }
+    if (Array.isArray(comp.groupRounds)) {
+      for (const round of comp.groupRounds) {
+        for (const m of round) {
+          if (m.home === fromId) m.home = toId;
+          if (m.away === fromId) m.away = toId;
+        }
+      }
+    }
+    if (Array.isArray(comp.groupResults)) {
+      for (const r of comp.groupResults) {
+        if (r.home === fromId) r.home = toId;
+        if (r.away === fromId) r.away = toId;
+      }
+    }
+    if (Array.isArray(comp.knockout)) {
+      for (const round of comp.knockout) {
+        for (const t of round) {
+          if (t.home === fromId) t.home = toId;
+          if (t.away === fromId) t.away = toId;
+          if (t.winner === fromId) t.winner = toId;
+        }
+      }
+    }
+  }
+
+  function sanitizeContinentalCompetitions(data) {
+    const comps = data?.competitions;
+    if (!comps) return;
+    const pre = comps['pre-libertadores'];
+    const lib = comps['libertadores'];
+    const sula = comps['sul-americana'];
+    if (!pre) return;
+
+    if (Array.isArray(pre.knockout) && pre.knockout.length > 1) {
+      pre.knockout = [pre.knockout[0]];
+    }
+
+    const preSet = new Set(pre.participants || []);
+    const ties = pre.knockout?.[0] || [];
+    const preDone = ties.length > 0 && ties.every(t => t.winner);
+    const groupsStarted = (lib?.groupResults?.length || 0) > 0 || (sula?.groupResults?.length || 0) > 0;
+
+    if (!preDone && !groupsStarted) {
+      if (lib && (lib.participants?.some(id => preSet.has(id)) || !lib.awaitingPreLibertadores)) {
+        const cleanLib = (lib.participants || []).filter(id => !preSet.has(id));
+        comps['libertadores'] = buildPendingGroupsCompetition('libertadores', cleanLib);
+      }
+      if (sula && (sula.participants?.some(id => preSet.has(id)) || !sula.awaitingPreLibertadores)) {
+        const libSet = new Set(comps['libertadores']?.participants || []);
+        const cleanSula = (sula.participants || []).filter(id => !preSet.has(id) && !libSet.has(id));
+        comps['sul-americana'] = buildPendingGroupsCompetition('sul-americana', cleanSula);
+      }
+    } else if (preDone && !groupsStarted) {
+      const winners = ties.map(t => t.winner).filter(Boolean);
+      const losers = ties.map(t => t.winner === t.home ? t.away : t.home).filter(Boolean);
+      const libNeedsSeed = lib && (lib.awaitingPreLibertadores || !Object.keys(lib.groups || {}).length || losers.some(id => lib.participants?.includes(id)) || !winners.every(id => lib.participants?.includes(id)));
+      const sulaNeedsSeed = sula && (sula.awaitingPreLibertadores || !Object.keys(sula.groups || {}).length || winners.some(id => sula.participants?.includes(id)) || !losers.every(id => sula.participants?.includes(id)));
+      if (libNeedsSeed || sulaNeedsSeed) {
+        seedContinentalFromPreLibertadores(data);
+      }
+    } else if (preDone && groupsStarted) {
+      const winners = ties.map(t => t.winner).filter(Boolean);
+      const losers = ties.map(t => t.winner === t.home ? t.away : t.home).filter(Boolean);
+      if (lib) {
+        const missingWinners = winners.filter(id => !lib.participants?.includes(id));
+        const wrongLosers = losers.filter(id => lib.participants?.includes(id));
+        wrongLosers.forEach((loserId, i) => {
+          const replacement = missingWinners[i] || foreignPool.find(id => !lib.participants?.includes(id) && !sula?.participants?.includes(id));
+          if (replacement) replaceClubInCompetition(lib, loserId, replacement);
+        });
+      }
+      if (sula) {
+        const libSet = new Set(lib?.participants || []);
+        const missingLosers = losers.filter(id => !sula.participants?.includes(id) && !libSet.has(id));
+        const wrongWinners = winners.filter(id => sula.participants?.includes(id));
+        wrongWinners.forEach((winnerId, i) => {
+          const replacement = missingLosers[i] || foreignPool.find(id => !libSet.has(id) && !sula.participants?.includes(id));
+          if (replacement) replaceClubInCompetition(sula, winnerId, replacement);
+        });
+      }
+    }
+
+    if (data.pending && (data.pending.competitionId === 'libertadores' || data.pending.competitionId === 'sul-americana')) {
+      const targetComp = comps[data.pending.competitionId];
+      if (!targetComp?.participants?.includes(data.club)) {
+        data.pending = null;
+      }
+    }
+  }
+
   function buildKnockoutCompetition(compId, teamIds, seed, year) {
     const meta = COMPETITION_META[compId];
     const size = Math.pow(2, Math.floor(Math.log2(teamIds.length)));
     const shuffled = shuffle(teamIds.slice(0, size), seed ^ year, compId);
-    const totalKoRounds = Math.log2(size);
+    const totalKoRounds = compId === 'pre-libertadores' ? 1 : Math.log2(size);
     const firstRound = [];
     for (let i = 0; i < size; i += 2) {
       firstRound.push({
@@ -440,11 +690,16 @@
     const divs = save.divisions;
     const is2026 = save.year === 2026 && !save.nextQualifications;
     if (is2026) {
+      const pre2026 = [...new Set(fixedCups2026['pre-libertadores'])];
+      const preSet = new Set(pre2026);
+      const lib2026 = fixedCups2026['libertadores'].filter(id => !preSet.has(id));
+      const libSet = new Set(lib2026);
+      const sula2026 = fixedCups2026['sul-americana'].filter(id => !preSet.has(id) && !libSet.has(id));
       return {
         'copa-brasil': fixedCups2026['copa-brasil'],
-        'pre-libertadores': fixedCups2026['pre-libertadores'],
-        'libertadores': fixedCups2026['libertadores'],
-        'sul-americana': fixedCups2026['sul-americana'],
+        'pre-libertadores': pre2026,
+        'libertadores': lib2026,
+        'sul-americana': sula2026,
         'copa-nordeste': fixedCups2026['copa-nordeste'],
         'copa-sul-sudeste': fixedCups2026['copa-sul-sudeste'],
         'copa-verde': fixedCups2026['copa-verde']
@@ -472,11 +727,14 @@
       return picked;
     };
 
-    const libDomestic = [...new Set([...(q.libertadores || serieA.slice(0, 4)), ...(q.preLibertadores || serieA.slice(4, 6))])].slice(0, 6);
-    const libertadores = [...libDomestic, ...takeForeign(16 - libDomestic.length)];
+    const libDomestic = [...new Set(q.libertadores || serieA.slice(0, 4))].slice(0, 4);
+    const preDomestic = [...new Set((q.preLibertadores || serieA.slice(4, 6)).filter(id => !libDomestic.includes(id)))].slice(0, 2);
+    const preLibertadores = [...preDomestic, ...takeForeign(4 - preDomestic.length)];
+    const takenContinental = new Set([...libDomestic, ...preLibertadores]);
 
-    const sulaDomestic = (q.sulAmericana || serieA.slice(6, 11)).filter(id => !libDomestic.includes(id)).slice(0, 6);
-    const sulAmericana = [...sulaDomestic, ...takeForeign(16 - sulaDomestic.length)];
+    const libertadores = [...libDomestic, ...takeForeign(14 - libDomestic.length)];
+    const sulaDomestic = (q.sulAmericana || serieA.slice(6, 11)).filter(id => !takenContinental.has(id)).slice(0, 6);
+    const sulAmericana = [...sulaDomestic, ...takeForeign(14 - sulaDomestic.length)];
 
     const nonA = [...divs.B, ...divs.C, ...divs.D];
     const regionalOf = regionId => {
@@ -493,7 +751,7 @@
 
     return {
       'copa-brasil': copaBrasil,
-      'pre-libertadores': [],
+      'pre-libertadores': preLibertadores,
       'libertadores': libertadores,
       'sul-americana': sulAmericana,
       'copa-nordeste': regionalOf('copa-nordeste'),
@@ -587,14 +845,19 @@
     if (entrants['copa-brasil']?.length) {
       competitions['copa-brasil'] = buildKnockoutCompetition('copa-brasil', entrants['copa-brasil'], save.seed, save.year);
     }
-    if (entrants['pre-libertadores']?.length) {
+    const hasPreLib = !!(entrants['pre-libertadores']?.length);
+    if (hasPreLib) {
       competitions['pre-libertadores'] = buildKnockoutCompetition('pre-libertadores', entrants['pre-libertadores'], save.seed, save.year);
     }
     if (entrants['libertadores']?.length) {
-      competitions['libertadores'] = buildGroupsCompetition('libertadores', entrants['libertadores'], save.seed, save.year);
+      competitions['libertadores'] = hasPreLib
+        ? buildPendingGroupsCompetition('libertadores', entrants['libertadores'])
+        : buildGroupsCompetition('libertadores', entrants['libertadores'], save.seed, save.year);
     }
     if (entrants['sul-americana']?.length) {
-      competitions['sul-americana'] = buildGroupsCompetition('sul-americana', entrants['sul-americana'], save.seed, save.year);
+      competitions['sul-americana'] = hasPreLib
+        ? buildPendingGroupsCompetition('sul-americana', entrants['sul-americana'])
+        : buildGroupsCompetition('sul-americana', entrants['sul-americana'], save.seed, save.year);
     }
     if (div !== 'A') {
       for (const regId of ['copa-nordeste', 'copa-sul-sudeste', 'copa-verde']) {
@@ -873,8 +1136,8 @@
         const entry = { compId: comp.id, round: slot.round + 1, home: f.home, away: f.away, h: score.h, a: score.a, phaseLabel: `Rodada ${slot.round + 1}` };
         comp.results.push(entry);
         recordedGames.push(entry);
-        assignSimulatedGoalEvents(save, comp.id, f.home, score.h, rng, isUser && f.home === userClub ? userMatch.goals : 0, isUser && f.home === userClub ? userMatch.assists : 0);
-        assignSimulatedGoalEvents(save, comp.id, f.away, score.a, rng, isUser && f.away === userClub ? userMatch.goals : 0, isUser && f.away === userClub ? userMatch.assists : 0);
+        assignSimulatedGoalEvents(save, comp.id, f.home, score.h, rng, isUser && f.home === userClub ? userMatch.goals : 0, isUser && f.home === userClub ? userMatch.assists : 0, isUser ? (f.home === userClub ? userMatch.teamScorers : userMatch.oppScorers) : []);
+        assignSimulatedGoalEvents(save, comp.id, f.away, score.a, rng, isUser && f.away === userClub ? userMatch.goals : 0, isUser && f.away === userClub ? userMatch.assists : 0, isUser ? (f.away === userClub ? userMatch.teamScorers : userMatch.oppScorers) : []);
       }
       if(comp.id===leagueCompId(leagueOf(save)))save.leagueRound = Math.max(save.leagueRound || 0, slot.round + 1);
       return recordedGames;
@@ -890,8 +1153,8 @@
         const entry = { compId: comp.id, round: slot.round + 1, group: f.group, home: f.home, away: f.away, h: score.h, a: score.a, phaseLabel: `Grupo ${f.group} · R${slot.round + 1}` };
         comp.groupResults.push(entry);
         recordedGames.push(entry);
-        assignSimulatedGoalEvents(save, comp.id, f.home, score.h, rng, isUser && f.home === userClub ? userMatch.goals : 0, isUser && f.home === userClub ? userMatch.assists : 0);
-        assignSimulatedGoalEvents(save, comp.id, f.away, score.a, rng, isUser && f.away === userClub ? userMatch.goals : 0, isUser && f.away === userClub ? userMatch.assists : 0);
+        assignSimulatedGoalEvents(save, comp.id, f.home, score.h, rng, isUser && f.home === userClub ? userMatch.goals : 0, isUser && f.home === userClub ? userMatch.assists : 0, isUser ? (f.home === userClub ? userMatch.teamScorers : userMatch.oppScorers) : []);
+        assignSimulatedGoalEvents(save, comp.id, f.away, score.a, rng, isUser && f.away === userClub ? userMatch.goals : 0, isUser && f.away === userClub ? userMatch.assists : 0, isUser ? (f.away === userClub ? userMatch.teamScorers : userMatch.oppScorers) : []);
       }
       if (slot.round === comp.groupRounds.length - 1) seedKnockoutFromGroups(save, comp);
       return recordedGames;
@@ -918,11 +1181,14 @@
           phaseLabel: `${tie.label} · ${legText}`
         };
         recordedGames.push(entry);
-        assignSimulatedGoalEvents(save, comp.id, home, score.h, rng, isUser && home === userClub ? userMatch.goals : 0, isUser && home === userClub ? userMatch.assists : 0);
-        assignSimulatedGoalEvents(save, comp.id, away, score.a, rng, isUser && away === userClub ? userMatch.goals : 0, isUser && away === userClub ? userMatch.assists : 0);
+        assignSimulatedGoalEvents(save, comp.id, home, score.h, rng, isUser && home === userClub ? userMatch.goals : 0, isUser && home === userClub ? userMatch.assists : 0, isUser ? (home === userClub ? userMatch.teamScorers : userMatch.oppScorers) : []);
+        assignSimulatedGoalEvents(save, comp.id, away, score.a, rng, isUser && away === userClub ? userMatch.goals : 0, isUser && away === userClub ? userMatch.assists : 0, isUser ? (away === userClub ? userMatch.teamScorers : userMatch.oppScorers) : []);
       }
       const allDone = ties.length > 0 && ties.every(t => t.winner);
-      if (allDone) advanceKnockoutWinners(comp, slot.round);
+      if (allDone) {
+        if (comp.id === 'pre-libertadores') seedContinentalFromPreLibertadores(save);
+        else advanceKnockoutWinners(comp, slot.round);
+      }
       return recordedGames;
     }
     return recordedGames;
@@ -1033,7 +1299,7 @@
       : opponent(save);
     if (!next) return null;
     const rng = random(save.seed ^ Math.imul(save.round + 1, kind === 'trial' ? 1597334677 : 668265263) ^ Math.imul(save.year - 2026, 99991));
-    const opening = [[0, 0], [0, 0], [0, 1], [1, 0], [2, 0], [1, 1], [1, 2], [2, 1]];
+    const opening = [[0, 0], [0, 0], [0, 0], [0, 0], [0, 1], [1, 0]];
     const [forGoals, against] = opening[Math.floor(rng() * opening.length)];
     const regularChances = kind === 'trial'
       ? 5
@@ -1041,9 +1307,29 @@
     const lineup=kind==='trial'?{starter:true,label:'Seletiva',points:60}:journey.status(save);
     const chances=lineup.starter?regularChances:2+Math.floor(rng()*2);
     const difficulty = next.club.strength >= 75 ? 'hard' : next.club.strength <= 66 ? 'easy' : 'normal';
+    const playingClub = next.playingClub ?? save.club;
+    const myTeam = team(playingClub);
+    const openingForScorers = [];
+    const openingOppScorers = [];
+    const teamScorers = [];
+    const oppScorers = [];
+    for (let i = 0; i < forGoals; i++) {
+      const name = pickWeightedPlayer(myTeam?.players || [], POS_GOAL_MULT, rng);
+      if (name) {
+        openingForScorers.push(name);
+        teamScorers.push({ name, assisted: false, simulated: true });
+      }
+    }
+    for (let i = 0; i < against; i++) {
+      const name = pickWeightedPlayer(next.club?.players || [], POS_GOAL_MULT, rng);
+      if (name) {
+        openingOppScorers.push(name);
+        oppScorers.push({ name, assisted: false, simulated: true });
+      }
+    }
     return {
       kind,
-      national:!!next.national,playingClub:next.playingClub??save.club,date:next.date,lineup,
+      national:!!next.national,playingClub,date:next.date,lineup,
       opponent: next.club.id,
       home: next.home,
       round: kind === 'trial' ? null : save.round + 1,
@@ -1062,6 +1348,12 @@
       used: 0,
       goals: 0,
       assists: 0,
+      teamScorers,
+      oppScorers,
+      openingForScorers,
+      openingOppScorers,
+      lastSimForScorer: null,
+      lastSimOppScorer: null,
       shots: 0,
       rating: 6,
       ratingEvents: [],
@@ -1080,6 +1372,7 @@
     if (save.stage !== 'offers' || !save.offers.includes(id)) return false;
     save.club = id;
     save.stage = 'season';
+    journey.state(save).points = 0;
     if (!save.careerTotals) save.careerTotals = { seasons: 0, matches: 0, goals: 0, assists: 0, wins: 0, clubs: [] };
     if (!save.careerTotals.clubs.includes(id)) save.careerTotals.clubs.push(id);
     initSeason(save);
@@ -1089,7 +1382,7 @@
   function joinAcademy(save,id){
     if(save.stage!=='trial'||save.pending||!team(id)||!['A','B','C','D',...journey.leagues.map(league=>league.code)].includes(team(id).league))return false;
     save.stage='offers';save.offers=[id];save.origin='academy';
-    journey.state(save).points=55;
+    journey.state(save).points=0;
     return contract(save,id);
   }
 
@@ -1128,7 +1421,19 @@
 
   function purchase(save, id) {
     const item = storeById.get(id);
-    if (!item || save.owned.includes(id) || save.balance < item.price) return false;
+    if (!item || save.balance < item.price) return false;
+    if (item.repeatable) {
+      if (item.id === 'consumable:attr-point') {
+        const hasRoom = attributeKeys.some(k => (save.player?.attributes?.[k] ?? 0) < 99);
+        if (!hasRoom) return false;
+        save.balance -= item.price;
+        xpProgress(save);
+        save.player.progression.attributePoints += 1;
+        return true;
+      }
+      return false;
+    }
+    if (save.owned.includes(id)) return false;
     save.balance -= item.price;
     save.owned.push(id);
     save.unreadItems.push(id);
@@ -1249,6 +1554,7 @@
       const prevDiv = divisionOf(save, save.club);
       const nextDiv = divisionOf(save, id);
       save.club = id;
+      journey.state(save).points = journey.transferPoints(save, id);
       if (!save.careerTotals) save.careerTotals = { seasons: 0, matches: 0, goals: 0, assists: 0, wins: 0, clubs: [] };
       if (!save.careerTotals.clubs.includes(id)) save.careerTotals.clubs.push(id);
       save.proposals = [];
@@ -1416,6 +1722,22 @@
       const provisional=objective.type==='rating'||objective.type==='win';
       return {...objective,current,complete:current>=objective.target&&(!provisional||final)};
     });
+  }
+
+  function awardXp(save, amount) {
+    const earned = Math.max(0, Math.round(Number(amount) || 0));
+    xpProgress(save);
+    const progress = save.player.progression;
+    progress.points += earned;
+    progress.total += earned;
+    let upgrades = 0;
+    while (progress.points >= xpProgress(save).required) {
+      progress.points -= xpProgress(save).required;
+      progress.level++;
+      progress.attributePoints += ATTRIBUTE_POINTS_PER_LEVEL;
+      upgrades++;
+    }
+    return { total: earned, upgrades, attributePoints: upgrades * ATTRIBUTE_POINTS_PER_LEVEL };
   }
 
   function awardMatchXp(save,match) {
@@ -1657,7 +1979,7 @@
     if(match.national)save.internationalHistory.push({...save.last,year:save.year});
   }
 
-  function chance(save, outcome, shots) {
+  function chance(save, outcome, shots, scorerName = null) {
     const match = save.pending;
     if (!match || match.used >= match.chances) return false;
     match.used++;
@@ -1668,12 +1990,34 @@
       match.forGoals++;
       if (outcome === 'goal') match.goals++;
       if (outcome === 'assist') match.assists++;
+      if ((outcome === 'assist' || outcome === 'teamGoal') && scorerName) {
+        (match.teamScorers ??= []).push({ name: scorerName, assisted: outcome === 'assist' });
+      }
     }
-    if (match.used < match.chances) {
+    match.lastSimForScorer = null;
+    match.lastSimOppScorer = null;
+    if (match.used < match.chances && !match.training) {
       const opponent = team(match.opponent);
+      const myTeam = team(match.playingClub ?? save.club);
       const gapRng = random(hashString(match.scenario ?? save.seed, `goal-between-${match.used}`));
-      const risk = clamp(.17 + ((opponent?.strength ?? 70)-70)*.006 + (match.home ? 0 : .035), .09, .30);
-      if (gapRng() < risk) match.against++;
+      const risk = clamp(.16 + ((opponent?.strength ?? 70)-70)*.005 + (match.home ? 0 : .03), .08, .26);
+      const forRisk = clamp(.11 + ((myTeam?.strength ?? 70)-70)*.004 + (match.home ? .02 : 0), .06, .18);
+      const roll = gapRng();
+      if (roll < risk) {
+        match.against++;
+        const oppName = pickWeightedPlayer(opponent?.players || [], POS_GOAL_MULT, gapRng);
+        if (oppName) {
+          match.lastSimOppScorer = oppName;
+          (match.oppScorers ??= []).push({ name: oppName, assisted: false, simulated: true });
+        }
+      } else if (roll < risk + forRisk) {
+        match.forGoals++;
+        const forName = pickWeightedPlayer(myTeam?.players || [], POS_GOAL_MULT, gapRng);
+        if (forName) {
+          match.lastSimForScorer = forName;
+          (match.teamScorers ??= []).push({ name: forName, assisted: false, simulated: true });
+        }
+      }
     }
     return match.used === match.chances;
   }
@@ -1924,6 +2268,7 @@
     data.ratingHistory = Array.isArray(data.ratingHistory)
       ? data.ratingHistory.filter(entry => Number.isFinite(entry?.rating)) : [];
     upgradeCalendar(data);
+    sanitizeContinentalCompetitions(data);
 
     for (const match of [data.pending, data.last]) if (match) {
       match.opponent = mapId(match.opponent);
@@ -1969,9 +2314,9 @@
     clubs, trials, team, appearance, defaultLook, paint, create, selectTrial, contract,joinAcademy,
     startRound, opponent, chance, finishMatch, standings, groupTables, continentalPlaces,
     activeCompetitions, scorers, assisters, restore, totalRounds, leagueOf, divisionOf,
-    leagueCompId, salaryFor, nameOf, shop, available, purchase, edit, activeProposals,
+    leagueCompId, salaryFor, nameOf, shop, shopCategories, trainingBoosts, available, purchase, edit, activeProposals,
     offerLockStatus, decide, newSeason, attributes, defaultAttributes, overall,
-    agePhase, attributeProgress, xpProgress, upgradeAttribute, ATTRIBUTE_POINTS_PER_LEVEL, ensureObjectives, objectiveProgress, START_AGE, RETIRE_AGE, isWorseClub, performanceContext, defensiveProfile,
+    agePhase, attributeProgress, xpProgress, awardXp, upgradeAttribute, ATTRIBUTE_POINTS_PER_LEVEL, ensureObjectives, objectiveProgress, START_AGE, RETIRE_AGE, isWorseClub, performanceContext, defensiveProfile,
     COMPETITION_META, isClassic: db.isClassic,
     needsPenaltyShootout, createShootout, shootoutNextTurn, recordShootoutKick,
     ratingAfter, ratingColor, recordRatingEvents, averageRating

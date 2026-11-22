@@ -75,24 +75,33 @@
   function state(save){
     save.player.nationality='BR';
     save.player.position??='AM';
-    save.selection??={points:60,training:null};
+    save.selection??={points:0,training:null};
     save.selection.points=clamp(Number(save.selection.points)||0,0,100);
     save.internationalHistory??=[];
     return save.selection;
+  }
+  function transferPoints(save,clubId){
+    const playerOvr=rules().overall(save.player.attributes);
+    const clubStrength=rules().team(clubId)?.strength??70;
+    return clamp(Math.round(50+(playerOvr-clubStrength)*4.2),5,92);
   }
   function status(save){
     const selection=state(save);
     const recent=save.ratingHistory.filter(entry=>entry.kind!=='trial'&&!entry.national).slice(-5);
     const average=recent.length?mean(recent.map(entry=>entry.rating)):7;
-    return {points:selection.points,average,starter:selection.points>=60&&average>=6,
-      label:average<6?'Questionado':selection.points>=60?'Titular':'Reserva'};
+    return {points:selection.points,average,starter:selection.points>=60&&average>=5.5,
+      label:average<5.5?'Questionado':selection.points>=60?'Titular':'Reserva'};
   }
   function postMatch(save,match){
     state(save);
     if(match.kind==='trial'||match.training||match.journeyRecorded)return;
     match.journeyRecorded=true;
     const rating=match.rating??6;
-    const delta=rating<6?-Math.ceil((6-rating)*6+4):rating>=7?Math.min(8,Math.round((rating-6)*3)):1;
+    const goals=match.goals??0, assists=match.assists??0, contrib=goals+assists;
+    const ratingDelta=rating>=9?7:rating>=8?5:rating>=7.5?3:rating>=7?2:rating>=6.7?1:rating>=6?0:rating>=5.5?-1:-Math.min(6,Math.ceil((5.5-rating)*3));
+    const contribBonus=Math.min(3,goals+Math.floor(assists/2)+(assists>0&&goals===0?1:0));
+    const rawDelta=ratingDelta+contribBonus;
+    const delta=contrib>0?clamp(Math.max(contrib>=2?2:1,rawDelta),1,9):clamp(rawDelta,-6,8);
     save.selection.points=clamp(save.selection.points+delta,0,100);
     match.selectionDelta=delta;
     const cycle=`${save.year}-${save.round}-${match.scenario}`;
@@ -142,7 +151,22 @@
     const rating=match.rating??6;
     const result=drill.type==='collective'?(rating>=9?3:rating>=8?2:rating>=7?1:rating<6?-Math.min(4,Math.ceil((6-rating)*2)):0):validGoals>=drill.attempts?3:validGoals>0?2:-2;
     const delta=match.abandoned?(match.used===0?0:Math.min(0,result)):result;
-    Object.assign(drill,{status:'complete',goals:validGoals,rating:match.rating,delta});
+    let baseXp=0;
+    if(!match.abandoned){
+      if(drill.type==='collective'){
+        baseXp=rating>=9?35:rating>=8?28:rating>=7?22:rating>=6?15:8;
+      }else{
+        const ratio=clamp(validGoals/Math.max(1,drill.attempts),0,1);
+        baseXp=validGoals>=drill.attempts?32:validGoals>0?Math.round(10+ratio*18):8;
+      }
+    }else if(match.used>0){
+      baseXp=Math.max(4,Math.round((validGoals/Math.max(1,drill.attempts))*12));
+    }
+    const boost=rules().trainingBoosts?.(save)??{totalPct:0,items:[]};
+    const xp=baseXp>0?Math.ceil(baseXp*(1+(boost.totalPct||0)/100)):0;
+    const xpAward=xp>0?(rules().awardXp?.(save,xp)??null):null;
+    Object.assign(drill,{status:'complete',goals:validGoals,rating:match.rating,delta,xp,bonusPct:boost.totalPct||0});
+    match.xpAward=xpAward;
     save.selection.points=clamp(save.selection.points+delta,0,100);
   }
   function restoreSquads(save){
@@ -232,6 +256,6 @@
       .map(([kind,label])=>{const count=awards.filter(award=>award.kind===kind).length;return `<article class="trophy-tile${count?' is-won':''}"><svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 5 64 33 95 38 72 60 77 92 50 77 23 92 28 60 5 38 36 33Z" fill="#ffd078" stroke="#17111e" stroke-width="4"/><path d="m50 17 9 22 24 4-23 4-10 25-1-25-23-4 24-4Z" fill="#fff0b4"/></svg><b>${count}</b><strong>${label}</strong></article>`;});
     return `<div class="awards-panel awards-overview"><section class="award-section personal-awards"><h3 class="hub-section-title">Conquistas pessoais</h3><div class="trophy-gallery">${individual.join('')}</div></section><section class="award-section team-awards"><h3 class="hub-section-title">Troféus</h3><div class="trophy-gallery" style="--trophy-rows:${Math.ceil(cups.length/5)};--trophy-small-rows:${Math.ceil(cups.length/4)}">${cups.join('')}</div></section></div>`;
   }
-  window.goatCareerJourney={data,leagues,nations,groupOf,squad,state,status,postMatch,availableDrills,drillNames,startDrill,finishDrill,
+  window.goatCareerJourney={data,leagues,nations,groupOf,squad,state,transferPoints,status,postMatch,availableDrills,drillNames,startDrill,finishDrill,
     callup,userTeam,calendar,dateOf,europeanProposals,random,gallery,trophyIcon,restoreSquads};
 })();
