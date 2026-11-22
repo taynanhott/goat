@@ -8,13 +8,13 @@ function playerFrontLimit(player){
 window.createFootballBallPhysics=function(){
 'use strict';
 const config={radius:.11,mass:.43,gravity:9.81,airDensity:1.225,dragCoefficient:.22,magnus:.0022,rollingResistance:.62,grassDrag:.018,freeRollingResistance:1.18,freeGrassDrag:.066,slidingFriction:.34,postRestitution:.70},r=config.radius,air=.5*config.airDensity*config.dragCoefficient*Math.PI*r*r/config.mass,clamp=(v,a,b)=>Math.max(a,Math.min(b,v)),dot=(a,b)=>a.reduce((s,v,i)=>s+v*b[i],0),cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],subtract=(a,b)=>a.map((v,i)=>v-b[i]),unit=v=>{let l=Math.hypot(...v)||1;return v.map(x=>x/l)};
-function step(p,v,spin,dt,freeRoll=false){
+function step(p,v,spin,dt,freeRoll=false,groundFriction=true){
 const ground=p[1]<=r+.002&&Math.abs(v[1])<=.08;
 if(ground){
   const resistance=freeRoll?config.freeRollingResistance:config.rollingResistance;
   const grassDrag=freeRoll?config.freeGrassDrag:config.grassDrag;
   const speed=Math.hypot(v[0],v[2]);
-  const factor=speed>0?Math.max(0,1-(resistance+grassDrag*speed*speed)*dt/speed):0;
+  const factor=groundFriction?(speed>0?Math.max(0,1-(resistance+grassDrag*speed*speed)*dt/speed):0):1;
   v[0]*=factor;
   v[2]*=factor;
   v[1]=0;
@@ -28,7 +28,7 @@ if(ground){
   for(let i=0;i<3;i++)v[i]+=(-air*speed*v[i]+config.magnus*lift[i]-(i===1?config.gravity:0))*dt;
 }
 for(let i=0;i<3;i++)p[i]+=v[i]*dt;
-if(p[1]<r){p[1]=r;let impact=-v[1];v[1]=impact>.75?impact*(.43+.07*Math.min(1,impact/8)):0;let slipX=v[0]+spin[2]*r,slipZ=v[2]-spin[0]*r,slip=Math.hypot(slipX,slipZ);if(slip>.001){let impulse=Math.min(slip*.42,impact*config.slidingFriction*1.35);let dx=slipX/slip*impulse,dz=slipZ/slip*impulse;v[0]-=dx;v[2]-=dz;spin[0]+=dz/r*.75;spin[2]-=dx/r*.75;}}
+if(p[1]<r){p[1]=r;let impact=-v[1];v[1]=impact>.75?impact*(.43+.07*Math.min(1,impact/8)):0;let slipX=v[0]+spin[2]*r,slipZ=v[2]-spin[0]*r,slip=Math.hypot(slipX,slipZ);if(groundFriction&&slip>.001){let impulse=Math.min(slip*.42,impact*config.slidingFriction*1.35);let dx=slipX/slip*impulse,dz=slipZ/slip*impulse;v[0]-=dx;v[2]-=dz;spin[0]+=dz/r*.75;spin[2]-=dx/r*.75;}}
 let decay=Math.exp(-dt*.16);for(let i=0;i<3;i++)spin[i]*=decay;if(p[1]<=r+.002&&Math.hypot(...v)<.035){v[0]=v[1]=v[2]=0;spin[0]=spin[1]=spin[2]=0}
 }
 function bootContact(before,after,position,velocity,dt,padding=.08){
@@ -385,7 +385,7 @@ function launch(p,targetX,power,carry=[0,0],volley=false,options={}){
       const travel=goalDepth/-velocity[2];
       velocity[1]=(target.y-p[1])/travel+.5*config.gravity*travel;
       for(let i=0;i<3;i++){
-        const hit=crossing(p,velocity,spin,footballGoalLineZ);
+        const hit=crossing(p,velocity,spin,footballGoalLineZ,options.groundFriction??true);
         if(!hit||Math.abs(target.y-hit.y)<.008)break;
         velocity[1]+=(target.y-hit.y)/hit.time;
       }
@@ -406,17 +406,17 @@ function launch(p,targetX,power,carry=[0,0],volley=false,options={}){
   const spin=[-velocity[2]/r*.035,curl,velocity[0]/r*.035];
 
   for(let i=0;i<9;i++){
-    const hit=crossing(p,velocity,spin,0);
+    const hit=crossing(p,velocity,spin,0,options.groundFriction??true);
     if(!hit||Math.abs(targetX-hit.x)<.008)break;
     velocity[0]+=clamp((targetX-hit.x)/Math.max(.09,hit.time),-9,9);
   }
   return {velocity,spin,finesse};
 }
-function crossing(position,velocity,angular,plane=.65){let p=[...position],v=[...velocity],spin=[...angular],dt=1/240;for(let time=0;time<4;time+=dt){let old=[...p];step(p,v,spin,dt,true);if(old[2]>=plane&&p[2]<=plane){let t=(old[2]-plane)/(old[2]-p[2]);return{x:old[0]+(p[0]-old[0])*t,y:old[1]+(p[1]-old[1])*t,time:time+t*dt}}if(v[2]>=0||Math.hypot(...v)<.05)break}return null}
+function crossing(position,velocity,angular,plane=.65,groundFriction=true){let p=[...position],v=[...velocity],spin=[...angular],dt=1/240;for(let time=0;time<4;time+=dt){let old=[...p];step(p,v,spin,dt,true,groundFriction);if(old[2]>=plane&&p[2]<=plane){let t=(old[2]-plane)/(old[2]-p[2]);return{x:old[0]+(p[0]-old[0])*t,y:old[1]+(p[1]-old[1])*t,time:time+t*dt}}if(v[2]>=0||Math.hypot(...v)<.05)break}return null}
 function reflect(v,n,restitution=.5,friction=.08){let normal=dot(v,n);if(normal>=0)return;let tangent=v.map((x,i)=>x-normal*n[i]);for(let i=0;i<3;i++)v[i]=tangent[i]*(1-friction)-normal*restitution*n[i]}
 function closestSegments(a,b,c,d){let u=subtract(b,a),v=subtract(d,c),w=subtract(a,c),aa=dot(u,u),bb=dot(u,v),cc=dot(v,v),dd=dot(u,w),ee=dot(v,w),den=aa*cc-bb*bb,s=aa<1e-12?0:clamp(den>1e-12?(bb*ee-cc*dd)/den:-dd/aa,0,1),t=cc<1e-12?0:clamp((bb*s+ee)/cc,0,1);if(aa>1e-12)s=clamp((bb*t-dd)/aa,0,1);if(cc>1e-12)t=clamp((bb*s+ee)/cc,0,1);return{ball:a.map((x,i)=>x+u[i]*s),bar:c.map((x,i)=>x+v[i]*t),fraction:s}}
 function goalFrame(old,p,v,spin){let bars=[[[-3.66,0,0],[-3.66,2.44,0]],[[3.66,0,0],[3.66,2.44,0]],[[-3.66,2.44,0],[3.66,2.44,0]]];for(let [a,b]of bars){let hit=closestSegments(old,p,a,b),delta=subtract(hit.ball,hit.bar),distance=Math.hypot(...delta),radius=r+.06;if(distance>=radius)continue;let normal=distance>1e-6?delta.map(x=>x/distance):unit(v.map(x=>-x));if(dot(v,normal)>=0)continue;reflect(v,normal,config.postRestitution,.055);for(let i=0;i<3;i++){p[i]=hit.bar[i]+normal[i]*(radius+.001);spin[i]*=.7}return true}return false}
-function aerialControl(position,velocity,spin,{point,previous=point,dt,heading,pace=0,kind='chest',normal,center}){
+function aerialControl(position,velocity,spin,{point,previous=point,dt,heading,pace=0,kind='chest',normal,center,actor,targetPace=pace,acceleration=5}){
   const chest=kind==='chest'||kind==='directed';
   if(chest&&normal&&center){
     const dx=position[0]-center[0],dz=position[2]-center[2];
@@ -431,6 +431,25 @@ function aerialControl(position,velocity,spin,{point,previous=point,dt,heading,p
   velocity[2]=-Math.cos(heading)*speed;
   velocity[1]=kind==='head'?-clamp(incoming*.10,1,2.6):-clamp(Math.abs(velocity[1])*.16,.35,1.8);
   for(let i=0;i<3;i++)spin[i]*=.12;
+  if(actor){
+    const axis=[-Math.sin(heading),-Math.cos(heading)];
+    const initial=Math.max(0,(actor.vx??0)*axis[0]+(actor.vz??0)*axis[1]);
+    const time=clamp((velocity[1]+Math.sqrt(velocity[1]**2+2*config.gravity*Math.max(0,position[1]-r)))/config.gravity,.10,.85);
+    const desired=Math.max(initial,targetPace),gain=Math.min(Math.max(0,desired-initial),acceleration*time);
+    const accelerating=acceleration>0?gain/acceleration:0;
+    const travel=initial*time+gain*(time-accelerating*.5);
+    const lead=clamp(.38+desired*.035,.38,.65);
+    const target=[actor.x+axis[0]*(travel+lead),actor.z+axis[1]*(travel+lead)];
+    velocity[0]=clamp((target[0]-position[0])/time,-11.6,11.6);
+    velocity[2]=clamp((target[1]-position[2])/time,-11.6,11.6);
+    for(let iteration=0;iteration<4;iteration++){
+      const p=[...position],v=[...velocity],w=[...spin];let elapsed=0;
+      for(;elapsed<1;elapsed+=1/240){step(p,v,w,1/240,true);if(p[1]<=r+.002)break;}
+      if(elapsed<.06)break;
+      velocity[0]+=clamp((target[0]-p[0])/elapsed,-2.5,2.5);
+      velocity[2]+=clamp((target[1]-p[2])/elapsed,-2.5,2.5);
+    }
+  }
   return true;
 }
 function passLaunch(origin,target,kind='pass',options={}){

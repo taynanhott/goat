@@ -26,7 +26,7 @@ O jogo roda no navegador a partir do HTML, com WebGL, JavaScript, CSS, dados de 
 | Cruzamento / pedir cruzamento | Segurar e soltar B | Segurar e soltar B |
 | Nova bola no treino | T | R3 |
 | Replay no treino | V | L3 |
-| Trocar câmera | C | View |
+| Alternar foco da câmera entre bola e meu jogador | C | Select / View |
 | Mirar em falta ou pênalti | A/D ou ←/→ | Analógico esquerdo na horizontal |
 | Confirmar local da falta no treino | X | X |
 | Pausar ou continuar | Esc ou P | Menu |
@@ -328,3 +328,46 @@ Apenas um companheiro mantém corrida solicitada por RB. Selecionar outro cancel
 
 
 A seleção do RB prioriza o companheiro mais próximo dentro de direções semelhantes à mira, sem usar alcance de força nem preferência do alvo de passe anterior. Jogadores fora do cone apontado não recebem a solicitação.
+
+
+A câmera é selecionada no menu de pausa, com prévia no campo e jogo pausado. Setas horizontais ou analógico alternam jogador, clássica e lateral. A/Enter confirma e retoma o jogo; B/Esc cancela e volta ao menu. Select/View ou C alterna o foco entre bola e meu jogador, inclusive na prévia.
+
+
+### Ball roll e movimentação ofensiva
+
+Com posse e bola baixa próxima, incline o analógico direito para um dos lados do jogador, usando os eixos da câmera. O jogador apoia a sola e rola a bola lateralmente com transferência de peso; um movimento rápido executa um drible, e manter o analógico inclinado repete o movimento ao concluir cada ciclo. Pode ser iniciado parado, andando ou correndo; durante a execução, o avanço indicado pelo analógico esquerdo se combina com a rolagem lateral, permitindo saída na diagonal andando ou correndo. Não é executado durante carga de chute, passe ou cobrança. Os companheiros podem usar o movimento para escapar de um marcador quando o espaço lateral melhora. Sem bola, procuram espaços e linhas de passe com corridas, mantendo a formação e respeitando o impedimento.
+
+
+Na câmera lateral, diagonais completas alcançam os mesmos cantos que cima/baixo, com resposta mais direta e independente da orientação do jogador. Mirar no terço externo do gol favorece chute baixo em finalizações pelo chão, incluindo primeira e colocado; cavadinhas, voleios, cabeceios e cobranças preservam suas trajetórias. A prévia da mira acompanha essa finalização baixa.
+
+O ciclo do ball roll inclui retirada da sola continuando na direção da rolagem, pouso do pé ativo no gramado do outro lado da bola e transferência de apoio antes de permitir a repetição com o analógico mantido.
+
+No ball roll em corrida, o jogador freia durante o apoio e a rolagem, mantendo o avanço diagonal com velocidade reduzida. A aceleração retorna gradualmente na saída.
+
+Ao manter o analógico direito, a referência de direção permanece fixa no campo até soltá-lo: repetições seguem a mesma linha, sem acumular a velocidade lateral como avanço nem girar a direção pelo corpo. A corrida combina o avanço reduzido com essa direção para preservar a diagonal.
+
+No ball roll, o corpo acompanha lateralmente a rolagem e a travessia do pé; após o pouso, esse apoio completa o impulso. Esse mesmo pé realiza o impulso pelo antepé; a perna oposta apenas recupera a posição e volta a apoiar antes da repetição.
+
+O passo cruza em X: o pé ativo atravessa pela frente da perna de apoio e pousa além da bola. O impulso só começa após o tornozelo real atingir o pouso; o pé permanece plantado enquanto a outra perna descruza, pisa e prepara o ciclo seguinte. A validação `node goat/tools/validate-ball-roll.cjs` executa o controlador e o esqueleto reais nos dois lados, parado, andando e correndo, com três repetições por caso.
+
+O analógico direito aciona o ball roll para os lados em relação à direção de movimento do jogador. Para trás solicita uma puxada somente parado ou andando; correndo permite apenas os lados. Para frente não inicia o drible. O impulso lateral é mais rápido e a passada livre aumenta com a velocidade de entrada. A validação inclui corrida a favor e contra o gol, iniciada durante uma passada. A mira lateral usa a orientação projetada entre os cantos do gol para permitir alcançar ambos.
+
+Antes da rolagem, jogador e bola desaceleram juntos até a bola estar controlada; o contato da sola aguarda essa preparação. A corrida mantém avanço na transição, com impulso lateral de maior alcance e passada livre correspondente. O pé de apoio volta plano ao gramado e seu pouso considera o avanço do corpo.
+
+Correr sem a posse da bola consome metade da estamina da corrida com bola. O ball roll usa a direção real de deslocamento e controla a própria pose sem sobreposição das correções automáticas do corpo durante o gesto.
+
+Mirar nos cantos na câmera lateral não força chute rasteiro. A altura segue a força e o tipo de finalização; o segundo toque no botão durante a preparação continua solicitando chute rasteiro.
+
+A preparação do ball roll também exige bola a até 0,62 m do corpo: quando ela está adiantada, a frenagem permite o jogador alcançá-la antes de elevar a sola. Em corrida o ciclo e o impulso lateral são mais rápidos; o pouso considera a posição final prevista da rolagem.
+
+O avanço do companheiro por RB é confirmado ao soltar o botão. Se houver chute ou preparação de finalização enquanto RB estiver pressionado, esse avanço é descartado e RB funciona apenas como modificador do chute colocado.
+
+O ball roll em corrida usa alcance lateral maior (0,74 m contra 0,58 m andando/parado) e ritmo próprio mais rápido, inclusive nas repetições enquanto o comando de corrida está ativo. A passada de recuperação usa o mesmo alcance do impulso.
+
+O chute direto do usuário não perde velocidade horizontal por resistência do gramado nem por atrito ao tocar o chão. Após desvio, defesa/rebote ou trave, a resistência do gramado volta a atuar. Gravidade, resistência do ar e resposta vertical do contato com o chão permanecem ativas. As previsões de trajetória usam a mesma regra.
+
+O deslocamento do corpo começa durante a rolagem e o passo cruzado, com aceleração e desaceleração contínuas; o pouso dá continuidade ao impulso. O avanço é integrado gradualmente para evitar saltos ao transferir o peso para o pé do ball roll.
+
+Companheiros orientam o corpo inteiro para o destino antes de liberar passes ou cruzamentos. Na recepção aérea, a aproximação rápida mantém orientação de corrida, reduz torção do tronco e gira o corpo perto do contato. O domínio projeta a queda da bola à frente considerando velocidade e aceleração do recebedor. Companheiros podem preparar chute de primeira em passe ou sobra baixa com ângulo e linha de finalização livres. O goleiro prioriza a saída dentro da área quando está mais próximo da bola que todos os jogadores de linha, mergulhando nas bolas baixas ao alcance das luvas. Um ball roll sincronizado à janela do bote frontal ou carrinho faz aquele desarme falhar; fora dessa janela, a disputa segue normal.
+
+A até 1,25 m de uma bola livre ou passe, a assistência mantém a aproximação até o domínio, mesmo com direção contrária no analógico; longe, a direção pode ser alterada. A assistência cede a finalizações preparadas. Chutes de primeira dos companheiros planejam o encontro pela posição da chuteira no contato do clipe, altura prevista da bola e alcance da passada; usam chute rápido ou voleio conforme a chegada.

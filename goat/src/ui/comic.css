@@ -1326,3 +1326,19 @@ body[data-screen="origin"] .career-top h2 { font-size: clamp(25px,5.5vh,49px); c
 .teammate-mark .offside-flag::after { content: ""; position: absolute; top: 0; left: 0; width: 6px; height: 4px; background: conic-gradient(#ffcf48 25%, #f07732 0 50%, #ffcf48 0 75%, #f07732 0); border: 1px solid #211923; }
 
 .teammate-mark.is-requested-run svg polygon { fill: #ef3434; }
+
+.camera-preview { position: fixed; z-index: 20; bottom: 24px; left: 50%; transform: translateX(-50%) rotate(-.5deg); width: min(420px, calc(100vw - 48px)); padding: 16px 18px; border: 3px solid var(--ink); background: var(--paper); color: var(--ink); text-align: center; box-shadow: 6px 6px 0 var(--ink); }
+.camera-preview[hidden] { display: none; }
+.camera-preview > div { display: flex; align-items: center; justify-content: center; gap: 12px; }
+.camera-preview > div:first-child { margin-bottom: 12px; }
+.camera-preview strong { flex: 1; min-width: 0; font: italic 28px/1 var(--display); text-transform: uppercase; letter-spacing: .04em; }
+.camera-preview p { margin: 12px 0; font-size: 11px; font-weight: 700; line-height: 1.5; opacity: .8; }
+.camera-preview button { appearance: none; min-height: 38px; padding: 8px 14px; border: 2px solid var(--ink); border-radius: 0; background: var(--teal); color: var(--paper); box-shadow: 3px 3px 0 var(--ink); font: 800 12px/1.2 var(--type); transition: transform .12s, box-shadow .12s, background .12s; }
+.camera-preview button:hover, .camera-preview button:focus-visible { background: var(--amber); color: var(--ink); transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
+.camera-preview button:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+#cameraPrevious, #cameraNext { width: 40px; padding: 7px; background: var(--ink); color: var(--amber); font-size: 18px; }
+#cameraFocus { min-height: 30px; padding: 5px 14px; background: transparent; color: var(--ink); box-shadow: none; border-style: dashed; }
+#cameraConfirm { background: var(--amber); color: var(--ink); }
+#cameraCancel { background: var(--paper); color: var(--ink); }
+@media (max-width: 480px) { .camera-preview { bottom: 16px; padding: 12px; } .camera-preview strong { font-size: 24px; } .camera-preview > div { gap: 8px; } .camera-preview button { padding: 8px 10px; font-size: 11px; } }
+

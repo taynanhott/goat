@@ -1386,13 +1386,13 @@ if(options.pelvis&&ankleGoals.length){
     const thigh=Math.hypot(...rig[knee].p),shin=Math.hypot(...rig[foot].p);
     const horizontal=(aim[0]-origin[0])**2+(aim[2]-origin[2])**2;
     const drop=origin[1]-aim[1];
-    const distance2=thigh**2+shin**2+2*thigh*shin*Math.cos(target.kneeBend);
+    const distance2=thigh**2+shin**2+2*thigh*shin*Math.cos(target.kneeBend??0);
     const lift=Math.sqrt(Math.max(0,distance2-horizontal))-drop;
-    desired=Math.max(desired,lift*target.legExtension*target.weight);
+    desired=Math.max(desired,lift*(target.legExtension??0)*target.weight);
     const reachable=Math.sqrt(Math.max(0,(thigh+shin-.75)**2-horizontal))-drop;
-    limit=Math.min(limit,lerp(maxLift,Math.max(0,reachable),target.groundWeight*target.weight));
+    limit=Math.min(limit,lerp(maxLift,Math.max(0,reachable),(target.groundWeight??0)*target.weight));
   }
-  s.legRaise=lerp(s.legRaise??0,clamp(desired,0,limit),1-Math.exp(-dt*22));
+  s.legRaise=lerp(Number.isFinite(s.legRaise)?s.legRaise:0,clamp(desired,0,limit),1-Math.exp(-dt*22));
   s.root[1]+=s.legRaise;
   s.world=[];
 }else s.legRaise=0;

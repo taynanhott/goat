@@ -206,8 +206,219 @@ window.createFootballMotionController = function(options) {
     return { phase: 'pivot', heading: currentHeading, progress, action: turn };
   }
 
+  function skillDirection(yaw,axis,running){
+    const right=[Math.cos(yaw),-Math.sin(yaw)],front=forward(yaw);
+    const lateral=axis[0]*right[0]+axis[1]*right[1],ahead=axis[0]*front[0]+axis[1]*front[1];
+    if(Math.abs(lateral)>.60)return {kind:'roll',axis:right.map(v=>v*Math.sign(lateral))};
+    if(!running&&ahead<-.65)return {kind:'pull'};
+    return null;
+  }
+  function startBallRoll(a,axis,ball,ankles,running){
+    if(a.ballRoll||a.turningAround||a.aerialFlight?.airborne||ball[1]>.27||Math.hypot(ball[0]-a.x,ball[2]-a.z)>1.1)return false;
+    const chain=a.rollStickHeld?a.ballRollChain:null;
+    const yaw=chain?.yaw??(Math.hypot(a.vx||0,a.vz||0)>1?Math.atan2(-a.vx,-a.vz):a.yaw);
+    const right=[Math.cos(yaw),-Math.sin(yaw)],side=axis[0]*right[0]+axis[1]*right[1];
+    if(Math.hypot(...axis)<.5)return false;
+    const index=side<0?1:0,state=states.get(a),walking=Math.hypot(a.vx||0,a.vz||0);
+    const anchors=feet.map((foot,i)=>{
+      const point=ankles?.[i]??state?.feet[i]?.point;
+      return point&&point.every(Number.isFinite)&&Math.hypot(point[0]-a.x,point[2]-a.z)<.75
+        ?[...point]:footLocation(a,i,0,yaw);
+    });
+    const run=running??walking>3;
+    const reach=run?.74:.58;
+    a.ballRoll={running:run,reach,age:0,preparing:true,prepAge:0,yaw,axis:[...axis],index,foot:feet[index],origin:[...ball],start:[a.x,a.z],anchors,walking,travel:[0,0],drive:chain?[...chain.drive]:[a.vx||0,a.vz||0],alignment:chain?0:clamp((ball[0]-a.x)*axis[0]+(ball[2]-a.z)*axis[1]+.16,-.20,.20),rate:run?3.6:2.05+Math.min(.95,walking*.16)};
+    a.spawnControl=null;a.touchPending=null;return true;
+  }
+  function advanceBallRoll(a,dt,ball,velocity,controlled,direction,speed){
+    const r=a.ballRoll;if(!r)return false;
+    if(r.preparing){
+      if(!controlled||ball[1]>.4||Math.hypot(ball[0]-a.x,ball[2]-a.z)>1.45){a.ballRoll=null;return false;}
+      r.prepAge+=dt;
+      const ease=1-Math.exp(-dt*24),pace=Math.min(speed,2.2);
+      for(let i=0;i<2;i++)r.drive[i]=mix(r.drive[i],direction[i]*pace,ease);
+      a.vx=r.drive[0];a.vz=r.drive[1];a.x+=a.vx*dt;a.z+=a.vz*dt;
+      a.dribbleIntent=pace>.05;a.travelYaw=r.yaw;a.dribbleHeading=r.yaw;
+      const relative=Math.hypot(velocity[0]-a.vx,velocity[2]-a.vz);
+      const gap=Math.hypot(ball[0]-a.x,ball[2]-a.z);
+      if(r.prepAge>=.10&&gap<=.62&&Math.hypot(velocity[0],velocity[2])<=2.55&&relative<.85){
+        r.preparedBallSpeed=Math.hypot(velocity[0],velocity[2]);r.preparedGap=gap;
+        r.preparing=false;r.start=[a.x,a.z];r.origin=[...ball];r.travel=[0,0];
+        r.anchors=(r.prepAnkles??r.anchors).map(p=>[...p]);
+      }
+      return true;
+    }
+    r.age+=dt*r.rate;
+    if(r.planted)r.pushAge=(r.pushAge??0)+dt*r.rate;
+    if(!controlled||ball[1]>.4||Math.hypot(ball[0]-a.x,ball[2]-a.z)>1.5||(r.pushAge??0)>.56&&(r.groundTime??0)>=.06){
+      if(controlled&&r.lastFeet){
+        const state=newState(a,r.lastFeet);
+        state.next=r.index;state.sinceTouch=0;state.upperTime=r.upperTime??walkLandings[1];
+        state.upperWeight=.7;
+        states.set(a,state);
+      }else states.delete(a);
+      a.ballRollChain=controlled?{yaw:r.yaw,drive:[...r.drive]}:null;
+      a.ballRoll=null;return false;
+    }
+    const braking=smooth(r.age/.22)*(1-smooth((r.age-.82)/.24));
+    const targetSpeed=Math.min(speed,mix(2.4,1.8,braking));
+    const ease=1-Math.exp(-dt*(Math.hypot(...r.drive)>targetSpeed?24:7));
+    for(let i=0;i<2;i++){
+      r.drive[i]=mix(r.drive[i],direction[i]*targetSpeed,ease);
+      r.travel[i]+=r.drive[i]*dt;
+    }
+    if(r.age<.24)r.origin=[ball[0]-r.travel[0],ball[1],ball[2]-r.travel[1]];
+    const follow=smooth((r.pushAge??0)/.46),align=r.alignment*smooth(r.age/.24);
+    const accompany=r.reach*.42*smooth((r.age-.20)/.62);
+    let x=r.start[0]+r.axis[0]*accompany+r.axis[0]*align+r.travel[0];
+    let z=r.start[1]+r.axis[1]*accompany+r.axis[1]*align+r.travel[1];
+    if(r.pushOrigin){
+      r.pushCarry??=[0,0];
+      const carryWeight=mix(1,.45,smooth((r.pushAge??0)/.20));
+      for(let i=0;i<2;i++)r.pushCarry[i]+=r.drive[i]*dt*carryWeight;
+      x=r.pushOrigin[0]+r.axis[0]*r.reach*.58*follow+r.pushCarry[0];
+      z=r.pushOrigin[1]+r.axis[1]*r.reach*.58*follow+r.pushCarry[1];
+    }
+    const front=forward(r.yaw),lead=(ball[0]-x)*front[0]+(ball[2]-z)*front[1];
+    const room=Math.max(0,.34-lead);
+    const projection=front[0]*r.axis[0]+front[1]*r.axis[1];
+    const correction=r.planted?[front[0]-r.axis[0]*projection,front[1]-r.axis[1]*projection]:front;
+    x=clamp(x-correction[0]*room,-limits.side,limits.side);
+    z=clamp(z-correction[1]*room,playerFrontLimit(a),limits.back);
+    a.vx=(x-a.x)/dt;a.vz=(z-a.z)/dt;a.x=x;a.z=z;a.yaw=r.yaw;a.travelYaw=r.yaw;a.dribbleHeading=r.yaw;a.touchPending=null;a.dribbleIntent=false;
+    return true;
+  }
+  function rollSolePoint(r){
+    const drag=smooth((r.age-.27)/.37);
+    return [r.origin[0]+r.travel[0]+r.axis[0]*(r.running?.46:.40)*drag,r.origin[1]*2,r.origin[2]+r.travel[1]+r.axis[1]*(r.running?.46:.40)*drag];
+  }
+  function ballRollContact(a,ball,velocity,spin,physics,dt){
+    const r=a.ballRoll;if(!r)return;
+    if(r.preparing){
+      const dx=ball[0]-a.x,dz=ball[2]-a.z,gap=Math.hypot(dx,dz);
+      const catchup=clamp((gap-.50)*5,0,1.8);
+      physics.brakeDribble(ball,velocity,Math.max(.5,2.35-catchup),36,dt);
+      const ease=1-Math.exp(-dt*24);
+      const inv=gap>.01?1/gap:0;
+      velocity[0]=mix(velocity[0],r.drive[0]-dx*inv*catchup,ease);
+      velocity[2]=mix(velocity[2],r.drive[1]-dz*inv*catchup,ease);return;
+    }
+    if(r.age<.27){
+      const ease=1-Math.exp(-dt*25);
+      velocity[0]=mix(velocity[0],r.drive[0],ease);velocity[2]=mix(velocity[2],r.drive[1],ease);return;
+    }
+    if(r.age>.65){
+      const pace=r.planted?.45:1;
+      const ease=1-Math.exp(-dt*38);
+      velocity[0]=mix(velocity[0],r.drive[0]*pace,ease);
+      velocity[2]=mix(velocity[2],r.drive[1]*pace,ease);
+      return;
+    }
+    const sole=rollSolePoint(r),gap=Math.hypot(sole[0]-ball[0],sole[2]-ball[2]);
+    if(ball[1]>.27||gap>.25)return;
+    velocity[0]-=r.drive[0];velocity[2]-=r.drive[1];
+    physics.rollUnderSole(ball,velocity,spin,sole,r.axis,2.7*r.rate,dt);
+    velocity[0]+=r.drive[0];velocity[2]+=r.drive[1];
+
+  }
+  function ballRollPose(a,ball,dt,ankles){
+    const r=a.ballRoll,plant=smooth(r.age/.24),release=smooth((r.age-.62)/.20),side=r.index===0?1:-1;
+    const load=Math.sin(Math.PI*smooth(r.age/.98)),drag=smooth((r.age-.27)/.37);
+    if(r.age>=.62&&!r.landing){
+      const exitTime=.20/r.rate;
+      const front=forward(r.yaw),right=[Math.cos(r.yaw),-Math.sin(r.yaw)];
+      const lateralSign=r.index===0?1:-1;
+      const endSole=rollSolePoint({...r,age:.65});
+      const ballAcross=(endSole[0]-a.x)*right[0]+(endSole[2]-a.z)*right[1];
+      const support=r.anchors[1-r.index];
+      const supportAcross=(support[0]-a.x)*right[0]+(support[2]-a.z)*right[1];
+      const crossed=lateralSign*clamp(Math.max(lateralSign*ballAcross+.18,lateralSign*supportAcross+.17),.30,.46);
+      const point=[a.x+right[0]*crossed+front[0]*.28+r.drive[0]*exitTime*.25,
+        ankleHeight,a.z+right[1]*crossed+front[1]*.28+r.drive[1]*exitTime*.25];
+      r.landing=point;r.releaseFrom=[ball[0]+Math.sin(r.yaw-side*.16)*.127,ball[1]*2+.056,ball[2]+Math.cos(r.yaw-side*.16)*.127];
+    }
+    const landing=r.landing??footLocation(a,r.index,.07,r.yaw);
+    const contactYaw=r.yaw-side*.16*plant*(1-release);
+    const contact=[ball[0]+Math.sin(contactYaw)*.127,ball[1]*2+.056,ball[2]+Math.cos(contactYaw)*.127];
+    const start=r.anchors[r.index].map((v,i)=>v+(i===1?0:r.travel[i===0?0:1]));
+    const entry=[contact[0]-r.axis[0]*.24,contact[1]+.06,contact[2]-r.axis[1]*.24];
+    
+    const u=clamp(r.age/.24,0,1);
+    const lifted=u<1?start.map((v,i)=>(1-u)*(1-u)*v+2*(1-u)*u*entry[i]+u*u*contact[i]):contact;
+    const active=interpolate(r.releaseFrom??lifted,landing,release);
+    active[1]+=.055*Math.sin(Math.PI*plant)*(1-release)+.055*Math.sin(Math.PI*release);
+    if(release>0&&release<1){
+      const arc=.045*Math.sin(Math.PI*release);
+      active[0]-=Math.sin(r.yaw)*arc;active[2]-=Math.cos(r.yaw)*arc;
+    }
+    if(release>=1){
+      active[0]=r.landing[0];active[1]=ankleHeight;active[2]=r.landing[2];
+      r.groundTime=(r.groundTime??0)+dt;
+      const actual=ankles?.[r.index];
+      const onGround=actual&&actual[1]<=ankleHeight+.045&&Math.hypot(actual[0]-active[0],actual[2]-active[2])<.10;
+      if(r.groundTime>=.035&&onGround&&!r.planted){
+        r.planted=true;
+        r.pushOrigin=[a.x,a.z];r.pushTravel=[...r.travel];
+      }
+    }
+    const pushAge=r.pushAge??0;
+    const supportIndex=1-r.index,step=smooth((pushAge-.10)/.38);
+    const supportStart=r.anchors[supportIndex].map((v,i)=>v+(i===1?0:r.travel[i===0?0:1]*smooth((r.walking-2)/5)*.18));
+    r.supportPlant??=footLocation({...a,x:r.start[0],z:r.start[1]},supportIndex,.12,r.yaw);
+    const prepare=smooth(r.age/.20);
+    for(let i=0;i<3;i++)supportStart[i]=mix(supportStart[i],r.supportPlant[i],prepare);
+    if(pushAge>.10&&!r.recoveryStep){
+      const remaining=.32/r.rate;
+      const future={...a,x:r.pushOrigin[0]+r.axis[0]*r.reach*.58+r.drive[0]*remaining*.45,
+        z:r.pushOrigin[1]+r.axis[1]*r.reach*.58+r.drive[1]*remaining*.45};
+      const landing=footLocation(future,supportIndex,.06+.10*smooth(r.walking/5),r.yaw);
+      r.recoveryStep={start:[...supportStart],landing};
+    }
+    const recovery=r.recoveryStep;
+    const support=interpolate(recovery?.start??supportStart,recovery?.landing??supportStart,step);
+    const freeSwing=Math.sin(Math.PI*step);
+    support[1]+=(.17+.075*smooth(r.walking/5))*freeSwing;
+    support[0]-=Math.sin(r.yaw)*(.08+.08*smooth(r.walking/5))*freeSwing;
+    support[2]-=Math.cos(r.yaw)*(.08+.08*smooth(r.walking/5))*freeSwing;
+    const settle=smooth((pushAge-.34)/.22);
+    const brace=smooth(r.age/.18)*(1-smooth((r.age-.28)/.28));
+    const transfer=smooth(pushAge/.08)*(1-smooth((pushAge-.40)/.16));
+    const weightShift=side*(brace*.85-transfer*.65);
+    const shoulder=side*Math.sin(Math.PI*drag)*(1-settle);
+    const swing=Math.sin((r.age/.98)*Math.PI*2)*load;
+    r.lastFeet=r.index===0?[active,support]:[support,active];
+    r.upperTime=(r.index===0?walkLandings[0]:walkLandings[1])+r.age*.34;
+    const upperBody=clips.jog?{clip:'jog',time:r.upperTime,weight:.42+.12*settle}:undefined;
+    const push=smooth((pushAge-.06)/.14)*(1-smooth((pushAge-.40)/.16));
+    const heel=push;
+    const twist=side*(brace*.14-transfer*.19);
+    const desired={height:.925-.045*brace-.13*plant*(1-settle)-.025*transfer+.14*push+.025*smooth((pushAge-.28)/.22),
+      lateral:.13*weightShift,forward:.025*brace+.02*transfer,
+      pitch:.09*brace+.13*transfer-.035*push,roll:-.15*weightShift,twist};
+    const posture=r.posture??(r.posture={...desired});
+    const soften=1-Math.exp(-dt*20);
+    for(const key of Object.keys(desired))posture[key]=mix(posture[key],desired[key],soften);
+    return {clip:'idle',poseName:'ballRoll',time:0,grounded:true,bodyResponse:false,authoredGround:true,fade:r.age>=.62?.022:.055,bodyYaw:r.yaw,upperBody,
+      footPlant:{foot:r.foot,point:[ball[0],ball[1]*2+.02,ball[2]],boot:true,weight:plant*(1-release)},
+      pelvis:{lateral:posture.lateral,height:posture.height,forward:posture.forward,
+        rotation:[posture.pitch,posture.twist,posture.roll]},
+      offsets:{Spine:[.055*load,-side*.12*load*(1-2*drag),.14*weightShift],
+        Spine1:[-.035*transfer,-twist*.4,.07*weightShift],Spine2:[-.045*transfer,-twist*.55,.045*weightShift],
+        LeftShoulder:[.025*swing,0,-.035*load],RightShoulder:[-.025*swing,0,.035*load],
+        LeftArm:[-.10*brace-.12*transfer+.10*swing,.08*shoulder,-.10*load-.07*weightShift],
+        RightArm:[-.10*brace-.12*transfer-.10*swing,.08*shoulder,.10*load-.07*weightShift],
+        LeftForeArm:[-.10*brace-.16*transfer,0,-.035*swing],
+        RightForeArm:[-.10*brace-.16*transfer,0,.035*swing],
+        LeftHand:[.025*transfer,0,-.035*load],RightHand:[.025*transfer,0,.035*load]},
+      ankleTargets:[{foot:r.foot,point:active,yaw:r.yaw-side*.16*plant*(1-release),pitch:.07*plant*(1-release)-.12*Math.sin(Math.PI*release)+.22*heel,
+        roll:.65*heel,toeFlex:.18*heel,sole:[active[0],active[1]-ankleHeight,active[2]],
+        kneeBend:.68+.18*plant*(1-release)-.52*push,legExtension:.5*push,groundWeight:release,weight:1},
+      {foot:feet[supportIndex],point:support,yaw:r.yaw+side*.07*freeSwing,pitch:-.12*freeSwing,
+        kneeBend:.32+.22*brace+.5*freeSwing,legExtension:0,groundWeight:1-Math.sin(Math.PI*step),weight:1}],lookTarget:ball};
+  }
   function move(player, { dt, direction, speed, sprint, ball, velocity, controlled, loose = false, recoverable = false, facing, requestCut = false, requestPull = false, fakeCut = false, lateralCut, accelerationScale = 1 }) {
     if (dt <= 0) return Math.hypot(player.vx || 0, player.vz || 0);
+    if(advanceBallRoll(player,dt,ball,velocity,controlled,direction,speed))return Math.hypot(player.vx,player.vz);
     const flight=player.aerialFlight;
     if(flight?.airborne){
       player.vx=flight.vx;player.vz=flight.vz;
@@ -1007,6 +1218,10 @@ window.createFootballMotionController = function(options) {
     state.sinceTouch += dt;
     state.sprinting = false;
     const pace = Math.hypot(player.vx || 0, player.vz || 0);
+    if(controlled&&player.ballRoll){
+      if(player.ballRoll.preparing)player.ballRoll.prepAnkles=ankles?.map(p=>[...p]);
+      else return ballRollPose(player,ball,dt,ankles);
+    }
     if (controlled && lateralCut) return lateralFakePose(player, state, lateralCut, ball, velocity, pace, dt, ankles);
     const turn = player.turningAround;
     if (controlled && turn?.action.withBall && turn.phase !== 'exit') {
@@ -1457,6 +1672,10 @@ window.createFootballMotionController = function(options) {
 
   function reset(player) {
     states.delete(player);
+    player.closeBallLock = false;
+    player.ballRoll = null;
+    player.ballRollChain = null;
+    player.rollAxes = null;
     player.contactRecovery = null;
     player.inertiaPose = null;
     player.travelYaw = player.yaw;
@@ -1484,7 +1703,7 @@ window.createFootballMotionController = function(options) {
     const incoming=Math.hypot(rx,rz)>.75?Math.atan2(rx,rz):Math.atan2(-bx,-bz);
     action.receiveYaw=incoming;
     const body=pose.bodyYaw??actor.yaw;
-    const twist=clamp(angle(incoming-body),-.62,.62);
+    const twist=clamp(angle(incoming-body),-.28,.28);
     action.yaw=body;
     const offsets={...pose.offsets};
     for(const [name,share] of [['Spine',.25],['Spine1',.40],['Spine2',.35]]){
@@ -1581,5 +1800,5 @@ window.createFootballMotionController = function(options) {
       weight,foot:strike.foot},lookTarget:action.lookTarget};
   }
   const limits=footballPlayLimits;
-  return { move, locomotion, chestReception, defensiveWindow, advanceAir, aerialPose, passRecovery, shotContact, contactPoint, cutExit, acceptTouch, incidentalTouch, lockCharge, reset, limits };
+  return { skillDirection, startBallRoll, ballRollContact, move, locomotion, chestReception, defensiveWindow, advanceAir, aerialPose, passRecovery, shotContact, contactPoint, cutExit, acceptTouch, incidentalTouch, lockCharge, reset, limits };
 };

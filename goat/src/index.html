@@ -10,7 +10,7 @@
 <body>
 <canvas id="game" tabindex="0" aria-label="Campo de futebol 3D"></canvas><div class="vignette"></div>
 <header><div><div class="brand">GO<b>AT</b></div></div><div class="scoreboard"><div class="stat"><strong id="goals">00</strong><span>GOLS</span></div><div class="stat"><strong id="saves">00</strong><span>DEFESAS</span></div><div class="stat"><strong id="shots">00</strong><span>CHUTES</span></div><div class="stat"><strong id="posts">00</strong><span>TRAVES</span></div></div></header>
-<div class="options"><button id="camera">Câmera: lateral</button><button id="replay" disabled>Replay · V</button><button id="reset">Nova bola · T</button></div>
+<div class="options"><button id="replay" disabled>Replay · V</button><button id="reset">Nova bola · T</button></div>
 <div class="event"><div id="message"></div><div id="eventRatingDelta" class="event-rating-delta" role="status" hidden></div><div id="submessage"></div></div><div id="aimSpread" hidden aria-hidden="true"></div><div id="reticle" hidden></div><div id="ballCue" hidden aria-hidden="true"></div><div id="teammateMarks" aria-hidden="true"></div><div id="playerMark" hidden aria-hidden="true"><svg viewBox="0 0 24 34" width="18" height="26"><polygon points="12,1.5 14.7,7.2 21,8 16.4,12.2 17.6,18.4 12,15.3 6.4,18.4 7.6,12.2 3,8 9.3,7.2" fill="#ffd93d" stroke="#1a1420" stroke-width="2" stroke-linejoin="round"/><polygon points="5,21 19,21 12,32.5" fill="#ffd93d" stroke="#1a1420" stroke-width="2" stroke-linejoin="round"/></svg></div><div id="replayTag" class="replaytag" hidden>● REPLAY / CÂMERA LENTA</div>
 <div class="bottom"><div class="shotpanel"><div class="paneltop"><strong>GOAT &nbsp; FINALIZADOR</strong><span class="badge" id="range">18 m</span></div><div class="powerlabel"><span>FORÇA DO CHUTE</span><span id="powerText">0%</span></div><div class="bar"><i id="power"></i></div><div class="shotfooter"><span id="height">MEIA ALTURA</span><span id="shotHint">SEGURE X</span></div></div><div class="status"><small id="keeperState">EM POSIÇÃO</small><div id="device">● Teclado e mouse</div><span id="movementHint">WASD / setas · mover e mirar</span><span id="passHint" class="career-pass-hint">T · passe para o companheiro</span></div></div>
 <div id="controls" hidden></div>
@@ -216,6 +216,7 @@
   <div id="careerContent" class="career-content"></div>
   <p id="careerWarning" class="career-warning" role="status" hidden></p>
 </section>
+<div id="cameraPreview" class="camera-preview" hidden><div><button id="cameraPrevious" aria-label="Câmera anterior">◀</button><strong id="cameraName">Lateral</strong><button id="cameraNext" aria-label="Próxima câmera">▶</button></div><button id="cameraFocus">Foco: bola</button><p>← / → ou analógico · selecionar · Select / C · foco</p><div><button id="cameraConfirm">A / Enter · Confirmar</button><button id="cameraCancel">B / Esc · Voltar</button></div></div>
 <div id="paused" class="overlay" hidden><div class="intro"><h2>Jogo pausado</h2>
   <fieldset id="trainingModes" class="training-modes" hidden><legend>Modo de treino</legend><div class="training-mode-buttons">
     <button type="button" data-practice="open" aria-pressed="true">Com bola</button>
@@ -233,6 +234,7 @@
 <button type="button" data-teammates="1" aria-label="1 companheiros" aria-pressed="false">1</button><button type="button" data-teammates="2" aria-label="2 companheiros" aria-pressed="true">2</button><button type="button" data-teammates="3" aria-label="3 companheiros" aria-pressed="false">3</button>
   </div></fieldset>
   <button type="button" id="trainingStadium" class="career-button" data-action="training-stadium" aria-haspopup="dialog" hidden>Estádio</button>
+  <button type="button" id="camera" class="career-button">Câmera</button>
   <button id="resume" class="career-button accent">Continuar</button>
   <button type="button" id="trainingPlayerSetup" class="career-button" data-action="training-player-paused" hidden>Jogador do Treino</button>
   <button id="leaveGame" class="career-button">Voltar ao menu</button>
