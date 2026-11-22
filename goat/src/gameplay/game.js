@@ -5027,14 +5027,14 @@ if(reception&&!reception.long&&!windup&&!charging&&ballPos[1]<.65){
   const dx=ballPos[0]-player.x,dz=ballPos[2]-player.z,gap=Math.hypot(dx,dz);
   const relativeSpeed=Math.hypot(ballVel[0]-(player.vx??0),ballVel[2]-(player.vz??0));
   const approaching=dx*(ballVel[0]-(player.vx??0))+dz*(ballVel[2]-(player.vz??0))<0;
-  if(gap>.18&&approaching&&(gap<3||gap/Math.max(1,relativeSpeed)<.65)){
+  if(gap>.18&&(approaching||reception.arrival<.55)&&(gap<3.5||reception.arrival<.55||gap/Math.max(1,relativeSpeed)<.65)){
     const facing=Math.atan2(-dx,-dz);
     ballFacing=player.yaw+clamp(signedTurn(facing-player.yaw),-dt*12,dt*12);
     player.watchBall=true;
     if(speed>.18){
       const travelYaw=Math.atan2(-direction[0],-direction[1]);
       if(Math.abs(signedTurn(travelYaw-facing))>Math.PI/2){
-        speed=Math.min(speed,3.8);
+        speed=Math.min(speed,2.8);
         sprint=false;
       }
     }
@@ -5319,7 +5319,11 @@ function advancePlayerBall(dt,substep,steps){
     ballAge=0;
     player.lostDribble=ballPos[1]<.30;
   }
-  if(['loose','pass'].includes(ballState)&&teamAI.canReceive(player)&&!firstTimeRequest&&!terminal()&&!windup&&!charging&&ballAge>.08&&ballPos[1]<.36&&gap<.86){
+  const incomingPass=ballState==='pass'?teamAI.receptionGuide(player):null;
+  const receivingYaw=mocap.get(player).bodyYaw??player.yaw;
+  const frontalReceive=!incomingPass||incomingPass.long||
+    (offset[0]*-Math.sin(receivingYaw)+offset[1]*-Math.cos(receivingYaw))>.035;
+  if(['loose','pass'].includes(ballState)&&frontalReceive&&teamAI.canReceive(player)&&!firstTimeRequest&&!terminal()&&!windup&&!charging&&ballAge>.08&&ballPos[1]<.36&&gap<.86){
     const heading=player.dribbleIntent?player.dribbleHeading:player.yaw;
     ballPhysics.receiveTouch(ballPos,ballVel,ballAngular,heading,Math.min(clock<player.receiveExitUntil?5.8:3.2,moveSpeed),offset);
     regainControl();

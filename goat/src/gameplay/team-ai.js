@@ -88,7 +88,7 @@ function receptionGuide(actor){
     return meet?{long:true,point:[meet.x,meet.y,meet.z],kind:delivery.kind}:null;
   }
   const point=long?[delivery.point[0],Math.max(.6,s.ball[1]*.2),delivery.point[1]]:[...s.ball];
-  return {long,point,kind:delivery.kind};
+  return {long,point,kind:delivery.kind,arrival:Math.max(0,delivery.contactAt-state().clock)};
 }
 function canReceive(actor){
   const s=state();
@@ -201,11 +201,18 @@ function passPlan(passer,target,kind,direction=null,power=.5){
   let runDirection=null,advance=0,flightTime,crossPower,crossReference;
   if(kind==='pass'&&passer!==player&&target===player){
     const pace=Math.hypot(target.vx??0,target.vz??0);
-    const arrival=Math.min(.16,.85/Math.max(1,pace));
     const facing=pace>1?[(target.vx??0)/pace,(target.vz??0)/pace]:
       [(passer.x-target.x)/d,(passer.z-target.z)/d];
-    x=target.x+(target.vx??0)*arrival+facing[0]*.35;
-    z=target.z+(target.vz??0)*arrival+facing[1]*.35;
+    let arrival=physics.passLaunch(state().ball,[target.x,.11,target.z],'pass').time;
+    for(let iteration=0;iteration<8;iteration++){
+      x=target.x+(target.vx??0)*arrival+facing[0]*.55;
+      z=target.z+(target.vz??0)*arrival+facing[1]*.55;
+      const next=physics.passLaunch(state().ball,[x,.11,z],'pass').time;
+      arrival=(arrival+next)*.5;
+    }
+    flightTime=arrival;
+    x=target.x+(target.vx??0)*arrival+facing[0]*.55;
+    z=target.z+(target.vz??0)*arrival+facing[1]*.55;
   }
   if(kind==='pass'&&passer===player){
     const range=4+power*34,dx=x-passer.x,dz=z-passer.z,len=Math.hypot(dx,dz)||1;
@@ -891,6 +898,11 @@ function touch(dt,from=0,to=1){
       delivery=null;api.loose();return;
     }
     if(gap>.88||a.aerialFlight?.airborne)continue;
+    if(a===player&&receiver()===player&&delivery?.kind==='pass'){
+      const yaw=mocap.get(player).bodyYaw??player.yaw;
+      const front=(s.ball[0]-player.x)*-Math.sin(yaw)+(s.ball[2]-player.z)*-Math.cos(yaw);
+      if(front<=.035)continue;
+    }
     if(involvement(a))return;
     const pace=Math.hypot(a.vx??0,a.vz??0);
     const direction=a===player?player.receiveDirection:null;
