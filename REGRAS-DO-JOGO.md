@@ -319,3 +319,12 @@ Partidas iniciadas como reserva oferecem de 2 a 3 lances, sorteados na criação
 
 
 Recepções aéreas preservam a orientação da passada e os apoios durante a mistura do tronco com o domínio. Domínio de joelho exige aproximação frontal e velocidade moderada; o peso da perna reduz na corrida. Cabeceios e recepções de peito em solo preservam as pernas da locomoção, e a camada de domínio sai gradualmente após o toque. O companheiro mantém a continuidade da passada ao dominar um passe rasteiro.
+
+
+Sem ação urgente, jogadores fazem pequenos ajustes contínuos dentro da região tática, com ritmos diferentes. Companheiros procuram abertura de linha de passe e espaço livre; defensores ajustam a cobertura antecipando o movimento da bola. Deslocamentos curtos usam caminhada, preservando as decisões de recepção e pressão.
+
+
+Apenas um companheiro mantém corrida solicitada por RB. Selecionar outro cancela a solicitação anterior, remove seu indicador vermelho e retoma o alvo de posicionamento da função, sem reposicionar o jogador instantaneamente.
+
+
+A seleção do RB prioriza o companheiro mais próximo dentro de direções semelhantes à mira, sem usar alcance de força nem preferência do alvo de passe anterior. Jogadores fora do cone apontado não recebem a solicitação.
