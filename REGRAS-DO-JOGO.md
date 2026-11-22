@@ -23,7 +23,7 @@ O jogo roda no navegador a partir do HTML, com WebGL, JavaScript, CSS, dados de 
 | Passe rasteiro / pedir passe ao companheiro com a bola | Espaço | A |
 | Lançamento rasteiro em profundidade / pedir lançamento | Segurar e soltar Y | Segurar e soltar Y |
 | Lançamento aéreo em profundidade | E + segurar e soltar Y | LB + segurar e soltar Y |
-| Cruzamento / pedir cruzamento | B | B |
+| Cruzamento / pedir cruzamento | Segurar e soltar B | Segurar e soltar B |
 | Nova bola no treino | T | R3 |
 | Replay no treino | V | L3 |
 | Trocar câmera | C | View |
@@ -196,3 +196,126 @@ A entrada oficial é `goat/src/index.html`. A publicação copia os recursos sep
 2. Edite os módulos em `goat/src/` e execute `npm --prefix goat run build` na raiz. Para conferir sintaxe e referências, use `npm run check`. Não gere uma versão de HTML único.
 3. Evite acoplar mudanças de visual ao resultado. Para mexer em animação, preserve a janela de contato e os volumes da chuteira, luva ou corpo. Para mexer na linha de fundo, preserve a ordem entre contato físico, cruzamento e transição. Para mexer no save, preserve a migração e os dados do jogador já existentes.
 4. A checagem por simulação confirmou 72 combinações de contato e saída do cortinho lateral, incluindo os dois lados, ângulos diagonais e laterais e diferentes velocidades iniciais. A avaliação visual em navegador ainda é necessária. Cenários prioritários são cortar andando e correndo, arrancar na diagonal no início do lance, entrar no gol com bola dominada, conduzir para fora pela linha de fundo, trave com rebote versus trave para fora, salto em chute rente ao gol e reação a uma cavadinha longa.
+
+### Cruzamentos com força e encontro da bola
+
+Com a posse, segurar B carrega a força e soltar executa o cruzamento. Sem a posse, tocar B solicita o cruzamento ao companheiro, que decide a força pela distância e pela corrida do recebedor; a duração do botão não determina a força do companheiro. A direção seleciona o companheiro; o destino considera sua corrida, sem restringir o alvo ao centro da área. A força altera a velocidade horizontal e o impulso vertical: uma carga insuficiente deixa a bola curta e uma carga excessiva pode fazê-la passar pelo recebedor. A assistência de recepção usa a trajetória física prevista e só corrige corridas para encontros alcançáveis próximos; cruzamentos com erro grande de força ficam sem essa correção.
+
+### Disputa em pé dos defensores
+
+O bote em pé usa a locomoção contínua e uma janela da perna que está em movimento. O defensor acompanha o portador por um lado estável, tenta contato no ombro ou nas costas e procura o ponto futuro da bola com a chuteira, sem travar o corpo num clipe de interceptação. O roubo exige contato físico da chuteira com a bola. Os alvos das mãos limitam a extensão do braço e orientam o cotovelo para evitar hiperextensão.
+
+Na disputa próxima, a segunda mão entra gradualmente conforme distância e alcance de cada braço. O contato usa plano de flexão estável, limite de dobramento do cotovelo e limite de extensão, sem forçar alvos atrás do ombro. Com a bola baixa exposta, o defensor procura ocupar o corredor entre o portador e a bola e pode tentar o toque curto com a chuteira mais próxima, mantendo a exigência de contato físico para o desarme.
+
+A previsão do cruzamento solicitado resolve em conjunto o tempo de voo e o avanço do recebedor. A assistência busca um encontro alcançável na descida da bola e ajusta a velocidade para chegar no instante previsto. Companheiros distinguem uma oportunidade de finalização de cabeça de uma recepção para dominar; os domínios aéreos verificam o movimento dos pontos de contato entre os quadros e dão prioridade ao recebedor para recolher a bola amortecida.
+
+Para desarmar o usuário por trás enquanto ele tem a posse, o defensor precisa manter pelo menos uma mão efetivamente em contato com o ombro ou as costas. A tentativa de agarrar sem alcance físico não habilita o roubo. A regra não altera disputas frontais, laterais nem a recuperação de bolas soltas.
+
+Desarmes laterais exigem cerca de 0,7 s de combate próximo; por trás, cerca de 1,05 s, além do contato real de pelo menos uma mão. A força do usuário pode ampliar esse intervalo em até 0,15 s. O tempo é individual por defensor e zera ao se afastar, mudar a posse ou passar à disputa frontal. Pela frente, o desarme mantém a rapidez atual e exige contato da chuteira com a bola.
+
+### Início dos ataques e indicadores
+
+Lances comuns alternam saídas entre aproximadamente 29 e 47 metros do gol, incluindo os dois corredores laterais. A linha defensiva começa mais recuada, dando espaço inicial à condução. Saídas laterais colocam companheiros na área e na entrada dela. O relógio do lance cresce com a distância até a área e o consumo de estamina da corrida diminui na proporção dessa distância. Exercícios específicos e cobranças preservam suas posições próprias. Uma pequena bandeira acima do indicador do companheiro sinaliza posição de impedimento; a infração continua dependendo da participação no lance. A condução interpola a orientação do pé pelo giro mais curto e preserva a velocidade da perna ao replanejar o toque durante a passada.
+
+### Seleção de passe e organização ofensiva
+
+Um círculo no gramado destaca o companheiro selecionado para passe, lançamento ou cruzamento. A seleção usa a direção do controle na projeção da câmera, incluindo a lateral, e tem tolerância a pequenas oscilações. A carga preserva os eixos de direção e o alvo ao centralizar o controle; a soltura executa para o alvo exibido. Os companheiros recebem funções de ponta esquerdo, ponta direito, centroavante e apoio de meio, preenchendo os papéis disponíveis em torno da posição do usuário. Mantêm largura, profundidade e apoio, com o ponta oposto fechando para receber cruzamentos e deslocamentos táticos graduais.
+
+O usuário ocupa sempre a função de meia-atacante. Cada lance coletivo da carreira alterna entre um e três companheiros: um centroavante; centroavante e um ponta; ou centroavante e os dois pontas. O treino de bola rolando permite escolher entre um e três companheiros. Cobranças e exercícios individuais mantêm sua configuração própria. A função do usuário não muda ao conduzir pela lateral.
+
+
+### Condução do companheiro com espaço
+
+Com corredor livre, o companheiro conduz em direção ao centro do gol e busca finalizar mais perto, por volta de 10,5 metros e com ângulo favorável. A pressão considera a distância e a velocidade de aproximação dos defensores e do goleiro: sob risco de perder a bola, pode antecipar um chute viável ou procurar um passe. Pedidos do usuário continuam tendo prioridade.
+
+
+### Recepção de passes e câmera lateral
+
+Passes rasteiros dos companheiros ao usuário antecipam seu deslocamento e miram à frente dos pés. Parado, o recebedor oferece a frente do corpo ao passador; na aproximação de um passe baixo, vira gradualmente para a bola antes do contato. A câmera lateral mantém altura, distância e ângulo fixos, deslizando apenas ao longo do campo conforme a posição da bola, sem zoom ou giro conforme a altura ou a largura da jogada.
+
+
+Finalizações dos companheiros recalculam a aproximação a cada quadro pela trajetória prevista da bola e pela posição da chuteira no contato. A preparação dá tempo para ajustar o apoio e acompanha a bola até o impacto; o contato percorre o movimento da chuteira também antes do instante nominal. O chute continua exigindo contato físico.
+
+
+Na aproximação do passe rasteiro pelas costas, o usuário reduz a corrida para receber e usa os clipes de corrida de costas ou diagonal conforme o deslocamento relativo ao corpo. A seleção desses clipes acompanha também a desaceleração de uma arrancada, evitando misturar pernas de corrida frontal com o corpo virado para a bola.
+
+
+Nos lançamentos do usuário, a carga define o alcance a partir do passador, independentemente da distância do companheiro selecionado. O recebedor e sua corrida definem a direção; não reduzem a distância da mesma carga quando estão próximos. Os limites do campo continuam valendo e os companheiros preservam sua escolha autônoma de lançamento.
+
+
+Companheiros orientam o domínio aéreo contra a direção de chegada da bola, mantendo essa orientação durante a aproximação. O domínio exige que a bola esteja à frente do corpo e não esteja chegando por trás; sem tempo para virar e fazer contato frontal, a bola continua em jogo.
+
+
+Os cabeceios preservam o estado da passada durante a aproximação, entram gradualmente na preparação perto da chegada da bola e mantêm tempo de acompanhamento e pouso após o impacto. Companheiros em apoio param dentro de uma zona de tolerância e só retomam o ajuste de posição ao se afastarem dela, evitando oscilações por correções mínimas repetidas.
+
+
+Passes rasteiros dos companheiros ao usuário limitam a antecipação a cerca de 1,2 m, mantendo a bola próxima dos pés mesmo na corrida. Lançamentos rasteiros autônomos comparam o tempo de chegada do recebedor, defensores e goleiro e verificam pontos intermediários da linha de passe. Priorizam a direção da corrida, vantagem de chegada e posição de finalização; quando não encontram uma profundidade segura, usam um passe curto.
+
+
+Na câmera lateral em bola rolando, a mira do chute usa o eixo vertical do analógico: cima aponta para a esquerda do gol e baixo para a direita, incluindo diagonais. Vale para chute normal, primeira e cabeceio; cobranças mantêm sua orientação própria.
+
+
+Com a posse, A/Espaço carrega o passe rasteiro e a soltura executa. Direção e força selecionam o recebedor dos passes, cruzamentos e lançamentos: cargas menores favorecem companheiros próximos, maiores favorecem distantes na direção indicada. A prévia acompanha a carga. O passe do usuário tem alcance definido pela carga; pedidos sem a posse continuam imediatos e os companheiros decidem a própria força.
+
+
+A direção de passes usa a projeção do campo na câmera para converter o analógico, compartilhando a mesma direção com a escolha do recebedor. Lançamentos do usuário seguem essa direção e o alcance da carga, sem virar ao trocar o companheiro selecionado ou conforme sua corrida. Centralizar o analógico preserva a última direção durante a carga.
+
+
+A câmera lateral fica perpendicular à linha lateral, sem deslocamento diagonal entre câmera e alvo. A posição fixa mais alta e afastada inclui as duas faixas laterais no enquadramento, mantendo somente o acompanhamento longitudinal da bola.
+
+
+A defesa mantém funções por posição: laterais acompanham os pontas em seus corredores, zagueiros protegem o centro da área e volante acompanha o usuário. Um único defensor assume a pressão ou interceptação conforme proximidade, marcação atribuída e perigo central; os demais preservam suas regiões. A câmera lateral fica mais próxima e baixa, com enquadramento deslocado para a lateral próxima.
+
+
+O goleiro cancela uma interceptação de passe quando a trajetória já não passa pelo ponto planejado. Ao perder a necessidade de saída ou trocar o portador da bola, reduz rapidamente a saída, recupera profundidade e realinha o ângulo com maior velocidade e aceleração, preservando tentativas de interceptação alcançáveis. A câmera lateral recebeu mais uma aproximação de zoom mantendo altura e ângulo constantes durante o lance.
+
+
+A câmera lateral acompanha também a altura da bola: câmera e alvo recebem o mesmo deslocamento vertical, preservando a inclinação e a distância entre eles. O enquadramento foi aproximado novamente.
+
+
+A câmera lateral acompanha a bola nos dois eixos do gramado e na altura. O deslocamento pela largura do campo mantém a bola enquadrada ao chegar à parte inferior da tela. Câmera e ponto de visão se deslocam juntos com distância e inclinação constantes, em enquadramento mais próximo.
+
+
+O acompanhamento da câmera em direção à lateral próxima tem limite calculado pelo campo de visão e pela proporção da tela: para de avançar quando a linha lateral inferior já cabe com margem no enquadramento, mantendo zoom e inclinação fixos.
+
+
+A câmera lateral usa inclinação mais acentuada, com menor afastamento horizontal e maior elevação, para reduzir a obstrução pelas coberturas das arquibancadas, incluindo a Arena Brasa. O limite da lateral inferior acompanha essa nova geometria. A inclinação permanece constante durante o acompanhamento.
+
+
+A Arena Brasa não tem cobertura nem suportes de teto na arquibancada da lateral próxima à câmera (lado positivo de X). Arquibancada, torcida e iluminação desse lado permanecem.
+
+
+A torcida usa roupa na parte inferior das pernas, com variações de calça e bermuda. A distribuição adiciona dois torcedores por posição anteriormente ocupada, com deslocamento lateral no sentido da fileira e variações independentes de aparência e animação. O limite de modelos próximos acompanha a duplicação.
+
+
+A distribuição da torcida mantém as posições originais e posiciona o público adicional nos intervalos das fileiras, usando a orientação de cada assento e a distância até o próximo. Isso substitui pares deslocados em torno de um único assento, preservando a quantidade duplicada e espalhando melhor o público.
+
+
+Os dois zagueiros preservam lados distintos do centro da área e somente um marca o centroavante. A saída de cobertura para pressão exige proximidade real ou perigo central próximo do gol; o volante pode acompanhar seu marcador em raio maior. Defensores sem pressão mantêm margem de parada na posição e somente um fecha a linha do chute.
+
+
+O treino livre atribui explicitamente as funções dos defensores a cada reinício: dois zagueiros, volante, lateral esquerdo e lateral direito, conforme a quantidade configurada. A inicialização também fornece uma função padrão por índice quando não informada, evitando papéis indefinidos ou herdados de outro lance.
+
+
+A defesa compacta a largura conforme a bola se aproxima da área: zagueiros reduzem o intervalo central, o lateral oposto fecha por dentro e o volante protege à frente da linha. A pressão começa antes na entrada da área; quando um defensor sai, outro zagueiro cobre o corredor entre bola e gol sem seguir o portador.
+
+
+Nos lances coletivos da carreira, a quantidade de defensores é sempre a quantidade de companheiros mais dois: 1/3, 2/4 ou 3/5. A composição prioriza dois zagueiros e volante, acrescentando laterais nas quantidades maiores. O treino livre mantém as escolhas independentes do menu e as cobranças preservam sua configuração específica.
+
+
+A corrida consome estamina sem o redutor global de metade do gasto. A compensação por começar longe do gol reduz o consumo em no máximo 25%, evitando arrancadas prolongadas demais; recuperação e efeito do atributo Estamina permanecem.
+
+
+RB com o analógico apontado para um companheiro solicita uma corrida em profundidade por até 4,5 segundos. O companheiro avança no seu corredor; se permanecer impedido por cerca de 0,9 segundo, recua até voltar à posição legal e retoma sua função. RB com chute mantém a finalização colocada.
+
+
+Solicitar corrida de companheiro com RB exige que o usuário esteja com a bola sob domínio. O comando não solicita devolução nem corrida quando a posse está com um companheiro ou a bola está em trânsito.
+
+
+A corrida solicitada com RB e seu indicador vermelho terminam no primeiro contato de recepção do companheiro, incluindo domínio aéreo e finalização de primeira.
+
+
+Partidas iniciadas como reserva oferecem de 2 a 3 lances, sorteados na criação da partida.
+
+
+Recepções aéreas preservam a orientação da passada e os apoios durante a mistura do tronco com o domínio. Domínio de joelho exige aproximação frontal e velocidade moderada; o peso da perna reduz na corrida. Cabeceios e recepções de peito em solo preservam as pernas da locomoção, e a camada de domínio sai gradualmente após o toque. O companheiro mantém a continuidade da passada ao dominar um passe rasteiro.

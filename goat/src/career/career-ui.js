@@ -39,7 +39,7 @@
     ['Passe / pedir passe ao portador', 'Espaço', 'A'],
     ['Lançamento rasteiro / pedir lançamento', 'Segurar e soltar Y', 'Segurar e soltar Y'],
     ['Lançamento aéreo', 'E + segurar/soltar Y', 'LB + segurar/soltar Y'],
-    ['Cruzamento / pedir cruzamento', 'B', 'B'],
+    ['Cruzar / pedir cruzamento', 'Segurar e soltar B / tocar B para pedir', 'Segurar e soltar B / tocar B para pedir'],
     ['Nova bola no treino', 'T', 'R3'],
     ['Replay no treino', 'V', 'L3'],
     ['Trocar câmera', 'C', 'View'],
@@ -128,7 +128,7 @@
       <g class="pad-letters"><text x="337" y="91">Y</text><text x="314" y="114">X</text><text x="360" y="114">B</text><text x="337" y="137">A</text></g>
       <g class="pad-lines"><path d="M176 45 L97 38 H19 M181 111 H104 L89 97 H19 M237 89 L104 158 H19 M330 44 L405 29 H500 M350 64 L410 56 H500 M314 110 L419 148 H500 M360 110 H500 M280 90 L407 190 H500"/></g>
       <g class="pad-labels"><text x="18" y="28">LB · Puxar</text><text x="18" y="88">Mover / mirar</text><text x="18" y="150">View · Câmera</text>
-      <text x="500" y="19" text-anchor="end">RT · Correr</text><text x="500" y="47" text-anchor="end">RB + X · Colocado</text><text x="500" y="100" text-anchor="end">B · Cruzamento</text><text x="500" y="138" text-anchor="end">X · Chutar</text><text x="500" y="181" text-anchor="end">Menu · Pausa</text></g>
+      <text x="500" y="19" text-anchor="end">RT · Correr</text><text x="500" y="47" text-anchor="end">RB + X · Colocado</text><text x="500" y="100" text-anchor="end">Segurar B · Cruzamento</text><text x="500" y="138" text-anchor="end">X · Chutar</text><text x="500" y="181" text-anchor="end">Menu · Pausa</text></g>
     </svg>`;
   }
 

@@ -1039,7 +1039,7 @@
       ? 5
       : clamp(Math.round(5.1 - (next.club.strength - 64) * 0.11 + (next.home ? 0.25 : 0) + (rng() - 0.5) * 1.8), 3, 6);
     const lineup=kind==='trial'?{starter:true,label:'Seletiva',points:60}:journey.status(save);
-    const chances=lineup.starter?regularChances:1+Math.floor(rng()*3);
+    const chances=lineup.starter?regularChances:2+Math.floor(rng()*2);
     const difficulty = next.club.strength >= 75 ? 'hard' : next.club.strength <= 66 ? 'easy' : 'normal';
     return {
       kind,

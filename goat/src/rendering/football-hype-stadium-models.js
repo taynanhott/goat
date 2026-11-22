@@ -2178,6 +2178,7 @@ function Ribbon({
   y,
   color,
   rect = false,
+  innerRect = rect,
   bottom,
   outerY,
   start = 0,
@@ -2195,20 +2196,20 @@ function Ribbon({
  ) {
   const geometry = useMemo(() => {
     const vertices           = [];
-    const point = (a        , r                  ) => {
+    const point = (a        , r, shape = rect) => {
       const c = Math.cos(a),
         s = Math.sin(a);
       return [
-        r[0] * Math.sign(c) * Math.pow(Math.abs(c), rect ? 0.45 : 1),
+        r[0] * Math.sign(c) * Math.pow(Math.abs(c), shape ? 0.45 : 1),
         y,
-        r[1] * Math.sign(s) * Math.pow(Math.abs(s), rect ? 0.45 : 1),
+        r[1] * Math.sign(s) * Math.pow(Math.abs(s), shape ? 0.45 : 1),
       ];
     };
     for (let i = 0; i < 64; i++) {
       const a = start + (i / 64) * (end - start),
         b = start + ((i + 1) / 64) * (end - start);
-      const p = point(a, inner),
-        q = point(b, inner),
+      const p = point(a, inner, innerRect),
+        q = point(b, inner, innerRect),
         r = point(a, outer),
         t = point(b, outer);
       r[1] = outerY ?? y;
@@ -2416,7 +2417,7 @@ function RealStadium({ skin }                  ) {
     jsx("group",{"name":model[1]},skin !== 'arena-mrv' && (
         jsx(Ribbon,{"inner":[x - 0.6, z - 0.6],"outer":[x + 0.4, z + 0.4],"y":4,"bottom":3,"color":accent,"rect":rect})
       ),skin === 'beira-rio' &&
-        Array.from({ length: 65 }, (_, i) => jsx(LeafRoof,{"key":i,"angle":(i / 65) * Math.PI * 2})),jsx(Ribbon,{"inner":[39, 57],"outer":[frontX, frontZ],"y":0.12,"color":skin === 'nilton-santos' ? '#ac6555' : '#778279',"rect":rect}),skin !== 'nilton-santos' &&
+        Array.from({ length: 65 }, (_, i) => jsx(LeafRoof,{"key":i,"angle":(i / 65) * Math.PI * 2})),jsx(Ribbon,{"inner":skin === 'beira-rio' ? [41, 61] : [39, 57],"innerRect":skin === 'beira-rio' || rect,"outer":[frontX, frontZ],"y":0.12,"color":skin === 'nilton-santos' ? '#ac6555' : '#778279',"rect":rect}),skin !== 'nilton-santos' &&
         skin !== 'mineirao' &&
         skin !== 'beira-rio' &&
         skin !== 'arena-mrv' && (

@@ -1139,7 +1139,7 @@ function crowdMesh(cell){
     const mapped=new Uint16Array(source.count);
     for(let i=0;i<source.count;i++){
       const at=i*modelStride,x=data[at],y=data[at+1],z=data[at+2],material=data[at+20];
-      const region=material===1||material===2?1:material===5?3:material===7?4:material===4?6:material===3?(y<42?5:2):2;
+      const region=material===1||material===2?1:material===5?3:material===7?4:material===4?6:material===3?(y<100&&Math.abs(x)<24?(y<42?5:4):2):2;
       const step=y>151?cell*.72:cell;
       const key=[region,Math.round(x/step),Math.round(y/step),Math.round(z/step)].join(',');
       let vertex=clusters.get(key);
@@ -1215,10 +1215,14 @@ function qscale(q,factor){
 }
 const spine1Idx=byName.Spine1,spine2Idx=byName.Spine2,neckIdx=byName.Neck,headIdx=byName.Head;
 const leftArmIdx=byName.LeftArm,rightArmIdx=byName.RightArm,leftForeIdx=byName.LeftForeArm,rightForeIdx=byName.RightForeArm;
+const bodyResponse=window.createFootballBodyResponse();
 function update(h,options,dt){
 const s=get(h),rig=s.bones,clip=pack.clips[options.clip]||pack.clips.idle,loop=options.loop??true,time=options.time??s.time+dt,key=(options.poseName??options.clip)+'|'+!!options.mirror+'|'+!!options.oppositeShot;
 const instant=(options.fade??.18)<=.005||dt>=.5;
 const extraY=options.extraY||0;
+const body=editedClipKeys.has(options.clip)?null:bodyResponse(h,options,dt,s,clip);
+const bodyOffsets=body?.offsets;
+if(body)options={...options,...body.patch};
 const armPrevious=!instant&&h.goalie&&clip.saveKind&&s.clip&&!options.q?keeperPreviousPose(s,!!options.mirror):null;
 const restarted=!loop&&!instant&&s.clip&&time<s.time-.12;
 if(s.key!==key||restarted){
@@ -1228,7 +1232,7 @@ if(s.key!==key||restarted){
   s.from=prevPose;
   s.fromRoot=[...s.root];
   if(flip)s.fromRoot[0]*=-1;
-  if(s.extraY!==undefined&&Math.abs(s.extraY-extraY)>1e-4)s.fromRoot[1]+=(s.extraY-extraY)/scale;
+  if(!options.ballistic&&s.extraY!==undefined&&Math.abs(s.extraY-extraY)>1e-4)s.fromRoot[1]+=(s.extraY-extraY)/scale;
   // Capture incoming angular & root velocity for inertialization carry-through
   const invDt=s.lastDt>.001&&!instant?1/s.lastDt:0;
   if(invDt>0&&s.qPrev&&!h.goalie&&!flip){
@@ -1310,6 +1314,7 @@ for(let i=0;i<count;i++){
       upperBodyJoints[i]?(actionLayer.upperWeight??.45):0;
     if(mask)q=qlerp(q,shotJoint(actionClip,actionFrame,i,false),actionLayer.weight*mask);
   }
+  if(bodyOffsets?.[rig[i].name]&&!editedClipKeys.has(options.clip))q=qm(q,qeuler(bodyOffsets[rig[i].name]));
   if(offset)q=qm(q,qeuler(offset));
   if(options.inertia&&!options.q){
     const p=options.inertia;
@@ -1482,7 +1487,7 @@ if(!instant&&h.goalie&&clip.saveKind&&!options.q){
   }
   s.world=[];
 }
-const trackedArms=h.goalie?[]:null;
+const trackedArms=[];
 const lobCarry=options.lobCarry??0;
 let carryFrame;
 if(lobCarry>0){
@@ -1526,8 +1531,9 @@ for(const target of [...contactHands.filter(target=>!handTargets.some(existing=>
   const destination=wrist.map((value,i)=>value+adjustment[i]*weight);
   const reach=subtract(destination,shoulder),axis=unit(reach);
   const upperLength=Math.hypot(...subtract(elbow,shoulder)),forearmLength=Math.hypot(...subtract(wrist,elbow));
-  const minReach=arm?Math.sqrt(upperLength**2+forearmLength**2+2*upperLength*forearmLength*Math.cos(2.36)):Math.abs(upperLength-forearmLength)+.1;
-  const distance=clamp(Math.hypot(...reach),minReach,upperLength+forearmLength-(arm?.65:.1));
+  const anatomical=!!target.anatomical&&!arm;
+  const minReach=anatomical?Math.sqrt(upperLength**2+forearmLength**2+2*upperLength*forearmLength*Math.cos(2.25)):arm?Math.sqrt(upperLength**2+forearmLength**2+2*upperLength*forearmLength*Math.cos(2.36)):Math.abs(upperLength-forearmLength)+.1;
+  const distance=clamp(Math.hypot(...reach),minReach,arm?upperLength+forearmLength-.65:Math.max(minReach,(upperLength+forearmLength)*(target.maxExtension??.995)));
   const clipBend=subtract(elbow,shoulder);
   const preferred=target.pole?unit(toModel([h.x+target.pole[0],extraY+target.pole[1],h.z+target.pole[2]])):null;
   const bendSource=preferred?unit(clipBend).map((value,i)=>lerp(value,preferred[i],weight*.89)):clipBend;
@@ -1551,6 +1557,18 @@ for(const target of [...contactHands.filter(target=>!handTargets.some(existing=>
     }
     (s.armBends??=[])[armIndex]=bend;
     trackedArms[armIndex]=true;
+  }else if(anatomical){
+    const sign=side==='Left'?1:-1,torso=worldQ(spine2Idx);
+    let outward=project(rotateVector(torso,[sign*.72,-1,-.22]));
+    if(Math.hypot(...outward)<.15)outward=project(rotateVector(torso,[sign,.1,-.7]));
+    outward=unit(outward);
+    const previous=s.armBends?.[armIndex],prior=previous&&project(previous);
+    if(prior&&Math.hypot(...prior)>.15&&dot(unit(prior),outward)>.10){
+      const ease=1-Math.exp(-dt*12);
+      outward=unit(unit(prior).map((value,i)=>lerp(value,outward[i],ease)));
+    }
+    bend=outward;
+    (s.armBends??=[])[armIndex]=bend;trackedArms[armIndex]=true;
   }else bend=Math.hypot(...bend)<.001?unit(cross(axis,[0,1,.3])):unit(bend);
   const along=(upperLength**2-forearmLength**2+distance**2)/(2*distance);
   const height=Math.sqrt(Math.max(0,upperLength**2-along**2));
@@ -1567,7 +1585,7 @@ for(const target of [...contactHands.filter(target=>!handTargets.some(existing=>
   const actualElbow=point(world(middle),[0,0,0]),actualWrist=point(world(end),[0,0,0]);
   aimBone(middle,subtract(actualWrist,actualElbow),subtract(newWrist,actualElbow));
   const handPose=qm(qi(worldQ(rig[end].parent)),orientation);
-  s.q[end]=target.followForearm?wristPose:
+  s.q[end]=anatomical?qlerp(wristPose,Array.from(idleValues.subarray(end*4,end*4+4)),.80):target.followForearm?wristPose:
     arm?limitJoint(handPose,wristPose,arm.hand,lerp(.42,.32,lobAnchor),lerp(.22,.12,lobAnchor)):handPose;
   if(lobAnchor>0){
     const limited=limitJoint(s.q[middle],lowerPose,arm.forearm,lerp(.77,1.60,lobCarry),.14);
@@ -1604,7 +1622,7 @@ if(blendWeight<1){
   }
   s.root=s.root.map((v,idx)=>{
     const fromVal=s.fromRoot[idx]+(inertDecay>.001&&s.inertRootVel?s.inertRootVel[idx]*inertDecay:0);
-    return lerp(fromVal,v,blendWeight);
+    return options.ballistic&&idx===1?v:lerp(fromVal,v,blendWeight);
   });
   s.world=[];
 }
@@ -1626,6 +1644,8 @@ let boneWorld=n=>mm(s.model,world(byName[n]));s.hands=[point(boneWorld('LeftHand
 
 const hbScale=1;
 const hbOff=null;
+const torsoForward=rotateVector(qm(worldQ(spine2Idx),qi(neutralWorld[spine2Idx])),[0,0,1]);
+s.chestForward=unit([0,1,2].map(axis=>s.model[axis]*torsoForward[0]+s.model[4+axis]*torsoForward[1]+s.model[8+axis]*torsoForward[2]));
 s.hitboxes=buildSkeletonBoxes(boneWorld,h.goalie,hbScale,hbOff);
 if(!h.goalie){
   const matrices=footNames.map(boneWorld);
@@ -2142,5 +2162,5 @@ function boneWorldPositions(h){
 }
 function snapshot(h){let s=get(h);return{clip:s.clip,time:s.time,mirror:s.mirror,extraY:s.extraY,bodyYaw:s.bodyYaw,root:[...s.root],q:s.q.map(q=>[...q])}}
 function restore(h,data){if(!data)return;let s=get(h);s.key=null;update(h,{...data,loop:false,fade:.001},1)}
-return{update,draw,get,useIndependentRig,snapshot,restore,shotGeometry,sphereHitsBox,dragBoneToWorld,registerBakedClip,clips:pack.clips,boneCount:count,scale,bones:fieldRig,byName,boneWorldPositions,ensureOriginal,rebuildClip,markClipEdited,commitClipDrafts,discardClipDrafts,hasUnsavedDrafts,saveEditedClips,restoreOriginal,exportEditedClips,exportOverridesScript,importEditedClips,createManualClip,deleteManualClip,editedClipKeys,crowdMesh,crowdPose,crowdBoneCount:crowdBones.length};
+return{update,draw,get,bodyContext:bodyResponse.setContext,bodyImpact:bodyResponse.impact,resetBody:bodyResponse.reset,useIndependentRig,snapshot,restore,shotGeometry,sphereHitsBox,dragBoneToWorld,registerBakedClip,clips:pack.clips,boneCount:count,scale,bones:fieldRig,byName,boneWorldPositions,ensureOriginal,rebuildClip,markClipEdited,commitClipDrafts,discardClipDrafts,hasUnsavedDrafts,saveEditedClips,restoreOriginal,exportEditedClips,exportOverridesScript,importEditedClips,createManualClip,deleteManualClip,editedClipKeys,crowdMesh,crowdPose,crowdBoneCount:crowdBones.length};
 };
