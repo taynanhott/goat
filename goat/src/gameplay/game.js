@@ -2962,13 +2962,19 @@ function advanceDefender(defender,dt,leadDefender,plan,defense){
     tx=clamp(tx,-motion.limits.side+1.4,motion.limits.side-1.4);
     tz=clamp(tz,1.4,motion.limits.back-1);
   }
+  const adjusting=!isPresser&&!closeDuel&&plan&&['wideMark','midfieldMark','cover'].includes(plan.role);
+  if(adjusting){
+    const phase=clock*.52+(defender.index??0)*2.1;
+    tx+=Math.sin(phase)*.8+clamp((ballVel[0]??0)*.08,-.4,.4);
+    tz+=Math.cos(phase)*.55;
+  }
   const approach=[tx-defender.x,tz-defender.z];
   const approachDist=Math.hypot(...approach);
   const direction=norm(approach);
-  const stopAt=isPresser?(defender.grip?.weight>.05?.63:.36):.65;
+  const stopAt=isPresser?(defender.grip?.weight>.05?.63:.36):adjusting?.12:.65;
   const paceScale=plan?.paceScale??1;
   const carrierSpeed=closeDuel?Math.hypot(carrier.vx??0,carrier.vz??0):0;
-  const speed=Math.min(defender.settings.pace*paceScale,closeDuel?Math.max(0,carrierSpeed*.95+(approachDist-.12)*4):Math.max(0,(approachDist-stopAt)*7.6));
+  const speed=Math.min(adjusting&&approachDist<2.8?1.4:defender.settings.pace*paceScale,closeDuel?Math.max(0,carrierSpeed*.95+(approachDist-.12)*4):Math.max(0,(approachDist-stopAt)*7.6));
   const faceBall=gap<2.4||!isPresser&&approachDist<1.1;
   motion.move(defender,{dt,direction,speed,sprint:speed>3.6,ball:ballPos,velocity:ballVel,controlled:false,
     facing:speed<1.6&&pace<1.6&&faceBall?defender.yaw+clamp(turn,-10*dt,10*dt):undefined});

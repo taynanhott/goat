@@ -167,6 +167,16 @@ function select(passer,kind,direction,power=.5){
 
   const desiredRange=(kind==='pass'?4:kind==='cross'?8:kind==='lob'?7:6)+clamp(power,.1,1)*(kind==='pass'?34:kind==='cross'?44:kind==='lob'?44:40);
   const fallback=direction??[-Math.sin(passer.yaw),-Math.cos(passer.yaw)];
+  if(kind==='run'){
+    const candidates=actors().map(actor=>{
+      const gap=distance(actor,passer);
+      const alignment=((actor.x-passer.x)*fallback[0]+(actor.z-passer.z)*fallback[1])/Math.max(.001,gap);
+      return {actor,gap,alignment};
+    }).filter(item=>item.gap>=1.1&&item.alignment>.65);
+    const bestAlignment=Math.max(-1,...candidates.map(item=>item.alignment));
+    return candidates.filter(item=>item.alignment>=bestAlignment-.12)
+      .sort((a,b)=>a.gap-b.gap)[0]?.actor??null;
+  }
   for(const a of actors()){
     const d=distance(a,passer);if(d<1.1)continue;
     let alignment;
@@ -427,6 +437,14 @@ function requestRun(direction){
   if(!direction||s.ballState!=='controlled'||s.terminal||s.play?.piece||s.windup||s.charging)return false;
   const target=select(player,'run',direction,.5);
   if(!target||target===owner)return false;
+  for(const a of actors()){
+    if(a!==target&&a.teamRun?.requested){
+      a.teamRun=null;
+      a.teamTarget=formationTarget(a,player);
+      a.formationClock=s.clock;
+      a.teamAtRest=false;
+    }
+  }
   target.teamRun={requested:true,x:target.x,z:Math.max(2,target.z-16),remaining:4.5,offsideAt:null,returning:false};
   target.teamAtRest=false;
   return true;
@@ -460,6 +478,12 @@ function targetFor(a,index){
     const dx=anchor.x-d.x,dz=anchor.z-d.z,gap=Math.hypot(dx,dz);
     if(gap>.01&&gap<2){anchor.x+=dx/gap*(2-gap)*.45;anchor.z+=dz/gap*(2-gap)*.35;}
   }
+  const phase=s.clock*.55+index*2.1;
+  const future={x:carrier.x+(carrier.vx??0)*.7,z:carrier.z+(carrier.vz??0)*.7};
+  const options=[-1,1].map(side=>({x:anchor.x+side*1.3,z:anchor.z-.6}));
+  const preferred=options.reduce((best,p)=>space(p)+lane(future,p)*.2>space(best)+lane(future,best)*.2?p:best);
+  anchor.x=clamp(anchor.x+Math.sin(phase)*.85+(preferred.x-anchor.x)*.35,-28,28);
+  anchor.z=clamp(anchor.z+Math.cos(phase)*.65,.8,48);
   const old=a.teamTarget??anchor;
   const weight=1-Math.exp(-Math.max(.001,s.clock-(a.formationClock??s.clock-.016))*4);
   a.formationClock=s.clock;
@@ -698,10 +722,10 @@ function update(dt){
     const cap=a===owner?(a.controlAge<.22?1.6:4.3):receiving?6.25:a.formationRole==='ST'?6.25:6.0;
     const settling=a!==owner&&!receiving;
     if(settling){
-      if(d<.32)a.teamAtRest=true;
-      else if(d>.72)a.teamAtRest=false;
+      if(d<.12)a.teamAtRest=true;
+      else if(d>.25)a.teamAtRest=false;
     }else a.teamAtRest=false;
-    const speed=a.teamAtRest?0:receiving?Math.min(cap,d/Math.max(.14,target.time??.2)+.35):Math.min(cap,d*2.5);
+    const speed=a.teamAtRest?0:receiving?Math.min(cap,d/Math.max(.14,target.time??.2)+.35):Math.min(settling&&!a.teamRun?.requested&&d<3?1.45:cap,d*2.5);
     motion.move(a,{dt,direction:!a.teamAtRest&&d>.1?[dx/d,dz/d]:[0,0],speed,sprint:speed>4.5,
       ball:s.ball,velocity:s.velocity,controlled:a===owner,facing:a.teamAction?.kind==='trap'&&!a.teamAction.reception?.touched?
         a.yaw+clamp(turn(a.teamAction.yaw-a.yaw),-dt*9,dt*9):undefined});
