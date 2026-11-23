@@ -1180,8 +1180,7 @@ function positionSetPieceWall(defense,piece){
            sideSign:index%2?-1:1,lat:lateralAxis,dep:depthAxis,clock:0}
         : {kind:'strafe',homeX:p.x,homeZ:p.z,phase:random(80+index)*Math.PI*2,
            amp:1.05+random(85+index)*.75,speed:.78+random(90+index)*.34,lat:lateralAxis,dep:depthAxis,clock:0,animTime:.14+index*.41}});
-    actor.appearance={...player.appearance,skin:['#b9754d','#d39a72','#754933','#9d6648'][index],
-      hair:index+1,primary:player.appearance?.primary??'#3b69a4',secondary:player.appearance?.secondary??'#22304e'};
+    actor.appearance=window.goatCareerSeason.teammatePaint(player.appearance,{skin:[1,0,3,2][index],hair:index+1});
     mocap.update(actor,{clip:'idle',time:.14+index*.41,grounded:true,fade:.001},1);
   });
 }
@@ -4115,9 +4114,8 @@ function launchShot(w){
   w.fired=true;
   w.contactBall=[...ballPos];
   w.impactAt=w.t;
-  const fatigueForce=w.piece||w.teamScorer?1:mix(1,.78,staminaFatigue());
   const shotStatForce=w.piece||w.teamScorer?1:clamp(.80+(mark().shot-50)*.0048,.76,1.05);
-  const force=(w.execution?.force??1)*fatigueForce*shotStatForce;
+  const force=(w.execution?.force??1)*shotStatForce;
   const power=w.power*force;
   const attributes=mark(),pieceKind=w.piece?.kind;
   const overhit=w.power>=1;

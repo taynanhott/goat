@@ -20,6 +20,58 @@
     const careerStadiumId=(stored?.careerStadiumId==='club-auto'||S?.byId[stored?.careerStadiumId])?stored.careerStadiumId:'club-auto';
     return {attributes,dominantFoot:stored?.dominantFoot==='LeftFoot'?'LeftFoot':'RightFoot',stadiumId,careerStadiumId};
   }
+  const menuAudio=(()=>{
+    let context=null,lastNavigation=0,lastConfirmation=-Infinity,holdPulse=0;
+    function unlock(){
+      try{
+        const Audio=window.AudioContext||window.webkitAudioContext;
+        if(!Audio)return;
+        context??=new Audio();
+        if(context.state==='suspended')context.resume().catch(()=>{});
+      }catch{}
+    }
+    function note(frequency,delay=0,duration=.12,volume=.035){
+      if(!context||context.state!=='running'||document.hidden)return;
+      const at=context.currentTime+delay,oscillator=context.createOscillator(),gain=context.createGain();
+      oscillator.type='sine';
+      oscillator.frequency.setValueAtTime(frequency,at);
+      gain.gain.setValueAtTime(0,at);
+      gain.gain.linearRampToValueAtTime(volume,at+.014);
+      gain.gain.exponentialRampToValueAtTime(.0001,at+duration);
+      oscillator.connect(gain);gain.connect(context.destination);
+      oscillator.onended=()=>{oscillator.disconnect();gain.disconnect();};
+      oscillator.start(at);oscillator.stop(at+duration+.015);
+    }
+    function navigate(){
+      const now=performance.now();
+      if(now-lastNavigation<85||holdPulse)return;
+      lastNavigation=now;
+      note(392,0,.085,.028);
+      note(490,.012,.065,.009);
+    }
+    function stop(){clearInterval(holdPulse);holdPulse=0;}
+    function confirm(){
+      stop();
+      const now=performance.now();
+      if(now-lastConfirmation<75)return;
+      lastConfirmation=now;lastNavigation=now;
+      note(392,0,.15,.038);note(494,.065,.17,.032);
+    }
+    function hold(duration){
+      stop();unlock();
+      const start=performance.now();
+      function pulse(){
+        const progress=Math.min(1,(performance.now()-start)/duration);
+        note(330+progress*110,0,.115,.019+progress*.008);
+      }
+      pulse();holdPulse=setInterval(pulse,145);
+    }
+    document.addEventListener('pointerdown',unlock,{capture:true});
+    document.addEventListener('keydown',unlock,{capture:true});
+    document.addEventListener('visibilitychange',()=>{if(document.hidden)stop();});
+    window.addEventListener('blur',stop);
+    return {unlock,navigate,confirm,hold,stop};
+  })();
   const holdTime = 1600;
   const upgradeHoldTime = 700;
   const firstRepeat = 350;
@@ -313,14 +365,17 @@
   function thumbnail(key, index, value) {
     if(key==='dominantFoot')return '<span class="foot-choice">'+(index===1?'E':'D')+'</span>';
     if (key === 'boots') {
-      const c1 = Array.isArray(value) ? value[0] : value;
-      const c2 = Array.isArray(value) ? value[1] : null;
+      const c1=Array.isArray(value)?value[0]:value;
+      const c2=Array.isArray(value)?value[1]:null;
       return `<svg viewBox="0 0 54 48" aria-hidden="true">
-        <path fill="${c1}" d="M14 14H26L31 25L43 27L48 30L48 35L42 39H7L5 34L12 27Z"/>
-        ${c2 ? `<path fill="${c2}" d="M14 14H22L18 35H7L5 34L12 27Z"/><path fill="${c2}" d="M24 23L31 25L36 35H29Z"/>` : ''}
-        <path fill="#504356" d="M5 34L12 35L38 35L48 32L48 36L43 39H8Z"/>
-        <path fill="none" stroke="#f4ddac" d="M18 21L27 20M21 25L30 24M24 29L33 27"/>
-        <path fill="#201923" d="M10 39H15V42H10ZM23 39H27V42H23ZM37 38H42V41H37Z"/>
+        <path fill="#202722" d="M7 32H10L9.8 36Q9.7 36.8 9 36.8H8Q7.3 36.8 7.2 36ZM14 32H17L16.8 36Q16.7 36.8 16 36.8H15Q14.3 36.8 14.2 36ZM35 32H38L37.8 36Q37.7 36.8 37 36.8H36Q35.3 36.8 35.2 36ZM41 31H44L43.8 36Q43.7 36.8 43 36.8H42Q41.3 36.8 41.2 36ZM47 29H50L49.7 33.7Q49.6 34.3 49 34.3H48Q47.3 34.3 47.2 33.7Z"/>
+        <path fill="${c1}" stroke="#252b28" stroke-width=".8" stroke-linejoin="round" d="M2.3 31.4Q1.5 27 3.2 20L4.2 16.5Q6.5 15.4 8.9 16.2L12.3 19.6Q15.6 21.3 19.1 19.6L21.8 17.9Q25 19.2 28.1 21.3L36.2 24L46.5 25.4Q50.4 25.8 52 28.2Q53 30.2 49.1 32L40.5 34H7Q3.4 34 2.3 31.4Z"/>
+        <path fill="#ffffff" opacity=".16" d="M4.5 18.6L6.8 18.3L8.7 19.7Q5.6 23.6 3.3 29.9Q3.1 24.8 4.5 18.6ZM29.7 21.5L38.6 23.6L49.2 25.7L51 27.1L47.4 28.8L39.9 26.2Z"/>
+        ${c2?`<path fill="${c2}" d="M3.2 20L4.2 16.5Q6.5 15.4 8.9 16.2L12.3 19.6Q15.6 21.3 19.1 19.6L14.7 31.4H2.3Q1.5 27 3.2 20ZM23.3 19L25.6 20.1L20.8 31.4H18.5Z"/>`:''}
+        <path fill="#ffffff" opacity=".12" d="M21.8 17.9Q25 19.2 28.1 21.3L36.2 24L46.5 25.4L49.6 26.6L38.4 26L27.2 23.1Z"/>
+        <path fill="none" stroke="#e2d4b7" stroke-width=".65" stroke-linecap="round" d="M20.8 20.1L25.2 20.7M23.3 21.6L28 22.2M25.8 23L30.5 23.6"/>
+        <path fill="none" stroke="#e2d4b7" stroke-opacity=".45" stroke-width=".45" d="M3.2 30.4H39.3Q45.5 30.1 50.3 28.2"/>
+        <path fill="#525c56" d="M2.3 31.4H39.3Q46.3 30.8 52.4 27.2Q53.1 29.6 50.7 31.3Q47.1 34.2 40.5 34.2H7Q3.6 34.2 2.3 31.4Z"/>
       </svg>`;
     }
     if (key === 'tankTop') {
@@ -458,18 +513,20 @@
     function playerAlerts(proposals=season.activeProposals(save)) {
       const xp=season.xpProgress(save);
       const profile=xp.attributePoints>0&&Object.values(season.attributes).some(key=>(save.player.attributes[key]??0)<99);
-      const shop=save.unreadItems.length>0, market=proposals.some(offer=>offer.seen!==true);
-      return {profile,shop,market,player:profile||shop||market};
+      const edit=save.unreadItems.length>0,shop=false,market=proposals.some(offer=>offer.seen!==true);
+      return {profile,shop,edit,market,player:profile||edit||market};
     }
 
     function updateAlerts() {
-      const {player,profile,shop,market}=playerAlerts();
-      for(const [action,unread] of [['tab-player',player],['player-profile',profile],['player-shop',shop],['player-market',market]]){
-        const button=content.querySelector('[data-action="'+action+'"]');
-        if(!button)continue;
-        button.querySelector('.notification-dot').hidden=!unread;
-        if(unread)button.setAttribute('aria-label',button.textContent.trim()+', novidades');
-        else button.removeAttribute('aria-label');
+      const {player,profile,shop,edit,market}=playerAlerts();
+      for(const [action,unread] of [['tab-player',player],['player-profile',profile],['player-shop',shop],['player-edit',edit],['player-market',market]]){
+        for(const button of content.querySelectorAll('[data-action="'+action+'"]')){
+          const dot=button.querySelector('.notification-dot');
+          if(!dot)continue;
+          dot.hidden=!unread;
+          if(unread)button.setAttribute('aria-label',button.textContent.trim()+', novidades');
+          else button.removeAttribute('aria-label');
+        }
       }
       persist();
     }
@@ -480,7 +537,8 @@
       save.unreadItems.splice(index,1);
       const card=content.querySelector('[data-item="'+id+'"]');
       if(card){
-        card.querySelector('.notification-dot').hidden=true;
+        const dot=card.querySelector('.notification-dot');
+        if(dot)dot.hidden=true;
         delete card.dataset.unread;
         alertObserver.unobserve(card);
       }
@@ -500,7 +558,8 @@
         if(!offer||offer.seen===true)continue;
         offer.seen=true;
         delete target.dataset.unread;
-        target.querySelector('.notification-dot').hidden=true;
+        const dot=target.querySelector('.notification-dot');
+        if(dot)dot.hidden=true;
         alertObserver.unobserve(target);
         changed=true;
       }
@@ -567,6 +626,7 @@
     }
 
     function endHold() {
+      menuAudio.stop();
       if (hold) clearTimeout(hold);
       hold = 0;
       holdButton?.classList.remove('is-holding');
@@ -583,8 +643,10 @@
       if(!allowed||el.dataset.hold!=='true')return;
       holdButton = el;
       el.classList.add('is-holding');
+      menuAudio.hold(action==='upgrade-attribute'?upgradeHoldTime:holdTime);
       hold = setTimeout(() => {
         endHold();
+        menuAudio.confirm();
         if(action==='upgrade-attribute'){
           if(season.upgradeAttribute(save,attr)){
             const prevScroll=content.querySelector('.hub-content')?.scrollTop??0;
@@ -625,6 +687,7 @@
 
     function showFocus(element) {
       if (element === focusedOption) return;
+      if(element)menuAudio.navigate();
       focusedOption?.classList.remove('is-menu-focused');
       focusedOption = element;
       focusedOption?.classList.add('is-menu-focused');
@@ -1064,12 +1127,11 @@
         const categories=season.shopCategories||[];
         if(!categories.some(c=>c.id===shopCategory))shopCategory=categories[0]?.id||'appearance';
         const catNav=`<nav class="tournament-phases shop-cats" aria-label="Setores da loja">${categories.map(cat=>{
-          const hasUnread=season.shop.some(it=>it.category===cat.id&&save.unreadItems.includes(it.id));
-          return `<button type="button" data-action="shop-cat" data-cat="${cat.id}" aria-pressed="${shopCategory===cat.id}">${cat.label}${badge(hasUnread)}</button>`;
+          return `<button type="button" data-action="shop-cat" data-cat="${cat.id}" aria-pressed="${shopCategory===cat.id}">${cat.label}</button>`;
         }).join('')}</nav>`;
         const items=season.shop.filter(item=>item.category===shopCategory);
         const cards=items.map(item=>{
-          const own=save.owned.includes(item.id),unread=save.unreadItems.includes(item.id);
+          const own=save.owned.includes(item.id),unread=false;
           const canBuy=!own&&save.balance>=item.price;
           if(item.consumable){
             if(item.repeatable){
@@ -1103,7 +1165,7 @@
         }).join('');
         const hint=shopCategory==='consumables'?'Itens de treino aumentam o XP dos desafios automaticamente.':'Selecione um item para ver no modelo 3D.';
         return `${catNav}<div class="shop-summary"><span>Saldo <strong>${cash(save.balance)}</strong></span>
-          <span>${hint}</span></div><div class="standings-scroll shop-scroll" tabindex="0" aria-label="Itens da loja">
+          <span>${hint}</span></div><div class="standings-scroll shop-scroll" tabindex="-1" aria-label="Itens da loja">
           <div class="shop-grid" style="--preview-skin:${lookPaint.skin};--preview-hair:${lookPaint.hairColor};--preview-beard:${lookPaint.beardColor}">${cards}</div></div>`;
       }
       if(playerTab==='awards')return journey.gallery(save);
@@ -1629,7 +1691,7 @@
           `<button type="button" data-action="comp-select" data-comp="${c.id}" aria-pressed="${selectedCompId===c.id}">${esc(c.shortName)}</button>`
         ).join('')}</nav>`,
         player:()=>tabs('Meu Jogador',[['profile','Dados Gerais',alerts.profile],['shop','Loja',alerts.shop],['awards','Conquistas'],
-          ['market','Propostas',alerts.market],['edit','Editar jogador']],playerTab,'player',subtabClass),
+          ['market','Propostas',alerts.market],['edit','Editar jogador',alerts.edit]],playerTab,'player',subtabClass),
         news:()=>tabs('Filtro do Noticiário',[['all','Todos'],['club','Meu Clube'],['player','Meu Jogador']],newsTab,'news',subtabClass),
         practice:()=>tabs('Treinos',[['challenges','Desafios de treino'],['free','Treino Livre']],practiceTab,'practice',subtabClass)
       };
@@ -2048,14 +2110,20 @@
       content.querySelectorAll('[data-item]').forEach(element=>element.classList.toggle('is-previewing',element.dataset.item===id));
     }
 
+    function refreshShopItem(id,skipNewItem=null){
+      const scrollTop=content.querySelector('.shop-scroll')?.scrollTop??0;
+      hub(skipNewItem);
+      const scroller=content.querySelector('.shop-scroll');
+      if(scroller)scroller.scrollTop=scrollTop;
+      focusOption(content.querySelector(`button[data-item="${id}"]`),{preventScroll:true});
+    }
+
     function equipItem(id,justPurchased=false) {
       const item=season.shop.find(entry=>entry.id===id);
       if(!item||(!item.repeatable&&!save.owned.includes(item.id)))return;
       if(!item.consumable)season.edit(save,save.player.name,{...save.player.look,[item.key]:item.index});
-      if(!justPurchased&&!item.repeatable)markShopItemSeen(id);
       persist();
-      hub(justPurchased&&!item.repeatable?id:null);
-      focusOption(content.querySelector(`button[data-item="${id}"]`));
+      refreshShopItem(id,justPurchased&&!item.repeatable?id:null);
     }
 
     function unequipItem(id) {
@@ -2063,8 +2131,7 @@
       if(!item||item.consumable||!save.owned.includes(item.id))return;
       season.edit(save,save.player.name,{...save.player.look,[item.key]:0});
       persist();
-      hub();
-      focusOption(content.querySelector(`button[data-item="${id}"]`));
+      refreshShopItem(id);
     }
 
     function dispatch(action, target, holdConfirmed=false) {
@@ -2157,7 +2224,9 @@
           break;
         }
         case 'new-season': if(season.newSeason(save)){hubTab='games';selectedCompId=null;compPhase='table';selectedGroup='ALL';selectedKoRound=null;persist();hub();}break;
-        case 'player-edit': if(save?.club)creator(true);break;
+        case 'player-edit':
+          if(save?.club){save.unreadItems=[];persist();creator(true);}
+          break;
         case 'player-profile': case 'player-shop': case 'player-awards': case 'player-market':
           hubTab='player';playerTab=action.slice(7);hub();focusOption(content.querySelector(`[data-action="${action}"]`));break;
         case 'shop-cat':
@@ -2165,7 +2234,6 @@
           hub();focusOption(content.querySelector(`[data-action="shop-cat"][data-cat="${shopCategory}"]`),{preventScroll:true});break;
         case 'buy': case 'preview-item':
           previewItem(target.dataset.item);
-          if(markShopItemSeen(target.dataset.item))updateAlerts();
           break;
         case 'equip': equipItem(target.dataset.item);break;
         case 'unequip': unequipItem(target.dataset.item);break;
@@ -2238,6 +2306,14 @@
     content.addEventListener('click', click);
     pauseMenu.addEventListener('click', click);
     for (const root of [menu, content, pauseMenu]) {
+      root.addEventListener('click',event=>{
+        const button=event.target.closest('button');
+        if(button&&!button.disabled&&button.getAttribute('aria-disabled')!=='true'&&button.dataset.hold!=='true')menuAudio.confirm();
+      },true);
+      root.addEventListener('pointerover',event=>{
+        const button=event.target.closest('button');
+        if(button&&!button.disabled&&button!==event.relatedTarget?.closest?.('button'))menuAudio.navigate();
+      });
       root.addEventListener('focusin', event => {
         if (event.target.matches('button, input, select, .standings-scroll, .hub-content[tabindex], [data-training-stat]')) showFocus(event.target);
         if (event.target.matches('.look-thumbnail')) revealThumbnail(event.target);
@@ -2333,6 +2409,7 @@
     window.addEventListener('blur',stopTrainingStep);
 
     function back() {
+      menuAudio.confirm();
       if(screen==='review'){api.leaveMatch();highlightsScreen();return;}
       if(screen==='highlights'){resultScreen();return;}
       if (screen === 'home' || screen === 'game' || screen === 'shootout') return;
@@ -2355,6 +2432,28 @@
       if (index < 0) {
         focusOption(elements[0]);
         return;
+      }
+      if(y>0&&active.matches('[data-action="shop-cat"]')){
+        const first=elements.find(element=>element.matches('.shop-grid .shop-item'));
+        if(first){focusOption(first);return;}
+      }
+      const grid=active.closest('.shop-grid');
+      if(grid){
+        const cards=elements.filter(element=>element.closest('.shop-grid')===grid);
+        const columns=getComputedStyle(grid).gridTemplateColumns.split(' ').length;
+        const position=cards.indexOf(active),column=position%columns;
+        if(x){
+          const target=column+x;
+          focusOption(target>=0&&target<columns?cards[position+x]??active:active);
+          return;
+        }
+        if(y){
+          const target=position+y*columns;
+          if(target>=0){focusOption(cards[target]??active);return;}
+          const category=elements.find(element=>element.matches('[data-action="shop-cat"][aria-pressed="true"]'));
+          focusOption(category??active);
+          return;
+        }
       }
       const a = active.getBoundingClientRect();
       let best = null, bestScore = Infinity;
@@ -2398,6 +2497,7 @@
 
     function gamepad(buttons, vertical, horizontal, now = performance.now()) {
       const confirm = !!buttons[0], goBack = !!buttons[1];
+      if(confirm||goBack||Math.abs(vertical)>.58||Math.abs(horizontal)>.58||buttons[12]||buttons[13]||buttons[14]||buttons[15])menuAudio.unlock();
       const [x, y] = screen === 'game' && pauseMenu.hidden ? [0, 0] : direction(buttons, vertical, horizontal);
       const previous = nav;
       const changed = x !== previous.x || y !== previous.y;
@@ -2448,7 +2548,7 @@
         return;
       }
       const current = screen === 'game' ? pauseMenu : screen === 'home' ? menu : content;
-      const elements = [...current.querySelectorAll('button:not(:disabled):not([data-training-step]),input:not(:disabled):not(.training-range),select:not(:disabled),.standings-scroll,.hub-content[tabindex],[data-training-stat]')].filter(element=>{
+      const elements = [...current.querySelectorAll('button:not(:disabled):not([data-training-step]),input:not(:disabled):not(.training-range),select:not(:disabled),.standings-scroll:not(.shop-scroll),.hub-content[tabindex],[data-training-stat]')].filter(element=>{
         if(element.closest('[hidden]'))return false;
         const r=element.getBoundingClientRect();
         return r.width>0&&r.height>0;

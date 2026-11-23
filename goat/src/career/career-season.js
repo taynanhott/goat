@@ -165,7 +165,7 @@
     ['earring', 1, 16000, 'accessories'], ['earring', 2, 22000, 'accessories'], ['earring', 3, 13500, 'accessories'],
     ['glasses', 1, 18000, 'accessories'], ['glasses', 2, 23500, 'accessories'], ['glasses', 3, 20500, 'accessories'],
     ['bracelet', 1, 15000, 'accessories'], ['bracelet', 2, 11500, 'accessories'], ['bracelet', 3, 11500, 'accessories']
-  ].map(([key, index, price, category]) => ({ id: key + ':' + index, key, index, price, category }));
+  ].map(([key, index, price, category]) => ({ id: key + ':' + index, key, index, price: key === 'boots' ? price / 2 : price, category }));
 
   const consumableShop = [
     { id: 'consumable:attr-point', category: 'consumables', consumable: true, repeatable: true, icon: 'attrPoint', name: 'Ponto de Atributo (+1)', description: '+1 ponto para evoluir qualquer atributo', price: 15000 },
@@ -174,6 +174,8 @@
     { id: 'consumable:pesos-academia', category: 'consumables', consumable: true, icon: 'weights', name: 'Pesos de Academia', description: '+10% de XP nos treinos', xpBonusPct: 10, price: 28000 },
     { id: 'consumable:personal', category: 'consumables', consumable: true, icon: 'personal', name: 'Personal Trainer', description: '+10% de XP nos treinos', xpBonusPct: 10, price: 42000 }
   ];
+
+  for (const item of consumableShop) item.price *= 2;
 
   const shop = [...wearableShop, ...consumableShop];
   const storeById = new Map(shop.map(item => [item.id, item]));
@@ -216,6 +218,14 @@
       primary: club?.primary ?? '#efd9a8', secondary: club?.secondary ?? '#bd442e',
       tertiary:club?.tertiary,pattern:club?.pattern??'solid',clubId:club?.id
     };
+  }
+
+  function teammatePaint(reference,look={}){
+    return paint({...look,boots:1},{
+      id:reference?.clubId,
+      primary:reference?.primary??'#3b69a4',secondary:reference?.secondary??'#22304e',
+      tertiary:reference?.tertiary,pattern:reference?.pattern??'solid'
+    });
   }
 
   function random(seed) {
@@ -2311,7 +2321,7 @@
   }
 
   window.goatCareerSeason = {
-    clubs, trials, team, appearance, defaultLook, paint, create, selectTrial, contract,joinAcademy,
+    clubs, trials, team, appearance, defaultLook, paint, teammatePaint, create, selectTrial, contract,joinAcademy,
     startRound, opponent, chance, finishMatch, standings, groupTables, continentalPlaces,
     activeCompetitions, scorers, assisters, restore, totalRounds, leagueOf, divisionOf,
     leagueCompId, salaryFor, nameOf, shop, shopCategories, trainingBoosts, available, purchase, edit, activeProposals,

@@ -154,7 +154,7 @@ function reset(n){
     a.attackSearch=null;a.rollCooldown=0;a.formationRole=roles[i]??'ST';a.formationClock=state().clock;
     const position=formationTarget(a,player);a.x=position.x;a.z=position.z;
     a.teamTarget={...position};a.teamThink=.45+i*.08;
-    a.appearance={...player.appearance,skin:['#b9754d','#d49c78','#754933','#9d6648'][i],hair:2+i%3};
+    a.appearance=window.goatCareerSeason.teammatePaint(player.appearance,{skin:[1,0,3,2][i],hair:2+i%3});
     motion.reset(a);mocap.get(a).key=null;
     mocap.update(a,{clip:'idle',grounded:true,fade:.001},1);
   });

@@ -643,17 +643,6 @@ gl.attachShader(program,shader(gl.FRAGMENT_SHADER,`
     }
     if(face>.5&&uCustom>.5){
       float ax=abs(vBind.x);
-      if(uAcc.z>.5){
-        float frontG=smoothstep(4.5,7.8,z);
-        vec3 gFrame=uAcc.z<1.5?vec3(.10,.10,.13):uAcc.z<2.5?vec3(.88,.68,.24):vec3(.16,.58,.90);
-        vec3 gLens=uAcc.z<1.5?vec3(.07,.08,.11):uAcc.z<2.5?vec3(.22,.16,.08):vec3(.10,.34,.58);
-        float lens=oval(vec2(ax-3.45,y-168.1),vec2(2.15,1.15));
-        float frame=oval(vec2(ax-3.45,y-168.1),vec2(2.55,1.48))-lens;
-        float bridge=(1.-smoothstep(1.15,1.45,ax))*(1.-smoothstep(.26,.48,abs(y-168.45)));
-        float temple=smoothstep(5.4,6.4,ax)*(1.-smoothstep(.28,.55,abs(y-168.55)))*smoothstep(-1.5,5.5,z);
-        material=mix(material,gLens,frontG*lens*.88);
-        material=mix(material,gFrame,clamp(max(frontG*max(frame,bridge),temple),0.,1.)*.96);
-      }
       if(uAcc.y>.5){
         vec3 earCol=uAcc.y<1.5?vec3(.96,.78,.28):uAcc.y<2.5?vec3(.90,.97,1.):vec3(.12,.12,.16);
         float stud=oval(vec2(z-1.2,y-163.2),vec2(1.05,1.05))*smoothstep(6.8,7.9,ax);
@@ -930,8 +919,8 @@ function setModelMaterial(region,name,x,y,z,normal,goalie){
 
 const headAngles=[0,18,36,55,82,112,146,180,214,248,278,305,324,342].map(deg=>deg*Math.PI/180);
 const faceProfile=[
-  [151.5,3.8,3.4,6.6,0],[154.4,4.6,7.5,7.0,0],[157.5,5.8,9.1,9.0,.3],
-  [160.1,6.9,9.9,10.5,.15],[162.0,7.45,10.1,11.4,.25],[163.9,7.9,9.6,11.8,2.95],
+  [151.5,3.8,3.4,6.6,0],[154.4,5.15,9.25,7.0,.35],[157.5,6.45,10.15,9.0,.65],
+  [160.1,7.15,9.65,10.5,.15],[162.0,7.45,10.1,11.4,.25],[163.9,7.9,9.6,11.8,2.95],
   [165.9,8.02,9.2,12.1,1.30],[168.2,8.04,8.75,12.0,.83],[170.45,8.19,10.1,11.9,.29],
   [173.45,8.07,10.3,11.45,0],[176.65,7.12,8.9,9.9,0],[179.25,5.0,5.95,6.85,0],[180.5,2.6,2.7,3.9,0]
 ];
@@ -1048,16 +1037,44 @@ function classicHead(hairStyle,beardStyle){
       if(!short)strip(goat?.56:.58,s=>161.55-.59*s*s,s=>162.75-.78*s*s,depth*(beardStyle===8?.68:.49));
     }
   }else if(hair){
-    const lift=[2.75,0,.9,2.0,1.65,2.10,2.62,4.55,4.45,1.25,1.95,2.45][hairStyle];
-    const fringe=[173.8,0,175.3,173.6,175.1,174.7,173.4,174.2,172.8,175.4,173.2,173.9][hairStyle];
-    const nape=[163.7,0,166.9,164.6,169.4,165.8,164.2,167.2,162.2,166.2,155.4,161.8][hairStyle];
+    const lift=[5.1,0,.35,3.65,1.65,2.10,2.62,4.55,4.45,1.25,1.95,2.45][hairStyle];
+    const fringe=[174.8,0,176.0,171.9,175.1,174.7,173.4,174.2,172.8,175.4,173.2,173.9][hairStyle];
+    const nape=[169.5,0,170.4,163.1,169.4,165.8,164.2,167.2,162.2,166.2,155.4,161.8][hairStyle];
     const mohawk=hairStyle===7,afro=hairStyle===8,bun=hairStyle===9,longHair=hairStyle===10,dreads=hairStyle===11;
+    if(mohawk){
+      const path=[
+        [173.45,1,.35],[176.65,1,2.1],[179.25,1,3.6],[180.5,1,4.1],
+        [180.85,0,4.25],[180.5,-1,4.0],[179.25,-1,3.4],
+        [176.65,-1,2.6],[173.45,-1,1.65],[170.45,-1,.85],[168.2,-1,.25]
+      ];
+      const sections=path.map(([y,side,rise])=>{
+        const profile=faceProfile.find(row=>row[0]===y);
+        const width=side?Math.min(1.55,profile[1]*.58):1.25;
+        const base=[-1,1].map(sign=>{
+          if(!side)return [sign*width,180.95,-.7];
+          const angle=Math.asin(sign*width/profile[1]);
+          const p=headSurface(y,side>0?angle:Math.PI-angle);
+          return [p[0],p[1]+.30,p[2]+side*.24];
+        });
+        const tipZ=(base[0][2]+base[1][2])*.5;
+        const tipY=y+.30+rise;
+        return [base[0],base[1],[width*.43,tipY,tipZ],[-width*.43,tipY,tipZ]];
+      });
+      for(let i=0;i<sections.length-1;i++){
+        const a=sections[i],b=sections[i+1];
+        polygon([a[0],a[3],b[3],b[0]],[-1,0,0],.87);
+        polygon([a[1],b[1],b[2],a[2]],[1,0,0],.96);
+        polygon([a[3],a[2],b[2],b[3]],[0,1,0],1.03+(i%2)*.06);
+      }
+      polygon(sections[0],[0,0,1],.94);
+      polygon(sections[sections.length-1],[0,0,-1],.86);
+    }else{
     const rings=headAngles.map(angle=>{
       const sin=Math.sin(angle), cos=Math.cos(angle), front=Math.max(0,cos), back=Math.max(0,-cos);
       const curls=hairStyle===3||hairStyle===6||afro;
       const wave=afro?.65*Math.sin(angle*9+.5)+.50*Math.sin(angle*13)
         :dreads?.72*Math.sin(angle*12)+.32*Math.cos(angle*6)
-        :curls?.51*Math.sin(angle*7+.8)+.40*Math.sin(angle*11)
+        :curls?(hairStyle===3?.95:.51)*Math.sin(angle*7+.8)+(hairStyle===3?.72:.40)*Math.sin(angle*11)
         :.20*Math.sin(angle*3);
       const swept=(hairStyle===0||hairStyle===5)?sin*front*1.38:0;
       const edge=lerp(nape,fringe,front**.61)+wave*.52+swept-(longHair?back*4.5:0);
@@ -1065,14 +1082,15 @@ function classicHead(hairStyle,beardStyle){
         const y=lerp(edge,180.45,t),p=headSurface(clamp(y,154.5,180.45),angle);
         const part=hairStyle===5?.80*Math.exp(-((angle-.41)**2)/.013)*Math.sin(t*Math.PI):0;
         const crest=mohawk?Math.exp(-((Math.abs(sin)/.34)**2)):1;
-        const gain=Math.sin(t*Math.PI*.79)*(lift*crest+wave*(mohawk?.25:.55))*(front*.27+.63);
-        const sideBoost=afro?2.2*Math.sin(t*Math.PI*.85):longHair?(1-t)*1.8*(.4+back*.8):dreads?(1-t)*1.25:0;
+        const gain=Math.sin(t*Math.PI*.79)*(lift*crest+wave*(mohawk?.25:.55))*(hairStyle===0?.24+front*1.18:front*.27+.63);
+        const sideBoost=hairStyle===3?1.3*Math.sin(t*Math.PI*.85):afro?2.2*Math.sin(t*Math.PI*.85):longHair?(1-t)*1.8*(.4+back*.8):dreads?(1-t)*1.25:0;
         const fullness=(mohawk?.08:.22)+gain*.72+sideBoost-part;
         const dropY=longHair&&t<.5?-(.5-t)*5.2*(.35+back*.9):0;
         return [p[0]+sin*fullness+swept*t*.40,p[1]+gain*.89+dropY,p[2]+cos*fullness-(longHair?back*(1-t)*1.8:0)];
       });
     });
     cover([0,1,2,3,4].map(row=>rings.map(column=>column[row])),[hairStyle===0?1.0:0,181.15+lift*(mohawk?.72:.47),mohawk?-.3:-.65],[0,171.4,-1.5]);
+    }
     if(bun){
       const cx=0,cy=179.4,cz=-8.2,rx=2.85,ry=2.55,rz=2.65,sides=10,stacks=6;
       const bRings=Array.from({length:stacks-1},(_,r)=>{
@@ -1128,7 +1146,7 @@ function classicHead(hairStyle,beardStyle){
     w:new Float32Array(weights),ix:new Uint16Array(indices),colors,regions,hairStyle,beardStyle};
 }
 
-function modelDetails(goalie,hairStyle){
+function modelDetails(goalie,hairStyle,glassesStyle){
   const vertices=[],normals=[],joints=[],weights=[],indices=[],regions=[],colors=[];
   function form(center,axes,bone,color,kind,angle=0,sides=12,rings=8){
     const base=vertices.length/3,joint=byName[bone],cs=Math.cos(angle),sn=Math.sin(angle);
@@ -1164,7 +1182,25 @@ function modelDetails(goalie,hairStyle){
       }
     }
   }
-  if(hairStyle===undefined)for(const sign of [-1,1]){
+  if(glassesStyle){
+    const frame=glassesStyle===1?[.10,.10,.13]:glassesStyle===2?[.88,.68,.24]:[.16,.58,.90];
+    const lens=glassesStyle===1?[.055,.075,.10]:glassesStyle===2?[.22,.16,.08]:[.08,.30,.49];
+    const width=glassesStyle===3?2.65:2.45,height=glassesStyle===2?1.6:1.4;
+    for(const sign of [-1,1]){
+      const cx=sign*3.65,cy=168.3,cz=11.65;
+      form([cx,cy,cz],[width-.18,height-.18,.28],'Head',lens,'Detail',0,20,10);
+      for(let i=0;i<32;i++){
+        const angle=i*Math.PI*2/32;
+        form([cx+Math.cos(angle)*width,cy+Math.sin(angle)*height,cz],
+          [.30,.26,.39],'Head',frame,'Detail',0,8,5);
+      }
+      form([sign*7.2,168.5,5.9],[.27,.28,6.0],'Head',frame,'Detail',sign*.15,10,6);
+      form([sign*8.1,168.2,-.1],[.30,.48,1.1],'Head',frame,'Detail',0,10,6);
+      form([cx-sign*.55,cy+.45,cz+.26],[.70,.12,.055],'Head',[.39,.52,.61],'Detail',0,10,5);
+    }
+    form([0,168.65,11.9],[1.48,.27,.35],'Head',frame,'Detail',0,12,6);
+  }
+  if(hairStyle===undefined&&glassesStyle===undefined)for(const sign of [-1,1]){
     const side=sign>0?'Left':'Right';
     const foot=side+'Foot',toe=side+'ToeBase';
     if(goalie){
@@ -1189,7 +1225,7 @@ function modelDetails(goalie,hairStyle){
     }
   }
   return {count:vertices.length/3,p:new Float32Array(vertices),n:new Float32Array(normals),j:new Float32Array(joints),
-    w:new Float32Array(weights),ix:new Uint16Array(indices),colors,regions,hairStyle};
+    w:new Float32Array(weights),ix:new Uint16Array(indices),colors,regions,hairStyle,glassesStyle};
 }
 
 function outwardIndices(mesh){
@@ -1211,7 +1247,8 @@ function create(goalie,shared){
   const instance={goalie,bones:rig,sole:shared?.sole??soleSamples.map(({mesh,index,bind})=>({mesh,index,position:rebindVertex(bind,mesh,index,rig)})),clip:null,time:0,mirror:false,root:[0,100,0],q:rig.map(b=>[...b.q]),world:[],palette:new Float32Array(count*16),meshes:shared?.meshes??[],key:null,blend:1};
   if(shared)return instance;
   const head=goalie?[modelDetails(true,0)]:[classicHead(),...[0,2,3,4,5,6,7,8,9,10,11].map(style=>classicHead(style)),
-    ...[1,2,3,4,5,6,7,8,9].map(style=>classicHead(undefined,style))];
+    ...[1,2,3,4,5,6,7,8,9].map(style=>classicHead(undefined,style)),
+    ...[1,2,3].map(style=>modelDetails(false,undefined,style))];
   for(const base of [...(goalie?anatomy:fieldAnatomy),kitSurface(goalie),modelDetails(goalie),...head]){
     const model={...base,p:new Float32Array(base.p),n:new Float32Array(base.n),ix:outwardIndices(base)};
     const data=new Float32Array(base.count*modelStride);
@@ -1945,7 +1982,8 @@ function draw(h,vp,eye){
   gl.uniform1f(loc.uMirrorSign,s.mirror?-1:1);
   for(const [uniform,key] of Object.entries(materialRegions))gl.uniform3fv(loc[uniform],pigment(look?.[key]));
   const meshes=s.meshes.filter(({source})=>(source.hairStyle===undefined||source.hairStyle===(look?.hair??0))
-    &&(source.beardStyle===undefined||source.beardStyle===(look?.beard??0)));
+    &&(source.beardStyle===undefined||source.beardStyle===(look?.beard??0))
+    &&(source.glassesStyle===undefined||source.glassesStyle===(look?.glasses??0)));
   if(gpu)gl.uniformMatrix4fv(loc['uB[0]'],false,s.palette);
   else for(const m of meshes){
     const src=m.source,out=m.data;
