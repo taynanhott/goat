@@ -288,6 +288,7 @@ function smoothLoopSeam(clip){
       const idx=f*clip.stride+rootOff+a;
       clip.values[idx]=lerp(clip.values[idx],r0[a],t);
     }
+    if(clip.lift)clip.lift[f]=lerp(clip.lift[f],clip.lift[0],t);
     for(let b=0;b<count;b++){
       const q0=Array.from(clip.values.subarray(b*4,b*4+4));
       const off=f*clip.stride+b*4;
@@ -298,12 +299,15 @@ function smoothLoopSeam(clip){
   // Exact frame wrap at last frame for zero seam pop
   for(let b=0;b<count;b++)clip.values.set(clip.values.subarray(b*4,b*4+4),last*clip.stride+b*4);
   for(let a=0;a<3;a++)clip.values[last*clip.stride+rootOff+a]=r0[a];
+  if(clip.lift)clip.lift[last]=clip.lift[0];
 }
 
 const seamlessLoopClips=new Set([
   'idle','jog','sprint','backward','left','right',
   'runBall','sprintBall','messiClose','dribbleSide','dribbleWide',
-  'keeperIdle','keeperIdle2','sidestep','sidestep2'
+  'keeperIdle','keeperIdle2','sidestep','sidestep2',
+  'standardWalk','sadWalk','sadIdle','jogForwardLeft','jogForwardRight','jogBackwardLeft','jogBackwardRight',
+  'crowdCheering','crowdVictory','crowdJumping'
 ]);
 
 for(const [name,clip] of Object.entries(pack.clips)){
@@ -1495,7 +1499,7 @@ for(let i=0;i<count;i++){
     const name=rig[i].name,side=actionLayer.foot?.startsWith('Left')?'Left':'Right';
     const mask=name.startsWith(side)&&/UpLeg|Leg|Foot|Toe/.test(name)?(actionLayer.legWeight??1):
       upperBodyJoints[i]?(actionLayer.upperWeight??.45):0;
-    if(mask)q=qlerp(q,shotJoint(actionClip,actionFrame,i,false),actionLayer.weight*mask);
+    if(mask)q=qlerp(q,shotJoint(actionClip,actionFrame,i,!!actionLayer.opposite),actionLayer.weight*mask);
   }
   if(bodyOffsets?.[rig[i].name]&&!editedClipKeys.has(options.clip))q=qm(q,qeuler(bodyOffsets[rig[i].name]));
   if(offset)q=qm(q,qeuler(offset));
@@ -1536,7 +1540,19 @@ if(options.pelvis){
   s.root=[pose.lateral/scale,pose.height/scale,pose.forward/scale];
   s.q[0]=qm(qeuler(pose.rotation),s.q[0]);
 }
-const soleFlex=[0,0];
+if(blendWeight<1){
+  for(let i=0;i<count;i++){
+    let fromQ=s.from[i];
+    if(inertDecay>.001&&s.inertVel)fromQ=qm(qscale(s.inertVel[i],inertDecay),fromQ);
+    s.q[i]=qlerp(fromQ,s.q[i],blendWeight);
+  }
+  s.root=s.root.map((v,idx)=>{
+    const fromVal=s.fromRoot[idx]+(inertDecay>.001&&s.inertRootVel?s.inertRootVel[idx]*inertDecay:0);
+    return options.ballistic&&idx===1?v:lerp(fromVal,v,blendWeight);
+  });
+  s.world=[];
+}
+const soleFlex=options.soleFlex?[...options.soleFlex]:[0,0];
 const clipEdited=editedClipKeys.has(options.clip);
 const ankleGoals=(clipEdited?[]:(options.ankleTargets??[])).map(target=>{
   const actionWeight=actionFrame&&target.foot===actionLayer.foot?
@@ -1649,8 +1665,9 @@ for(const contact of options.ballContacts??[]){
 }
 s.contactCorrections=contactCorrections;
 const adaptiveFeet=new Set(contactFeet.map(target=>target.foot));
-const footPlants=[...(options.footPlants||[]),...(options.footPlant?[options.footPlant]:[])].filter(target=>!adaptiveFeet.has(target.foot));
-for(let plant of [...footPlants,...contactFeet]){let side=plant.foot.startsWith('Left')?'Left':'Right',hip=byName[side+'UpLeg'],knee=byName[side+'Leg'],foot=byName[side+'Foot'],H=point(world(hip),[0,0,0]),K=point(world(knee),[0,0,0]),A=point(world(foot),[0,0,0]),toe=point(world(foot),plant.boot?bootMarkers[side==='Left'?0:1]:[0,0,9]),localTarget=[];let delta=[plant.point[0]-h.x,plant.point[1]-extraY,plant.point[2]-h.z];for(let a=0;a<3;a++)localTarget[a]=(s.model[a*4]*delta[0]+s.model[a*4+1]*delta[1]+s.model[a*4+2]*delta[2])/(scale*scale);let weight=clamp(plant.weight??1,0,1),target=A.map((v,i)=>v+(localTarget[i]-toe[i])*weight),distance=Math.hypot(...subtract(target,H)),l1=Math.hypot(...subtract(K,H)),l2=Math.hypot(...subtract(A,K)),d=clamp(distance,Math.abs(l1-l2)+.01,l1+l2-(plant.track ? .4 : .01)),axis=unit(subtract(target,H)),bend=subtract(K,H),projection=dot(bend,axis);bend=unit(bend.map((v,i)=>v-axis[i]*projection));
+const footPlants=[...(options.footPlants||[]),...(options.footPlant?[options.footPlant]:[])].filter(target=>target.priority||!adaptiveFeet.has(target.foot));
+const priorityFeet=new Set(footPlants.filter(target=>target.priority).map(target=>target.foot));
+for(let plant of [...footPlants,...contactFeet.filter(target=>!priorityFeet.has(target.foot))]){let side=plant.foot.startsWith('Left')?'Left':'Right',hip=byName[side+'UpLeg'],knee=byName[side+'Leg'],foot=byName[side+'Foot'],H=point(world(hip),[0,0,0]),K=point(world(knee),[0,0,0]),A=point(world(foot),[0,0,0]),toe=point(world(foot),plant.boot?bootMarkers[side==='Left'?0:1]:[0,0,9]),localTarget=[];let delta=[plant.point[0]-h.x,plant.point[1]-extraY,plant.point[2]-h.z];for(let a=0;a<3;a++)localTarget[a]=(s.model[a*4]*delta[0]+s.model[a*4+1]*delta[1]+s.model[a*4+2]*delta[2])/(scale*scale);let weight=clamp(plant.weight??1,0,1),target=A.map((v,i)=>v+(localTarget[i]-toe[i])*weight),distance=Math.hypot(...subtract(target,H)),l1=Math.hypot(...subtract(K,H)),l2=Math.hypot(...subtract(A,K)),d=clamp(distance,Math.abs(l1-l2)+.01,l1+l2-(plant.track ? .4 : .01)),axis=unit(subtract(target,H)),bend=subtract(K,H),projection=dot(bend,axis);bend=unit(bend.map((v,i)=>v-axis[i]*projection));
 if(plant.track){
   const old=plant.track.knee;
   const base=[0,0,1];
@@ -1667,6 +1684,14 @@ if(!instant&&h.goalie&&clip.saveKind&&!options.q){
   for(const arm of keeperArms){
     s.q[arm.middle]=limitJoint(s.q[arm.middle],arm.forearmRest,arm.forearm,2.38,.64);
     s.q[arm.end]=limitJoint(s.q[arm.end],arm.handRest,arm.hand,.80,.45);
+  }
+  s.world=[];
+}
+if(armPrevious){
+  for(const arm of keeperArms){
+    s.q[arm.upper]=limitJoint(s.q[arm.upper],armPrevious[arm.upper],arm.upperAxis,dt*44,dt*19);
+    s.q[arm.middle]=limitJoint(s.q[arm.middle],armPrevious[arm.middle],arm.forearm,dt*40,dt*18);
+    s.q[arm.end]=limitJoint(s.q[arm.end],armPrevious[arm.end],arm.hand,dt*27,dt*16);
   }
   s.world=[];
 }
@@ -1797,32 +1822,12 @@ if(!options.root&&!options.pelvis&&!options.authoredGround&&!options.airborne&&s
   }else s.floorShift=null;
   if(options.grounded||shift>0){s.root[1]+=shift;s.world=[];}
 }
-if(blendWeight<1){
-  for(let i=0;i<count;i++){
-    let fromQ=s.from[i];
-    if(inertDecay>.001&&s.inertVel)fromQ=qm(qscale(s.inertVel[i],inertDecay),fromQ);
-    s.q[i]=qlerp(fromQ,s.q[i],blendWeight);
-  }
-  s.root=s.root.map((v,idx)=>{
-    const fromVal=s.fromRoot[idx]+(inertDecay>.001&&s.inertRootVel?s.inertRootVel[idx]*inertDecay:0);
-    return options.ballistic&&idx===1?v:lerp(fromVal,v,blendWeight);
-  });
-  s.world=[];
-}
-if(armPrevious){
-  for(const arm of keeperArms){
-    s.q[arm.upper]=limitJoint(s.q[arm.upper],armPrevious[arm.upper],arm.upperAxis,dt*44,dt*19);
-    s.q[arm.middle]=limitJoint(s.q[arm.middle],armPrevious[arm.middle],arm.forearm,dt*40,dt*18);
-    s.q[arm.end]=limitJoint(s.q[arm.end],armPrevious[arm.end],arm.hand,dt*27,dt*16);
-  }
-  s.world=[];
-}
 for(let i=0;i<count;i++){let mat=mm(world(i),rig[i].inverse);s.palette.set(mat,i*16)}
 if(blendWeight<1&&!options.authoredGround&&!options.airborne&&s.sole.length){
   const guardShift=solveSoleShift();
   if(guardShift>0){s.root[1]+=guardShift;s.world=[];for(let i=0;i<count;i++)s.palette.set(mm(world(i),rig[i].inverse),i*16)}
 }
-s.qPrev=prevSnapshot;s.rootPrev=prevRootSnapshot;s.lastDt=dt;
+s.qPrev=prevSnapshot;s.rootPrev=prevRootSnapshot;s.lastDt=dt;s.soleFlex=[...soleFlex];
 let boneWorld=n=>mm(s.model,world(byName[n]));s.hands=[point(boneWorld('LeftHand'),[0,-7,0]),point(boneWorld('RightHand'),[0,-7,0])];s.chest=point(boneWorld('Spine2'),[0,0,0]);s.head=point(boneWorld('Head'),[0,8,0]);s.feet=[point(boneWorld('LeftFoot'),[0,0,9]),point(boneWorld('RightFoot'),[0,0,9])];s.knees=[point(boneWorld('LeftLeg'),[0,0,0]),point(boneWorld('RightLeg'),[0,0,0])];
 
 const hbScale=1;
@@ -2353,7 +2358,7 @@ function boneWorldPositions(h){
   }
   return out;
 }
-function snapshot(h){let s=get(h);return{clip:s.clip,time:s.time,mirror:s.mirror,extraY:s.extraY,bodyYaw:s.bodyYaw,root:[...s.root],q:s.q.map(q=>[...q])}}
+function snapshot(h){let s=get(h);return{clip:s.clip,time:s.time,mirror:s.mirror,extraY:s.extraY,bodyYaw:s.bodyYaw,root:[...s.root],soleFlex:[...(s.soleFlex??[0,0])],q:s.q.map(q=>[...q])}}
 function restore(h,data){if(!data)return;let s=get(h);s.key=null;update(h,{...data,loop:false,fade:.001},1)}
 return{update,draw,get,bodyContext:bodyResponse.setContext,bodyImpact:bodyResponse.impact,resetBody:bodyResponse.reset,useIndependentRig,snapshot,restore,shotGeometry,sphereHitsBox,dragBoneToWorld,registerBakedClip,clips:pack.clips,boneCount:count,scale,bones:fieldRig,byName,boneWorldPositions,ensureOriginal,rebuildClip,markClipEdited,commitClipDrafts,discardClipDrafts,hasUnsavedDrafts,saveEditedClips,restoreOriginal,exportEditedClips,exportOverridesScript,importEditedClips,createManualClip,deleteManualClip,editedClipKeys,crowdMesh,crowdPose,crowdBoneCount:crowdBones.length};
 };

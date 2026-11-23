@@ -180,6 +180,14 @@ function steadyDribble(position,velocity,offset,target,carry,opening,dt){
   approachRollingVelocity(velocity,limitDribbleAtEdges(outgoing,position),opening?18:12,dt);
 }
 
+function guidePassTurn(position,velocity,target,carry,dt){
+  if(position[1]>r+.035||Math.abs(velocity[1])>.25)return;
+  const offset=[target[0]-position[0],target[1]-position[2]];
+  const error=Math.hypot(...offset),gain=Math.min(11,3.2/Math.max(.001,error));
+  const outgoing=carry.map((value,i)=>value+offset[i]*gain);
+  approachRollingVelocity(velocity,limitDribbleAtEdges(outgoing,position),36,dt);
+}
+
 function rollUnderSole(position,velocity,spin,point,axis,maxPace,dt){
   const remaining=(point[0]-position[0])*axis[0]+(point[2]-position[2])*axis[1];
   const pace=clamp(remaining/.019,0,maxPace);
@@ -478,5 +486,5 @@ function passLaunch(origin,target,kind='pass',options={}){
   }
   return {velocity,spin,time};
 }
-return{config,step,sweepBoot,separateBoot,deflectBoot,freeBallBetweenBoots,brakeDribble,guideCharge,steadyDribble,rollUnderSole,receiveTouch,groundTouch,dribbleTouch,launch,passLaunch,aerialControl,bootContact,crossing,reflect,goalFrame};
+return{config,step,sweepBoot,separateBoot,deflectBoot,freeBallBetweenBoots,brakeDribble,guideCharge,steadyDribble,guidePassTurn,rollUnderSole,receiveTouch,groundTouch,dribbleTouch,launch,passLaunch,aerialControl,bootContact,crossing,reflect,goalFrame};
 };

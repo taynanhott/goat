@@ -17,7 +17,7 @@ window.createFootballMotionController = function(options) {
   const walkReference = clips.jog;
   const walkLandings = clipLandings(walkReference);
   const cyclicRefs = {};
-  for (const key of ['standardWalk', 'jog', 'sprint', 'walkingLeftTurn']) {
+  for (const key of ['standardWalk', 'jog', 'sprint', 'walkingLeftTurn', 'backward', 'jogForwardLeft', 'jogForwardRight', 'jogBackwardLeft', 'jogBackwardRight']) {
     if (clips[key]?.landmarks?.length) cyclicRefs[key] = { clip: clips[key], landings: clipLandings(clips[key]) };
   }
   function swingProfile(key) {
@@ -1450,6 +1450,19 @@ window.createFootballMotionController = function(options) {
         layers.push({ clip: tClipKey, time: tTime, weight: bw.turn * .52, opposite: walkTurn ? bw.turnSide > 0 : bw.turnSide < 0 });
       }
     }
+    const watchKeys=['jog','backward','jogForwardLeft','jogForwardRight','jogBackwardLeft','jogBackwardRight'];
+    const watch=state.watchWeights??(state.watchWeights={});
+    const relative=angle(Math.atan2(-(player.vx??0),-(player.vz??0))-bodyYaw);
+    const backward=Math.abs(relative)>Math.PI/2,diagonal=Math.abs(Math.sin(relative))>.32;
+    const watchKey=diagonal?(backward?(relative<0?'jogBackwardLeft':'jogBackwardRight'):
+      (relative<0?'jogForwardLeft':'jogForwardRight')):backward?'backward':'jog';
+    let watchWeight=0;
+    for(const key of watchKeys){
+      watch[key]=mix(watch[key]??0,player.watchBall&&pace>.18&&key===watchKey?1:0,1-Math.exp(-dt*12));
+      if(clips[key])watchWeight+=watch[key];
+    }
+    for(const layer of layers)layer.weight*=1-clamp(watchWeight,0,1);
+    for(const key of watchKeys)if(clips[key]&&watch[key]>.002)layers.push({clip:key,time:pt[key]??0,weight:watch[key]});
     if (layers.length) pose.upperBlend = layers;
     else if (walkReference) pose.upperBody = { clip: 'jog', time: state.upperTime, weight: state.upperWeight };
     const phase = activeStep ? clamp(activeStep.age / activeStep.duration, 0, 1) : 0;
@@ -1727,7 +1740,7 @@ window.createFootballMotionController = function(options) {
     if(f.age>=f.takeoff+f.duration){
       f.airborne=false;f.landed=true;
       states.delete(actor);
-      actor.contactRecovery={elapsed:0,duration:.24,side:Math.sign(f.vx)||1};
+      actor.contactRecovery={elapsed:0,duration:f.landingDuration??.24,side:Math.sign(f.vx)||1};
       actor.aerialFlight=null;
     }
   }
@@ -1748,6 +1761,7 @@ window.createFootballMotionController = function(options) {
     if(airborne&&!f.launched){
       f.launched=true;
       f.vx=actor.vx||0;f.vz=actor.vz||0;f.yaw=yaw;
+      f.landingDuration=clamp(.20+Math.hypot(f.vx,f.vz)*.025+f.vy*.018,.22,.46);
       const target=action.headerPlan?.target??action.flightTarget;
       const remaining=(contact-time)/rate;
       if(target&&remaining>.055){
@@ -1761,13 +1775,14 @@ window.createFootballMotionController = function(options) {
     if(f.launched&&!airborne&&!f.landed){
       f.landed=true;
       states.delete(actor);
-      actor.contactRecovery={elapsed:0,duration:.24,side:f.vx*Math.cos(f.yaw)-f.vz*Math.sin(f.yaw)>=0?1:-1};
+      actor.contactRecovery={elapsed:0,duration:f.landingDuration??.24,side:f.vx*Math.cos(f.yaw)-f.vz*Math.sin(f.yaw)>=0?1:-1};
     }
     f.airborne=airborne;
     const lift=airborne?Math.max(0,f.vy*airTime-.5*f.gravity*airTime*airTime):0;
     const landingAge=f.launched?Math.max(0,airTime-f.duration):Infinity;
-    const landing=f.landed?1-smooth(landingAge/.24):0;
-    f.done=(!f.launched||f.landed&&landingAge>=.24)&&time>=end;
+    const landingDuration=f.landingDuration??.24;
+    const landing=f.landed?1-smooth(landingAge/landingDuration):0;
+    f.done=(!f.launched||f.landed&&landingAge>=landingDuration)&&time>=end;
     if(f.done&&actor.aerialFlight===f)actor.aerialFlight=null;
     const pose={clip:action.clip,time,loop:false,fade:.10,bodyYaw:airborne?f.yaw:yaw,
       airborne,grounded:!airborne,extraY:lift,ballistic:true,bodyContactTime:contact,bodyStartTime:start,
@@ -1789,16 +1804,38 @@ window.createFootballMotionController = function(options) {
     return pose;
   }
 
-  function passRecovery(actor,pose,action,dt){
+  function passRecovery(actor,pose,action,dt,ball,velocity){
+    if(action.preparing){actor.touchPending=null;return {...pose,lookTarget:action.lookTarget};}
     action.age+=dt;
     const clip=clips[action.clip],strike=shotContact(action.clip);
     const duration=action.duration??.3;
     const weight=smooth(action.age/.045)*(1-smooth((action.age-duration+.14)/.14));
     if(action.age>=duration){actor.teamAction=null;return pose;}
-    const start=Math.max(0,strike.time-.065),end=Math.min(clip.duration-.001,strike.time+.18);
-    return {...pose,bodyContactTime:strike.time,bodyStartTime:start,bodyFoot:strike.foot,actionLayer:{clip:action.clip,time:mix(start,end,clamp(action.age/duration,0,1)),
-      weight,foot:strike.foot},lookTarget:action.lookTarget};
+    const start=action.clipStart??Math.max(0,strike.time-.065),end=Math.min(clip.duration-.001,strike.time+.18);
+    const impact=action.impact??duration*.4,setup=action.setup??0;
+    const time=action.pending&&action.age>=impact?strike.time:action.age<=impact?mix(start,strike.time,clamp((action.age-setup)/Math.max(.01,impact-setup),0,1)):
+      mix(strike.time,end,clamp((action.age-impact)/Math.max(.01,duration-impact),0,1));
+    const foot=action.foot??strike.foot;
+    const result={...pose,bodyContactTime:strike.time,bodyStartTime:start,bodyFoot:foot,
+      actionLayer:{clip:action.clip,time,weight,foot,opposite:!!action.opposite},lookTarget:action.lookTarget};
+    if(action.pending&&ball&&velocity){
+      const remaining=Math.max(0,impact-action.age);
+      const point=predictBall(ball,velocity,Math.min(.10,remaining));
+      result.ballContacts=[{category:'pass',limb:foot,point,
+        normal:[Math.sin(action.yaw),0,Math.cos(action.yaw)],
+        weight:smooth((action.age-impact+.065)/.05)*(1-smooth((action.age-impact-.12)/.08)),maxCorrection:.34}];
+    }
+    return result;
+  }
+  function reactionPose(key,time,{poseName,mirror=false,yaw,fade=.24}={}){
+    let clip=clips[key]??clips.idle;
+    const sad=key==='sadWalk'||key==='sadIdle';
+    if(!sad&&time>=clip.duration){
+      time-=clip.duration;key='idle';clip=clips.idle;
+    }
+    return {clip:key,poseName:poseName?poseName+'|'+key:key,time:sad||key==='idle'?time%clip.duration:Math.min(time,clip.duration),
+      loop:sad||key==='idle',grounded:true,fade,mirror:key==='idle'?false:mirror,bodyYaw:yaw};
   }
   const limits=footballPlayLimits;
-  return { skillDirection, startBallRoll, ballRollContact, move, locomotion, chestReception, defensiveWindow, advanceAir, aerialPose, passRecovery, shotContact, contactPoint, cutExit, acceptTouch, incidentalTouch, lockCharge, reset, limits };
+  return { skillDirection, startBallRoll, ballRollContact, move, locomotion, chestReception, defensiveWindow, advanceAir, aerialPose, passRecovery, reactionPose, shotContact, contactPoint, cutExit, acceptTouch, incidentalTouch, lockCharge, reset, limits };
 };

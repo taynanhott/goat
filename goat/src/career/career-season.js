@@ -223,7 +223,7 @@
   function teammatePaint(reference,look={}){
     return paint({...look,boots:1},{
       id:reference?.clubId,
-      primary:reference?.primary??'#3b69a4',secondary:reference?.secondary??'#22304e',
+      primary:reference?.primary,secondary:reference?.secondary,
       tertiary:reference?.tertiary,pattern:reference?.pattern??'solid'
     });
   }

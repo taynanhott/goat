@@ -385,3 +385,19 @@ A lista de objetivos do HUD fica no canto superior direito (logo abaixo da nota)
 Em lançamentos em profundidade e corredores livres, os companheiros dominam em movimento mantendo a embalo da corrida, conduzem em velocidade mais alta em direção ao gol e finalizam de forma mais ativa ao encontrar abertura ou saída do goleiro. As finalizações dos companheiros não sofrem penalidade da fadiga nem do atributo Chute do usuário e variam entre chutes colocados e chutes mais potentes conforme distância e contexto.
 
 Quando um companheiro recebe passe ou lançamento pelas costas, a bola ignora temporariamente a colisão dos pés para ser posicionada limpa à frente da passada, permitindo arranque imediato sem travar. Sob tentativa de desarme, o companheiro busca imediatamente passar para outro aliado livre antes de perder a bola. Defensores têm inércia na corrida e no bote em pé, podendo passar direto em cortes secos e dribles de corpo. A bola colide fisicamente com as placas de publicidade atrás do gol e com as arquibancadas de todos os estádios, e a cidade ao redor do estádio é renderizada também durante a partida.
+
+### Sincronização das animações com os contatos
+
+Passes, lançamentos e cruzamentos preparam a animação antes de liberar a bola. A saída exige contato da chuteira e orientação do corpo para o destino; perder a posse ou ultrapassar a janela de contato cancela a preparação. Passes de primeira podem antecipar o gesto pela previsão da chegada, mantendo a bola em movimento até o contato. O impedimento e a conclusão do passe recebido são avaliados no toque efetivo.
+
+As finalizações dos companheiros escolhem entre chute rápido, em corrida, forte, colocado e voleio conforme o contexto. A proximidade do corpo não substitui a colisão da chuteira. Voleios, cavadinhas e chutes com gesto próprio preservam o tronco do clipe, evitando a sobreposição geral da animação de pênalti.
+
+As transições de pose são misturadas antes das correções dos pés e mãos. A movimentação voltada para a bola mantém os apoios da locomoção e sincroniza as referências diagonais e de costas com a passada. O ball roll mantém sua transferência de apoio e saída já existentes. A recuperação dos saltos varia com a velocidade de entrada e a intensidade do salto.
+
+O goleiro mantém a sequência de levantar após cair; diante de rebote ou chute urgente, acelera a recuperação sem saltar quadros. Os defensores esperam uma pose baixa antes da transição do carrinho para levantar. Reações às faltas variam conforme o lado do contato e o embalo do jogador.
+
+Comemorações têm mais opções entre os clipes existentes e transitam para a postura neutra ao terminar. Caminhadas tristes, diagonais e animações da torcida têm emendas de ciclo suavizadas. Replays novos preservam também o estado de flexão das chuteiras; gravações antigas continuam compatíveis.
+
+Na preparação dos passes com posse, a bola continua recebendo assistência de controle enquanto o corpo se alinha. O gesto começa somente com a bola baixa e próxima da posição de contato, usando o pé mais próximo e espelhando o clipe quando necessário. A desaceleração preserva o embalo inicial e acompanha a bola; a condução do companheiro não aplica um toque concorrente durante esse preparo. Passes de primeira mantêm a previsão de interceptação e a janela de contato própria.
+
+Nos chutes de primeira, o ajuste preciso da chuteira tem prioridade sobre a correção suave de contato. O usuário atualiza o ponto de encontro pela trajetória atual da bola, com deslocamento corporal limitado; o pé de apoio não afasta a bola antes da finalização. A janela de contato permanece ativa durante a recuperação curta do gesto, inclusive em clipes rápidos. O contato continua físico e uma bola fora do alcance pode passar sem ser atingida.
